@@ -17,10 +17,16 @@ export function activate(context: vscode.ExtensionContext) {
 		// The code you place here will be executed every time your command is executed
 
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Post Box!');
+		vscode.window.showInformationMessage('Boop from Post Box!');
 	});
 
 	context.subscriptions.push(disposable);
+
+	let testDisposable = vscode.commands.registerCommand('PostBox.test', () => {
+		vscode.window.showWarningMessage("Test warning");
+	});
+
+	context.subscriptions.push(testDisposable);
 }
 
 // this method is called when your extension is deactivated
