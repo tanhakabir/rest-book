@@ -1,6 +1,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { showCallTypeQuickPick } from './commandRESTCall';
+
+export const DEBUG_MODE = true;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -21,6 +24,18 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	context.subscriptions.push(disposable);
+
+
+	let pickDisaposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
+		showCallTypeQuickPick().then(choice => {
+			vscode.window.showInformationMessage(`Starting ${choice} call.`);
+			if (DEBUG_MODE) { console.log(`activate :: command selected ${choice}`); }
+
+			console.log(`INFO :: activate :: attempting to perform ${choice} call.`);
+		});
+	});
+
+	context.subscriptions.push(pickDisaposableCommand);
 }
 
 // this method is called when your extension is deactivated
