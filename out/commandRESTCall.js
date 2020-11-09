@@ -60,6 +60,8 @@ function commandRESTCall(context) {
         }
         function validateURL(url) {
             return __awaiter(this, void 0, void 0, function* () {
+                // wait before validating
+                yield new Promise(resolve => setTimeout(resolve, 1000));
                 const protocols = ['http', 'https'];
                 try {
                     new url_1.URL(url);

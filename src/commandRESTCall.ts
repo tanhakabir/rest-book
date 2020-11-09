@@ -54,6 +54,9 @@ export async function commandRESTCall(context: ExtensionContext) {
 	}
 
 	async function validateURL(url: string) {
+		// wait before validating
+		await new Promise(resolve => setTimeout(resolve, 1000));
+
 		const protocols = ['http', 'https'];
 
 		try {
