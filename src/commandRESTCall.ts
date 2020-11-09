@@ -82,7 +82,7 @@ export async function commandRESTCall(context: ExtensionContext) {
 	}
 
 	const state = await collectInputs();
-	window.showInformationMessage(`Attempting to preform ${state.callType === 'string' ? 
+	window.showInformationMessage(`Attempting to perform ${state.callType === 'string' ? 
 															state.callType : 
 															(state.callType as QuickPickItem).label} 
 														call to ${state.url}`);

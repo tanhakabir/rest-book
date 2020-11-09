@@ -88,7 +88,7 @@ function commandRESTCall(context) {
             });
         }
         const state = yield collectInputs();
-        vscode_1.window.showInformationMessage(`Attempting to preform ${state.callType === 'string' ?
+        vscode_1.window.showInformationMessage(`Attempting to perform ${state.callType === 'string' ?
             state.callType :
             state.callType.label} 
 														call to ${state.url}`);
