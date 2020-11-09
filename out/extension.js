@@ -6,6 +6,7 @@ exports.deactivate = exports.activate = exports.DEBUG_MODE = void 0;
 const vscode = require("vscode");
 const commandRESTCall_1 = require("./commandRESTCall");
 exports.DEBUG_MODE = false;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {

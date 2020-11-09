@@ -20,11 +20,10 @@ export function activate(context: vscode.ExtensionContext) {
 		// The code you place here will be executed every time your command is executed
 
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Post Box!');
+		vscode.window.showInformationMessage('Boop from Post Box!');
 	});
 
 	context.subscriptions.push(disposable);
-
 
 	let pickDisaposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
 		commandRESTCall(context).then(choice => {
