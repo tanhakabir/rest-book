@@ -1,9 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
+exports.deactivate = exports.activate = exports.DEBUG_MODE = void 0;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
+const commandRESTCall_1 = require("./commandRESTCall");
+exports.DEBUG_MODE = false;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -16,13 +19,18 @@ function activate(context) {
     let disposable = vscode.commands.registerCommand('PostBox.helloWorld', () => {
         // The code you place here will be executed every time your command is executed
         // Display a message box to the user
-        vscode.window.showInformationMessage('Boop from Post Box!');
+        vscode.window.showInformationMessage('Hello World from Post Box!');
     });
     context.subscriptions.push(disposable);
-    let testDisposable = vscode.commands.registerCommand('PostBox.test', () => {
-        vscode.window.showWarningMessage("Test warning");
+    let pickDisaposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
+        commandRESTCall_1.commandRESTCall(context).then(choice => {
+            if (exports.DEBUG_MODE) {
+                console.log(`activate :: command selected ${choice.callType}`);
+            }
+            console.log(`INFO :: activate :: attempting to perform ${choice.callType} call.`);
+        });
     });
-    context.subscriptions.push(testDisposable);
+    context.subscriptions.push(pickDisaposableCommand);
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated
