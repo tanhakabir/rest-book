@@ -10,16 +10,11 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:PostBox.helloWorld",
     "onCommand:PostBox.commandRestCall"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
-      {
-        "command": "PostBox.helloWorld",
-        "title": "Hello World"
-      },
       {
         "command": "PostBox.commandRestCall",
         "title": "REST Call"

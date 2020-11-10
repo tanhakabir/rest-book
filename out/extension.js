@@ -6,7 +6,6 @@ exports.deactivate = exports.activate = exports.DEBUG_MODE = void 0;
 const vscode = require("vscode");
 const commandRESTCall_1 = require("./commandRESTCall");
 exports.DEBUG_MODE = false;
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -16,13 +15,8 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('PostBox.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World from Post Box!');
-    });
-    context.subscriptions.push(disposable);
     let pickDisaposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
+        // The code you place here will be executed every time your command is executed
         commandRESTCall_1.commandRESTCall(context).then(choice => {
             if (exports.DEBUG_MODE) {
                 console.log(`activate :: command selected ${choice.callType}`);
