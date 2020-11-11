@@ -15,7 +15,7 @@ function activate(context) {
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
     // The commandId parameter must match the command field in package.json
-    let pickDisaposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
+    let pickDisposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
         // The code you place here will be executed every time your command is executed
         commandRESTCall_1.commandRESTCall(context).then(choice => {
             if (exports.DEBUG_MODE) {
@@ -24,7 +24,7 @@ function activate(context) {
             console.log(`INFO :: activate :: attempting to perform ${choice.callType} call.`);
         });
     });
-    context.subscriptions.push(pickDisaposableCommand);
+    context.subscriptions.push(pickDisposableCommand);
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated

@@ -6,18 +6,31 @@
   "engines": {
     "vscode": "^1.50.0"
   },
+  "enableProposedApi": true,
   "categories": [
     "Other"
   ],
   "activationEvents": [
-    "onCommand:PostBox.commandRestCall"
+    "onCommand:PostBox.commandRestCall",
+    "onNotebook:PostBox.restNotebook"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "PostBox.commandRestCall",
-        "title": "REST Call"
+        "title": "PostBox: REST Call"
+      }
+    ],
+    "notebookProvider": [
+      {
+        "viewType": "PostBox.restNotebook",
+        "displayName": "PostBox: REST Calls",
+        "selector": [
+          {
+            "filenamePattern": "*.postbox"
+          }
+        ]
       }
     ]
   },
@@ -36,12 +49,13 @@
     "@types/vscode": "^1.50.0",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
+    "axios": "^0.21.0",
     "eslint": "^7.9.0",
     "glob": "^7.1.6",
     "mocha": "^8.1.3",
     "typescript": "^4.0.2",
-    "vscode-test": "^1.4.0",
-    "axios": "^0.21.0"
+    "vscode-dts": "^0.3.1",
+    "vscode-test": "^1.4.0"
   },
   "dependencies": {
     "axios": "^0.21.0"
