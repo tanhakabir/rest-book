@@ -8,6 +8,13 @@ interface RawCell {
 }
 
 export class CallsNotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernel {
+    id?: string | undefined;
+    label: string = 'PostBox: REST Calls';
+    description?: string | undefined;
+    detail?: string | undefined;
+    isPreferred?: boolean | undefined;
+    preloads?: vscode.Uri[] | undefined;
+
     options?: vscode.NotebookDocumentContentOptions | undefined;
     onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
 
@@ -21,7 +28,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 
 	}
     
-    async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): vscode.NotebookData | Promise<vscode.NotebookData> {
+    async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
         let actualUri = openContext.backupId ? vscode.Uri.parse(openContext.backupId) : uri;
 		let contents = '';
 		try {
@@ -55,35 +62,50 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         return notebookData;
     }
 
-    resolveNotebook(document: vscode.NotebookDocument, webview: vscode.NotebookCommunication): Promise<void> {
-        throw new Error('Method not implemented.');
+    async resolveNotebook(document: vscode.NotebookDocument, webview: vscode.NotebookCommunication): Promise<void> {
+        // TODO figure out what this method is for
     }
     saveNotebook(document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-        throw new Error('Method not implemented.');
+        return this._save(document, document.uri);
     }
     saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
-        throw new Error('Method not implemented.');
+        return this._save(document, targetResource);
     }
-    backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
-        throw new Error('Method not implemented.');
+
+    async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri): Promise<void> {
+        let contents: RawCell[] = [];
+
+        document.cells.map(cell => {
+            contents.push({
+				kind: cell.cellKind,
+				language: cell.language,
+				value: cell.document.getText(),
+				editable: cell.metadata.editable
+			});
+        });
+
+		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));
+	}
+
+    async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
+        await this._save(document, context.destination);
+		return {
+			id: context.destination.toString(),
+			delete: () => vscode.workspace.fs.delete(context.destination)
+		};
     }
-    id?: string | undefined;
-    label: string = 'PostBox: REST Calls';
-    description?: string | undefined;
-    detail?: string | undefined;
-    isPreferred?: boolean | undefined;
-    preloads?: vscode.Uri[] | undefined;
+    
     executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     cancelCellExecution(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     executeAllCells(document: vscode.NotebookDocument): void {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     cancelAllCellsExecution(document: vscode.NotebookDocument): void {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     
 }

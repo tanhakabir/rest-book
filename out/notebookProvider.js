@@ -13,10 +13,10 @@ exports.CallsNotebookProvider = void 0;
 const vscode = require("vscode");
 class CallsNotebookProvider {
     constructor() {
+        this.label = 'PostBox: REST Calls';
         this._onDidChangeNotebook = new vscode.EventEmitter();
         this.onDidChangeNotebook = this._onDidChangeNotebook.event;
         this._localDisposables = [];
-        this.label = 'PostBox: REST Calls';
     }
     openNotebook(uri, openContext) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -56,28 +56,50 @@ class CallsNotebookProvider {
         });
     }
     resolveNotebook(document, webview) {
-        throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO figure out what this method is for
+        });
     }
     saveNotebook(document, cancellation) {
-        throw new Error('Method not implemented.');
+        return this._save(document, document.uri);
     }
     saveNotebookAs(targetResource, document, cancellation) {
-        throw new Error('Method not implemented.');
+        return this._save(document, targetResource);
+    }
+    _save(document, targetResource) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let contents = [];
+            document.cells.map(cell => {
+                contents.push({
+                    kind: cell.cellKind,
+                    language: cell.language,
+                    value: cell.document.getText(),
+                    editable: cell.metadata.editable
+                });
+            });
+            yield vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));
+        });
     }
     backupNotebook(document, context, cancellation) {
-        throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._save(document, context.destination);
+            return {
+                id: context.destination.toString(),
+                delete: () => vscode.workspace.fs.delete(context.destination)
+            };
+        });
     }
     executeCell(document, cell) {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     cancelCellExecution(document, cell) {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     executeAllCells(document) {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
     cancelAllCellsExecution(document) {
-        throw new Error('Method not implemented.');
+        //throw new Error('Method not implemented.');
     }
 }
 exports.CallsNotebookProvider = CallsNotebookProvider;
