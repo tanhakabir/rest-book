@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { commandRESTCall } from './commandRESTCall';
+import { CallsNotebookProvider } from './notebookProvider';
 
 export const DEBUG_MODE = false;
 
@@ -29,6 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(pickDisposableCommand);
 
 
+	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PostBox.restNotebook', new CallsNotebookProvider()))
 }
 
 // this method is called when your extension is deactivated

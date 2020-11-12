@@ -1,15 +1,60 @@
 import * as vscode from 'vscode';
 
+interface RawCell {
+	language: string;
+	value: string;
+	kind: vscode.CellKind;
+	editable?: boolean;
+}
+
 export class CallsNotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernel {
     options?: vscode.NotebookDocumentContentOptions | undefined;
     onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
-    
+
     private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
     onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
+
+
+    private _localDisposables: vscode.Disposable[] = [];
+
+    constructor() {
+
+	}
     
-    openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): vscode.NotebookData | Promise<vscode.NotebookData> {
-        throw new Error('Method not implemented.');
+    async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): vscode.NotebookData | Promise<vscode.NotebookData> {
+        let actualUri = openContext.backupId ? vscode.Uri.parse(openContext.backupId) : uri;
+		let contents = '';
+		try {
+			contents = Buffer.from(await vscode.workspace.fs.readFile(actualUri)).toString('utf8');
+		} catch {
+        }
+        
+        let raw: RawCell[];
+        try {
+            raw = <RawCell[]>JSON.parse(contents);
+        } catch {
+            raw = [];
+        }
+
+        const notebookData: vscode.NotebookData = {
+            languages: ['javascript'],
+            metadata: {
+                cellEditable: true,
+                cellRunnable: true,
+                cellHasExecutionOrder: true
+            },
+            cells: raw.map(item => ({
+                source: item.value,
+                language: item.language,
+                cellKind: item.kind,
+                outputs: [],
+                metadata: { editable: item.editable ?? true, runnable: true }
+            }))
+        };
+
+        return notebookData;
     }
+
     resolveNotebook(document: vscode.NotebookDocument, webview: vscode.NotebookCommunication): Promise<void> {
         throw new Error('Method not implemented.');
     }

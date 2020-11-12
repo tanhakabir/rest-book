@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
 const vscode = require("vscode");
@@ -6,10 +15,45 @@ class CallsNotebookProvider {
     constructor() {
         this._onDidChangeNotebook = new vscode.EventEmitter();
         this.onDidChangeNotebook = this._onDidChangeNotebook.event;
+        this._localDisposables = [];
         this.label = 'PostBox: REST Calls';
     }
     openNotebook(uri, openContext) {
-        throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            let actualUri = openContext.backupId ? vscode.Uri.parse(openContext.backupId) : uri;
+            let contents = '';
+            try {
+                contents = Buffer.from(yield vscode.workspace.fs.readFile(actualUri)).toString('utf8');
+            }
+            catch (_a) {
+            }
+            let raw;
+            try {
+                raw = JSON.parse(contents);
+            }
+            catch (_b) {
+                raw = [];
+            }
+            const notebookData = {
+                languages: ['javascript'],
+                metadata: {
+                    cellEditable: true,
+                    cellRunnable: true,
+                    cellHasExecutionOrder: true
+                },
+                cells: raw.map(item => {
+                    var _a;
+                    return ({
+                        source: item.value,
+                        language: item.language,
+                        cellKind: item.kind,
+                        outputs: [],
+                        metadata: { editable: (_a = item.editable) !== null && _a !== void 0 ? _a : true, runnable: true }
+                    });
+                })
+            };
+            return notebookData;
+        });
     }
     resolveNotebook(document, webview) {
         throw new Error('Method not implemented.');

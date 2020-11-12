@@ -5,6 +5,7 @@ exports.deactivate = exports.activate = exports.DEBUG_MODE = void 0;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
 const commandRESTCall_1 = require("./commandRESTCall");
+const notebookProvider_1 = require("./notebookProvider");
 exports.DEBUG_MODE = false;
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -25,6 +26,7 @@ function activate(context) {
         });
     });
     context.subscriptions.push(pickDisposableCommand);
+    context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PostBox.restNotebook', new notebookProvider_1.CallsNotebookProvider()));
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated
