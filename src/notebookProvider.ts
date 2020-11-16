@@ -1,3 +1,7 @@
+import { spawn } from 'child_process';
+import { createCipher } from 'crypto';
+import { dirname } from 'path';
+import * as userHome from 'user-home';
 import * as vscode from 'vscode';
 
 interface RawCell {
@@ -25,7 +29,13 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
     private _localDisposables: vscode.Disposable[] = [];
 
     constructor() {
-
+        vscode.notebook.registerNotebookKernelProvider({
+			viewType: 'PostBox.restNotebook',
+		}, {
+			provideKernels: () => {
+				return [this];
+			}
+		});
 	}
     
     async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
@@ -75,14 +85,14 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
     async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri): Promise<void> {
         let contents: RawCell[] = [];
 
-        document.cells.map(cell => {
+        for(const cell of document.cells) {
             contents.push({
 				kind: cell.cellKind,
 				language: cell.language,
 				value: cell.document.getText(),
 				editable: cell.metadata.editable
 			});
-        });
+        }
 
 		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));
 	}
@@ -95,14 +105,76 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 		};
     }
     
-    executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
-        //throw new Error('Method not implemented.');
+    async executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell): Promise<void> {
+        try {
+            cell.metadata.runState = vscode.NotebookCellRunState.Running;
+            const start = +new Date();
+            cell.metadata.runStartTime = start;
+            cell.outputs = [];
+            const logger = (s: string) => {
+                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Text, text: s }];
+            };
+            await this._performExecution(cell.document.getText(), cell, document, logger);
+            cell.metadata.runState = vscode.NotebookCellRunState.Success;
+            cell.metadata.lastRunDuration = +new Date() - start;
+        } catch (e) {
+            cell.outputs = [...cell.outputs,
+                {
+                  outputKind: vscode.CellOutputKind.Error,
+                  ename: e.name,
+                  evalue: e.message,
+                  traceback: [e.stack],
+                },
+            ];
+            cell.metadata.runState = vscode.NotebookCellRunState.Error;
+            cell.metadata.lastRunDuration = undefined;
+        }
+        
     }
+
+    async _performExecution( code: string, 
+                             cell: vscode.NotebookCell, 
+                             document: vscode.NotebookDocument, 
+                             logger: (s: string) => void): 
+                             Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined> {
+
+        return new Promise((resolve, reject) => {
+            const command = [
+                'node',
+                ['-e', `(async () => { ${code} } )()`]
+            ];
+    
+            const cwd = document.uri.scheme === 'untitled'
+                ? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? userHome : dirname(document.uri.path);
+            console.log(cwd);
+
+            const execution = spawn(...command, { cwd });
+
+            execution.on('error', (err) => {
+                reject(err);
+            });
+        
+            execution.stdout.on('data', (data: Buffer) => {
+                logger(data.toString());
+            });
+        
+            execution.stderr.on('data', (data: Buffer) => {
+                logger(data.toString());
+            });
+        
+            execution.on('close', () => {
+                resolve(undefined);
+            });
+        });
+    }
+
     cancelCellExecution(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
         //throw new Error('Method not implemented.');
     }
-    executeAllCells(document: vscode.NotebookDocument): void {
-        //throw new Error('Method not implemented.');
+    async executeAllCells(document: vscode.NotebookDocument): Promise<void> {
+        for (const cell of document.cells) {
+            await this.executeCell(document, cell);
+        }
     }
     cancelAllCellsExecution(document: vscode.NotebookDocument): void {
         //throw new Error('Method not implemented.');

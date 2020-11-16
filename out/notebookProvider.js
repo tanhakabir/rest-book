@@ -10,6 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
+const child_process_1 = require("child_process");
+const path_1 = require("path");
+const userHome = require("user-home");
 const vscode = require("vscode");
 class CallsNotebookProvider {
     constructor() {
@@ -17,6 +20,13 @@ class CallsNotebookProvider {
         this._onDidChangeNotebook = new vscode.EventEmitter();
         this.onDidChangeNotebook = this._onDidChangeNotebook.event;
         this._localDisposables = [];
+        vscode.notebook.registerNotebookKernelProvider({
+            viewType: 'PostBox.restNotebook',
+        }, {
+            provideKernels: () => {
+                return [this];
+            }
+        });
     }
     openNotebook(uri, openContext) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -69,14 +79,14 @@ class CallsNotebookProvider {
     _save(document, targetResource) {
         return __awaiter(this, void 0, void 0, function* () {
             let contents = [];
-            document.cells.map(cell => {
+            for (const cell of document.cells) {
                 contents.push({
                     kind: cell.cellKind,
                     language: cell.language,
                     value: cell.document.getText(),
                     editable: cell.metadata.editable
                 });
-            });
+            }
             yield vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));
         });
     }
@@ -90,13 +100,69 @@ class CallsNotebookProvider {
         });
     }
     executeCell(document, cell) {
-        //throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                cell.metadata.runState = vscode.NotebookCellRunState.Running;
+                const start = +new Date();
+                cell.metadata.runStartTime = start;
+                cell.outputs = [];
+                const logger = (s) => {
+                    cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Text, text: s }];
+                };
+                yield this._performExecution(cell.document.getText(), cell, document, logger);
+                cell.metadata.runState = vscode.NotebookCellRunState.Success;
+                cell.metadata.lastRunDuration = +new Date() - start;
+            }
+            catch (e) {
+                cell.outputs = [...cell.outputs,
+                    {
+                        outputKind: vscode.CellOutputKind.Error,
+                        ename: e.name,
+                        evalue: e.message,
+                        traceback: [e.stack],
+                    },
+                ];
+                cell.metadata.runState = vscode.NotebookCellRunState.Error;
+                cell.metadata.lastRunDuration = undefined;
+            }
+        });
+    }
+    _performExecution(code, cell, document, logger) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                var _a, _b, _c;
+                const command = [
+                    'node',
+                    ['-e', `(async () => { ${code} } )()`]
+                ];
+                const cwd = document.uri.scheme === 'untitled'
+                    ? (_c = (_b = (_a = vscode.workspace.workspaceFolders) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.uri.fsPath) !== null && _c !== void 0 ? _c : userHome : path_1.dirname(document.uri.path);
+                console.log(cwd);
+                const execution = child_process_1.spawn(...command, { cwd });
+                execution.on('error', (err) => {
+                    reject(err);
+                });
+                execution.stdout.on('data', (data) => {
+                    logger(data.toString());
+                });
+                execution.stderr.on('data', (data) => {
+                    logger(data.toString());
+                });
+                execution.on('close', () => {
+                    resolve(undefined);
+                });
+            });
+        });
     }
     cancelCellExecution(document, cell) {
         //throw new Error('Method not implemented.');
     }
     executeAllCells(document) {
-        //throw new Error('Method not implemented.');
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const cell of document.cells) {
+                yield this.executeCell(document, cell);
+            }
+        });
     }
     cancelAllCellsExecution(document) {
         //throw new Error('Method not implemented.');
