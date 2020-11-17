@@ -11,8 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commandRESTCall = void 0;
 const vscode_1 = require("vscode");
-const url_1 = require("url");
-const extension_1 = require("./extension");
+const common_1 = require("./common");
 const multiStepInput_1 = require("./multiStepInput");
 const axios = require('axios').default;
 function commandRESTCall(context) {
@@ -39,7 +38,7 @@ function commandRESTCall(context) {
                     shouldResume: shouldResume
                 });
                 state.callType = pick;
-                if (extension_1.DEBUG_MODE) {
+                if (common_1.DEBUG_MODE) {
                     console.log(`pickRESTCallType :: call type chosen ${pick.label}`);
                 }
                 return (input) => inputURL(input, state);
@@ -53,32 +52,16 @@ function commandRESTCall(context) {
                     totalSteps: 3,
                     value: state.url || '',
                     prompt: 'Enter the endpoint location as: https://endpoint.com',
-                    validate: validateURL,
+                    validate: _validateURL,
                     shouldResume: shouldResume
                 });
             });
         }
-        function validateURL(url) {
+        function _validateURL(url) {
             return __awaiter(this, void 0, void 0, function* () {
                 // wait before validating
                 yield new Promise(resolve => setTimeout(resolve, 1000));
-                const protocols = ['http', 'https'];
-                try {
-                    new url_1.URL(url);
-                    const parsed = url_1.parse(url);
-                    if (extension_1.DEBUG_MODE) {
-                        console.log(parsed.protocol);
-                    }
-                    return protocols
-                        ? parsed.protocol
-                            ? protocols.map(x => `${x.toLowerCase()}:`).includes(parsed.protocol)
-                                ? undefined : 'Not a valid HTTP/HTTPS URL.'
-                            : 'Not a valid HTTP/HTTPS URL.'
-                        : undefined;
-                }
-                catch (err) {
-                    return 'Not a valid HTTP/HTTPS URL.';
-                }
+                return common_1.validateURL(url) ? undefined : 'Not a valid HTTP/HTTPS URL.';
             });
         }
         function shouldResume() {
