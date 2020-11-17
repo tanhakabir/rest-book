@@ -10,6 +10,8 @@ interface RawCell {
 	editable?: boolean;
 }
 
+type CancellationToken = { onCancellationRequested?: () => void };
+
 export class CallsNotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernel {
     id?: string | undefined;
     label: string = 'PostBox: REST Calls';
@@ -24,8 +26,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
     private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
     onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
 
-
-    private _localDisposables: vscode.Disposable[] = [];
+    private cancellations = new Map<vscode.NotebookCell, CancellationToken>();
 
     constructor() {
         vscode.notebook.registerNotebookKernelProvider({
@@ -113,7 +114,9 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             const logger = (d: any) => {
                 cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new Response(d).parse() }];
             };
-            await this._performExecution(cell, document, logger);
+            const token: CancellationToken = { onCancellationRequested: undefined };
+            this.cancellations.set(cell, token);
+            await this._performExecution(cell, document, logger, token);
             cell.metadata.runState = vscode.NotebookCellRunState.Success;
             cell.metadata.lastRunDuration = +new Date() - start;
         } catch (e) {
@@ -133,16 +136,25 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 
     async _performExecution( cell: vscode.NotebookCell, 
                              document: vscode.NotebookDocument, 
-                             logger: (s: string) => void): 
+                             logger: (s: string) => void,
+                             token: CancellationToken): 
                              Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined> {
         const query = cell.document.getText();
+        const cancelTokenAxios = axios.CancelToken.source();
 
         if (!validateURL(query)) {
             return Promise.reject('Not a valid URL.');
         }
 
         try {
-            let response = await axios.get(query);
+            let response = await axios.get(query, {
+                cancelToken: cancelTokenAxios.token
+            });
+
+            token.onCancellationRequested = () => {
+                cancelTokenAxios.cancel();
+            };
+
             logger(response);
         } catch (exception) {
             logger(exception);
@@ -150,7 +162,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
     }
 
     cancelCellExecution(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
-        //throw new Error('Method not implemented.');
+        this.cancellations.get(cell)?.onCancellationRequested?.();
     }
     async executeAllCells(document: vscode.NotebookDocument): Promise<void> {
         for (const cell of document.cells) {
@@ -158,7 +170,9 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         }
     }
     cancelAllCellsExecution(document: vscode.NotebookDocument): void {
-        //throw new Error('Method not implemented.');
+        for (const cell of document.cells) {
+            this.cancellations.get(cell)?.onCancellationRequested?.();
+        }
     }
     
 }

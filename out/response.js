@@ -1,9 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Response = void 0;
+const common_1 = require("./common");
 class Response {
     constructor(response) {
-        console.log(response);
+        if (common_1.DEBUG_MODE) {
+            console.log(response);
+        }
         try {
             this.status = response.status;
             this.statusText = response.statusText;

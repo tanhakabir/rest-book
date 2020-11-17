@@ -19,7 +19,7 @@ class CallsNotebookProvider {
         this.label = 'PostBox: REST Calls';
         this._onDidChangeNotebook = new vscode.EventEmitter();
         this.onDidChangeNotebook = this._onDidChangeNotebook.event;
-        this._localDisposables = [];
+        this.cancellations = new Map();
         vscode.notebook.registerNotebookKernelProvider({
             viewType: 'PostBox.restNotebook',
         }, {
@@ -109,7 +109,9 @@ class CallsNotebookProvider {
                 const logger = (d) => {
                     cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new response_1.Response(d).parse() }];
                 };
-                yield this._performExecution(cell, document, logger);
+                const token = { onCancellationRequested: undefined };
+                this.cancellations.set(cell, token);
+                yield this._performExecution(cell, document, logger, token);
                 cell.metadata.runState = vscode.NotebookCellRunState.Success;
                 cell.metadata.lastRunDuration = +new Date() - start;
             }
@@ -127,14 +129,20 @@ class CallsNotebookProvider {
             }
         });
     }
-    _performExecution(cell, document, logger) {
+    _performExecution(cell, document, logger, token) {
         return __awaiter(this, void 0, void 0, function* () {
             const query = cell.document.getText();
+            const cancelTokenAxios = axios.CancelToken.source();
             if (!common_1.validateURL(query)) {
                 return Promise.reject('Not a valid URL.');
             }
             try {
-                let response = yield axios.get(query);
+                let response = yield axios.get(query, {
+                    cancelToken: cancelTokenAxios.token
+                });
+                token.onCancellationRequested = () => {
+                    cancelTokenAxios.cancel();
+                };
                 logger(response);
             }
             catch (exception) {
@@ -143,7 +151,8 @@ class CallsNotebookProvider {
         });
     }
     cancelCellExecution(document, cell) {
-        //throw new Error('Method not implemented.');
+        var _a, _b;
+        (_b = (_a = this.cancellations.get(cell)) === null || _a === void 0 ? void 0 : _a.onCancellationRequested) === null || _b === void 0 ? void 0 : _b.call(_a);
     }
     executeAllCells(document) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -153,7 +162,10 @@ class CallsNotebookProvider {
         });
     }
     cancelAllCellsExecution(document) {
-        //throw new Error('Method not implemented.');
+        var _a, _b;
+        for (const cell of document.cells) {
+            (_b = (_a = this.cancellations.get(cell)) === null || _a === void 0 ? void 0 : _a.onCancellationRequested) === null || _b === void 0 ? void 0 : _b.call(_a);
+        }
     }
 }
 exports.CallsNotebookProvider = CallsNotebookProvider;

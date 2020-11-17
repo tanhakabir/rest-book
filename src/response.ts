@@ -1,3 +1,5 @@
+import { DEBUG_MODE } from './common';
+
 export class Response {
     private status: number| undefined;
     private statusText: string | undefined;
@@ -7,7 +9,7 @@ export class Response {
     private data: any | undefined;
 
     constructor(response: any) {
-        console.log(response);
+        if (DEBUG_MODE) { console.log(response); }
 
         try {
             this.status = response.status;
