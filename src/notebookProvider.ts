@@ -1,8 +1,6 @@
-import { spawn } from 'child_process';
-import { createCipher } from 'crypto';
-import { dirname } from 'path';
-import * as userHome from 'user-home';
+import { DEBUG_MODE, validateURL } from './common';
 import * as vscode from 'vscode';
+const axios = require('axios').default;
 
 interface RawCell {
 	language: string;
@@ -54,11 +52,11 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         }
 
         const notebookData: vscode.NotebookData = {
-            languages: ['javascript'],
+            languages: ['PostBox'],
             metadata: {
-                cellEditable: true,
                 cellRunnable: true,
-                cellHasExecutionOrder: true
+                cellHasExecutionOrder: true,
+                displayOrder: ['x-application/PostBox', 'application/json', 'text/markdown']
             },
             cells: raw.map(item => ({
                 source: item.value,
@@ -111,10 +109,37 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             const start = +new Date();
             cell.metadata.runStartTime = start;
             cell.outputs = [];
-            const logger = (s: string) => {
-                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Text, text: s }];
+            const logger = (d: any) => {
+                console.log(d);
+
+                let display = {
+                    "application/json": {
+                        status: d.status,
+                        statusText: d.statusText,
+                        headers: {
+                            date: d.headers.date,
+                            expires: d.headers.expires,
+                            "cache-control": d.headers["cache-control"],
+                            "content-type": d.headers["content-type"],
+                            p3p: d.headers.p3p,
+                            server: d.headers.server,
+                            "x-xss-protection": d.headers["x-xss-protection"],
+                            "x-frame-options": d.headers["x-frame-option"],
+                            "set-cookie": d.headers["set-cookie"],
+                            connection: d.headers.connection,
+                            "transfer-encoding": d.headers["transfer-encoding"]
+                        },
+                        data: d.data
+                    }
+                };
+
+                try {
+                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: display }];
+                } catch (err) {
+                    console.log(err);
+                }
             };
-            await this._performExecution(cell.document.getText(), cell, document, logger);
+            await this._performExecution(cell, document, logger);
             cell.metadata.runState = vscode.NotebookCellRunState.Success;
             cell.metadata.lastRunDuration = +new Date() - start;
         } catch (e) {
@@ -132,40 +157,22 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         
     }
 
-    async _performExecution( code: string, 
-                             cell: vscode.NotebookCell, 
+    async _performExecution( cell: vscode.NotebookCell, 
                              document: vscode.NotebookDocument, 
                              logger: (s: string) => void): 
                              Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined> {
+        const query = cell.document.getText();
 
-        return new Promise((resolve, reject) => {
-            const command = [
-                'node',
-                ['-e', `(async () => { ${code} } )()`]
-            ];
-    
-            const cwd = document.uri.scheme === 'untitled'
-                ? vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? userHome : dirname(document.uri.path);
-            console.log(cwd);
+        if (!validateURL(query)) {
+            return Promise.reject('Not a valid URL.');
+        }
 
-            const execution = spawn(...command, { cwd });
-
-            execution.on('error', (err) => {
-                reject(err);
-            });
-        
-            execution.stdout.on('data', (data: Buffer) => {
-                logger(data.toString());
-            });
-        
-            execution.stderr.on('data', (data: Buffer) => {
-                logger(data.toString());
-            });
-        
-            execution.on('close', () => {
-                resolve(undefined);
-            });
-        });
+        try {
+            let response = await axios.get(query);
+            logger(response);
+        } catch (exception) {
+            logger(exception);
+        }
     }
 
     cancelCellExecution(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {

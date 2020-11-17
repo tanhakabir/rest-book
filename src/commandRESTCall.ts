@@ -1,6 +1,6 @@
 import { QuickPickItem, window, Disposable, CancellationToken, QuickInputButton, QuickInput, ExtensionContext, QuickInputButtons, Uri, Event } from 'vscode';
 import { URL, parse } from 'url';
-import { DEBUG_MODE } from './extension';
+import { DEBUG_MODE, validateURL } from './common';
 import { MultiStepInput } from './multiStepInput';
 const axios = require('axios').default;
 
@@ -48,30 +48,16 @@ export async function commandRESTCall(context: ExtensionContext) {
 			totalSteps: 3,
 			value: state.url || '',
 			prompt: 'Enter the endpoint location as: https://endpoint.com',
-			validate: validateURL,
+			validate: _validateURL,
 			shouldResume: shouldResume
 		});
 	}
 
-	async function validateURL(url: string) {
+	async function _validateURL(url: string) {
 		// wait before validating
 		await new Promise(resolve => setTimeout(resolve, 1000));
 
-		const protocols = ['http', 'https'];
-
-		try {
-			new URL(url);
-			const parsed = parse(url);
-			if (DEBUG_MODE) { console.log(parsed.protocol); }
-			return protocols
-				? parsed.protocol
-					? protocols.map(x => `${x.toLowerCase()}:`).includes(parsed.protocol) 
-						? undefined : 'Not a valid HTTP/HTTPS URL.'
-					: 'Not a valid HTTP/HTTPS URL.'
-				: undefined;
-		} catch (err) {
-			return 'Not a valid HTTP/HTTPS URL.';
-		}
+		return validateURL(url) ? undefined : 'Not a valid HTTP/HTTPS URL.';
 	}
 
 	function shouldResume() {

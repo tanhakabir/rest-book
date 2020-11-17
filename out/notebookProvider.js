@@ -10,10 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
-const child_process_1 = require("child_process");
-const path_1 = require("path");
-const userHome = require("user-home");
+const common_1 = require("./common");
 const vscode = require("vscode");
+const axios = require('axios').default;
 class CallsNotebookProvider {
     constructor() {
         this.label = 'PostBox: REST Calls';
@@ -45,11 +44,11 @@ class CallsNotebookProvider {
                 raw = [];
             }
             const notebookData = {
-                languages: ['javascript'],
+                languages: ['PostBox'],
                 metadata: {
-                    cellEditable: true,
                     cellRunnable: true,
-                    cellHasExecutionOrder: true
+                    cellHasExecutionOrder: true,
+                    displayOrder: ['x-application/PostBox', 'application/json', 'text/markdown']
                 },
                 cells: raw.map(item => {
                     var _a;
@@ -106,10 +105,36 @@ class CallsNotebookProvider {
                 const start = +new Date();
                 cell.metadata.runStartTime = start;
                 cell.outputs = [];
-                const logger = (s) => {
-                    cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Text, text: s }];
+                const logger = (d) => {
+                    console.log(d);
+                    let display = {
+                        "application/json": {
+                            status: d.status,
+                            statusText: d.statusText,
+                            headers: {
+                                date: d.headers.date,
+                                expires: d.headers.expires,
+                                "cache-control": d.headers["cache-control"],
+                                "content-type": d.headers["content-type"],
+                                p3p: d.headers.p3p,
+                                server: d.headers.server,
+                                "x-xss-protection": d.headers["x-xss-protection"],
+                                "x-frame-options": d.headers["x-frame-option"],
+                                "set-cookie": d.headers["set-cookie"],
+                                connection: d.headers.connection,
+                                "transfer-encoding": d.headers["transfer-encoding"]
+                            },
+                            data: d.data
+                        }
+                    };
+                    try {
+                        cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: display }];
+                    }
+                    catch (err) {
+                        console.log(err);
+                    }
                 };
-                yield this._performExecution(cell.document.getText(), cell, document, logger);
+                yield this._performExecution(cell, document, logger);
                 cell.metadata.runState = vscode.NotebookCellRunState.Success;
                 cell.metadata.lastRunDuration = +new Date() - start;
             }
@@ -127,31 +152,19 @@ class CallsNotebookProvider {
             }
         });
     }
-    _performExecution(code, cell, document, logger) {
+    _performExecution(cell, document, logger) {
         return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                var _a, _b, _c;
-                const command = [
-                    'node',
-                    ['-e', `(async () => { ${code} } )()`]
-                ];
-                const cwd = document.uri.scheme === 'untitled'
-                    ? (_c = (_b = (_a = vscode.workspace.workspaceFolders) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.uri.fsPath) !== null && _c !== void 0 ? _c : userHome : path_1.dirname(document.uri.path);
-                console.log(cwd);
-                const execution = child_process_1.spawn(...command, { cwd });
-                execution.on('error', (err) => {
-                    reject(err);
-                });
-                execution.stdout.on('data', (data) => {
-                    logger(data.toString());
-                });
-                execution.stderr.on('data', (data) => {
-                    logger(data.toString());
-                });
-                execution.on('close', () => {
-                    resolve(undefined);
-                });
-            });
+            const query = cell.document.getText();
+            if (!common_1.validateURL(query)) {
+                return Promise.reject('Not a valid URL.');
+            }
+            try {
+                let response = yield axios.get(query);
+                logger(response);
+            }
+            catch (exception) {
+                logger(exception);
+            }
         });
     }
     cancelCellExecution(document, cell) {
