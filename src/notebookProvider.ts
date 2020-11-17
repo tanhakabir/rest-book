@@ -1,5 +1,6 @@
 import { DEBUG_MODE, validateURL } from './common';
 import * as vscode from 'vscode';
+import { Response } from './response';
 const axios = require('axios').default;
 
 interface RawCell {
@@ -56,7 +57,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             metadata: {
                 cellRunnable: true,
                 cellHasExecutionOrder: true,
-                displayOrder: ['x-application/PostBox', 'application/json', 'text/markdown']
+                displayOrder: ['x-application/PostBox', 'text/markdown']
             },
             cells: raw.map(item => ({
                 source: item.value,
@@ -110,34 +111,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             cell.metadata.runStartTime = start;
             cell.outputs = [];
             const logger = (d: any) => {
-                console.log(d);
-
-                let display = {
-                    "application/json": {
-                        status: d.status,
-                        statusText: d.statusText,
-                        headers: {
-                            date: d.headers.date,
-                            expires: d.headers.expires,
-                            "cache-control": d.headers["cache-control"],
-                            "content-type": d.headers["content-type"],
-                            p3p: d.headers.p3p,
-                            server: d.headers.server,
-                            "x-xss-protection": d.headers["x-xss-protection"],
-                            "x-frame-options": d.headers["x-frame-option"],
-                            "set-cookie": d.headers["set-cookie"],
-                            connection: d.headers.connection,
-                            "transfer-encoding": d.headers["transfer-encoding"]
-                        },
-                        data: d.data
-                    }
-                };
-
-                try {
-                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: display }];
-                } catch (err) {
-                    console.log(err);
-                }
+                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new Response(d).parse() }];
             };
             await this._performExecution(cell, document, logger);
             cell.metadata.runState = vscode.NotebookCellRunState.Success;
