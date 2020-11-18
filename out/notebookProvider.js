@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
-const common_1 = require("./common");
 const vscode = require("vscode");
+const parser_1 = require("./parser");
 const response_1 = require("./response");
 const axios = require('axios').default;
 class CallsNotebookProvider {
@@ -121,7 +121,8 @@ class CallsNotebookProvider {
                         outputKind: vscode.CellOutputKind.Error,
                         ename: e.name,
                         evalue: e.message,
-                        traceback: [e.stack],
+                        //   traceback: [e.stack],
+                        traceback: [],
                     },
                 ];
                 cell.metadata.runState = vscode.NotebookCellRunState.Error;
@@ -131,15 +132,12 @@ class CallsNotebookProvider {
     }
     _performExecution(cell, document, logger, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const query = cell.document.getText();
-            const cancelTokenAxios = axios.CancelToken.source();
-            if (!common_1.validateURL(query)) {
-                return Promise.reject('Not a valid URL.');
-            }
+            const parser = new parser_1.Parser(cell, document);
             try {
-                let response = yield axios.get(query, {
-                    cancelToken: cancelTokenAxios.token
-                });
+                const cancelTokenAxios = axios.CancelToken.source();
+                let options = parser.getAxiosOptions();
+                options['cancelToken'] = cancelTokenAxios.token;
+                let response = yield axios(options);
                 token.onCancellationRequested = () => {
                     cancelTokenAxios.cancel();
                 };

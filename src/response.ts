@@ -1,4 +1,4 @@
-import { DEBUG_MODE } from './common';
+import { logDebug } from './common';
 
 export class Response {
     private status: number| undefined;
@@ -9,7 +9,7 @@ export class Response {
     private data: any | undefined;
 
     constructor(response: any) {
-        if (DEBUG_MODE) { console.log(response); }
+        logDebug(response);
 
         try {
             this.status = response.status;

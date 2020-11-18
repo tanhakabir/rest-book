@@ -4,9 +4,7 @@ exports.Response = void 0;
 const common_1 = require("./common");
 class Response {
     constructor(response) {
-        if (common_1.DEBUG_MODE) {
-            console.log(response);
-        }
+        common_1.logDebug(response);
         try {
             this.status = response.status;
             this.statusText = response.statusText;
