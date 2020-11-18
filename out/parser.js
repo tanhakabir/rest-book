@@ -23,21 +23,13 @@ class Parser {
         linesOfRequest = linesOfRequest.filter(s => { return s; });
         common_1.logDebug(linesOfRequest);
         this.originalRequest = linesOfRequest;
-        let method = this._parseMethod();
-        let baseUrl = this._parseBaseUrl();
         this.requestOptions = {
-            method: method,
-            baseURL: baseUrl
+            method: this._parseMethod(),
+            baseURL: this._parseBaseUrl()
         };
     }
     getAxiosOptions() {
         return lodash_1.pickBy(this.requestOptions, lodash_1.identity);
-    }
-    getMethod() {
-        return this.requestOptions.method;
-    }
-    getBaseUrl() {
-        return this.requestOptions.baseURL;
     }
     _parseMethod() {
         const tokens = this.originalRequest[0].split(/[\s,]+/);

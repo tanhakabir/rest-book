@@ -54,25 +54,14 @@ export class Parser {
 
         this.originalRequest = linesOfRequest;
 
-        let method = this._parseMethod();
-        let baseUrl = this._parseBaseUrl();
-
         this.requestOptions = {
-            method: method,
-            baseURL: baseUrl
+            method: this._parseMethod(),
+            baseURL: this._parseBaseUrl()
         };
     }
 
     getAxiosOptions(): any {
         return pickBy(this.requestOptions, identity);
-    }
-
-    getMethod(): string  {
-        return this.requestOptions.method;
-    }
-
-    getBaseUrl(): string {
-        return this.requestOptions.baseURL;
     }
 
     private _parseMethod(): Method {
