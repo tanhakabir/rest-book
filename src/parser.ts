@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { pickBy, identity } from 'lodash';
+import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, validateURL } from './common';
 import * as vscode from 'vscode';
 
@@ -66,8 +66,10 @@ export class Parser {
         this.requestOptions.params = this._parseQueryParams();
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        this.requestOptions.headers = { "User-Agent": "postbox" };
-        this.requestOptions.headers = this._parseHeaders();
+        let defaultHeaders = { "User-Agent": "postbox" };
+        this.requestOptions.headers = this._parseHeaders() ?? defaultHeaders;
+
+        this.requestOptions.data = this._parseBody();
     }
 
     getAxiosOptions(): any {
@@ -110,7 +112,7 @@ export class Parser {
         throw new Error('Invalid URL given!');
     }
 
-    private _parseQueryParams(): any | undefined {
+    private _parseQueryParams(): {[key: string] : string} | undefined {
         let queryInUrl = this.originalRequest[0].split('?')[1];
         let strParams: string[] = queryInUrl ? queryInUrl.split('&') : [];
 
@@ -143,7 +145,7 @@ export class Parser {
         return params;
     }
 
-    private _parseHeaders(): any | undefined {
+    private _parseHeaders(): {[key: string] : string} | undefined {
         if (this.originalRequest.length < 2) { return undefined; }
 
         let i = 1;
@@ -160,7 +162,7 @@ export class Parser {
 
         while(i < this.originalRequest.length && this.originalRequest[i]) {
             let h = this.originalRequest[i];
-            let parts = h.split(/[\s:]/).filter(s => { return s; });
+            let parts = h.split(/(:\s+)/).filter(s => { return !s.match(/(:\s+)/); });
 
             if (parts.length !== 2) { throw new Error(`Invalid header ${h}`); }
 
@@ -168,7 +170,27 @@ export class Parser {
             i++;
         }
 
-        return headers;
+        return isEmpty(headers) ? undefined : headers;
+    }
+
+    private _parseBody(): {[key: string] : string} | string | undefined {
+        if (this.originalRequest.length < 3) { return undefined; }
+
+        let i = 0;
+
+        while(i < this.originalRequest.length && this.originalRequest[i]) {
+          i++;
+        }
+
+        i++;
+
+        let bodyStr = this.originalRequest.slice(i).join('\n');
+
+        try {
+            return JSON.parse(bodyStr);
+        } catch {
+            return bodyStr;
+        }
     }
 
 }
