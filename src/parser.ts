@@ -1,5 +1,5 @@
 import { EOL } from 'os';
-import { pickBy, identity } from 'lodash';
+import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, validateURL } from './common';
 import * as vscode from 'vscode';
 
@@ -66,8 +66,8 @@ export class Parser {
         this.requestOptions.params = this._parseQueryParams();
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        this.requestOptions.headers = { "User-Agent": "postbox" };
-        this.requestOptions.headers = this._parseHeaders();
+        let defaultHeaders = { "User-Agent": "postbox" };
+        this.requestOptions.headers = this._parseHeaders() ?? defaultHeaders;
 
         this.requestOptions.data = this._parseBody();
     }
@@ -170,7 +170,7 @@ export class Parser {
             i++;
         }
 
-        return headers;
+        return isEmpty(headers) ? undefined : headers;
     }
 
     private _parseBody(): {[key: string] : string} | string | undefined {

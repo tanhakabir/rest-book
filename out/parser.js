@@ -18,6 +18,7 @@ var Method;
 })(Method = exports.Method || (exports.Method = {}));
 class Parser {
     constructor(cell, document) {
+        var _a;
         const query = cell.document.getText();
         let linesOfRequest = query.split(os_1.EOL);
         if (linesOfRequest.filter(s => { return s; }).length === 0) {
@@ -31,8 +32,8 @@ class Parser {
         };
         this.requestOptions.params = this._parseQueryParams();
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        this.requestOptions.headers = { "User-Agent": "postbox" };
-        this.requestOptions.headers = this._parseHeaders();
+        let defaultHeaders = { "User-Agent": "postbox" };
+        this.requestOptions.headers = (_a = this._parseHeaders()) !== null && _a !== void 0 ? _a : defaultHeaders;
         this.requestOptions.data = this._parseBody();
     }
     getAxiosOptions() {
@@ -118,7 +119,7 @@ class Parser {
             headers[parts[0]] = parts[1];
             i++;
         }
-        return headers;
+        return lodash_1.isEmpty(headers) ? undefined : headers;
     }
     _parseBody() {
         if (this.originalRequest.length < 3) {
