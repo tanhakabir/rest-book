@@ -33,6 +33,7 @@ class Parser {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         this.requestOptions.headers = { "User-Agent": "postbox" };
         this.requestOptions.headers = this._parseHeaders();
+        this.requestOptions.data = this._parseBody();
     }
     getAxiosOptions() {
         return lodash_1.pickBy(this.requestOptions, lodash_1.identity);
@@ -110,7 +111,7 @@ class Parser {
         let headers = {};
         while (i < this.originalRequest.length && this.originalRequest[i]) {
             let h = this.originalRequest[i];
-            let parts = h.split(/[\s:]/).filter(s => { return s; });
+            let parts = h.split(/(:\s+)/).filter(s => { return !s.match(/(:\s+)/); });
             if (parts.length !== 2) {
                 throw new Error(`Invalid header ${h}`);
             }
@@ -118,6 +119,23 @@ class Parser {
             i++;
         }
         return headers;
+    }
+    _parseBody() {
+        if (this.originalRequest.length < 3) {
+            return undefined;
+        }
+        let i = 0;
+        while (i < this.originalRequest.length && this.originalRequest[i]) {
+            i++;
+        }
+        i++;
+        let bodyStr = this.originalRequest.slice(i).join('\n');
+        try {
+            return JSON.parse(bodyStr);
+        }
+        catch (_a) {
+            return bodyStr;
+        }
     }
 }
 exports.Parser = Parser;
