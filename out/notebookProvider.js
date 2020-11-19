@@ -71,10 +71,14 @@ class CallsNotebookProvider {
         });
     }
     saveNotebook(document, cancellation) {
-        return this._save(document, document.uri);
+        return __awaiter(this, void 0, void 0, function* () {
+            return this._save(document, document.uri);
+        });
     }
     saveNotebookAs(targetResource, document, cancellation) {
-        return this._save(document, targetResource);
+        return __awaiter(this, void 0, void 0, function* () {
+            return this._save(document, targetResource);
+        });
     }
     _save(document, targetResource) {
         return __awaiter(this, void 0, void 0, function* () {
