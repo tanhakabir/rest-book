@@ -1,5 +1,6 @@
 import { DEBUG_MODE, validateURL } from './common';
 import * as vscode from 'vscode';
+import { Parser, Method } from './parser';
 import { Response } from './response';
 const axios = require('axios').default;
 
@@ -125,7 +126,8 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
                   outputKind: vscode.CellOutputKind.Error,
                   ename: e.name,
                   evalue: e.message,
-                  traceback: [e.stack],
+                //   traceback: [e.stack],
+                  traceback: [],
                 },
             ];
             cell.metadata.runState = vscode.NotebookCellRunState.Error;
@@ -138,18 +140,17 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
                              document: vscode.NotebookDocument, 
                              logger: (s: string) => void,
                              token: CancellationToken): 
-                             Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined> {
-        const query = cell.document.getText();
-        const cancelTokenAxios = axios.CancelToken.source();
+                             Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void> {
 
-        if (!validateURL(query)) {
-            return Promise.reject('Not a valid URL.');
-        }
+        const parser = new Parser(cell, document);
 
         try {
-            let response = await axios.get(query, {
-                cancelToken: cancelTokenAxios.token
-            });
+            const cancelTokenAxios = axios.CancelToken.source();
+
+            let options = parser.getAxiosOptions();
+            options['cancelToken'] = cancelTokenAxios.token;
+
+            let response = await axios(options);
 
             token.onCancellationRequested = () => {
                 cancelTokenAxios.cancel();

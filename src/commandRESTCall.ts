@@ -1,6 +1,6 @@
 import { QuickPickItem, window, Disposable, CancellationToken, QuickInputButton, QuickInput, ExtensionContext, QuickInputButtons, Uri, Event } from 'vscode';
 import { URL, parse } from 'url';
-import { DEBUG_MODE, validateURL } from './common';
+import { logDebug, validateURL } from './common';
 import { MultiStepInput } from './multiStepInput';
 const axios = require('axios').default;
 
@@ -37,7 +37,7 @@ export async function commandRESTCall(context: ExtensionContext) {
 		});
 
 		state.callType = pick;
-		if (DEBUG_MODE) { console.log(`pickRESTCallType :: call type chosen ${pick.label}`)}
+		logDebug(`pickRESTCallType :: call type chosen ${pick.label}`);
 		return (input: MultiStepInput) => inputURL(input, state);
 	}
 

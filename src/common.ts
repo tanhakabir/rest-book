@@ -8,7 +8,7 @@ export function validateURL(url: string): boolean {
     try {
         new URL(url);
         const parsed = parse(url);
-        if (DEBUG_MODE) { console.log(parsed.protocol); }
+        logDebug(parsed.protocol);
         return protocols
             ? parsed.protocol
                 ? protocols.map(x => `${x.toLowerCase()}:`).includes(parsed.protocol) 
@@ -17,5 +17,12 @@ export function validateURL(url: string): boolean {
             : true;
     } catch (err) {
         return false;
+    }
+}
+
+
+export function logDebug(item: string | any ) {
+    if (DEBUG_MODE) {
+        console.log(item);
     }
 }

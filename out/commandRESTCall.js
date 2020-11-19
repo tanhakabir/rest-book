@@ -38,9 +38,7 @@ function commandRESTCall(context) {
                     shouldResume: shouldResume
                 });
                 state.callType = pick;
-                if (common_1.DEBUG_MODE) {
-                    console.log(`pickRESTCallType :: call type chosen ${pick.label}`);
-                }
+                common_1.logDebug(`pickRESTCallType :: call type chosen ${pick.label}`);
                 return (input) => inputURL(input, state);
             });
         }

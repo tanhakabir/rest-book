@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateURL = exports.DEBUG_MODE = void 0;
+exports.logDebug = exports.validateURL = exports.DEBUG_MODE = void 0;
 const url_1 = require("url");
 exports.DEBUG_MODE = false;
 function validateURL(url) {
@@ -8,9 +8,7 @@ function validateURL(url) {
     try {
         new url_1.URL(url);
         const parsed = url_1.parse(url);
-        if (exports.DEBUG_MODE) {
-            console.log(parsed.protocol);
-        }
+        logDebug(parsed.protocol);
         return protocols
             ? parsed.protocol
                 ? protocols.map(x => `${x.toLowerCase()}:`).includes(parsed.protocol)
@@ -23,4 +21,10 @@ function validateURL(url) {
     }
 }
 exports.validateURL = validateURL;
+function logDebug(item) {
+    if (exports.DEBUG_MODE) {
+        console.log(item);
+    }
+}
+exports.logDebug = logDebug;
 //# sourceMappingURL=common.js.map

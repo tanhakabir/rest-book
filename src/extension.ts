@@ -3,8 +3,7 @@
 import * as vscode from 'vscode';
 import { commandRESTCall } from './commandRESTCall';
 import { CallsNotebookProvider } from './notebookProvider';
-
-export const DEBUG_MODE = false;
+import { logDebug } from './common';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -21,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 		// The code you place here will be executed every time your command is executed
 
 		commandRESTCall(context).then(choice => {
-			if (DEBUG_MODE) { console.log(`activate :: command selected ${choice.callType}`); }
+			logDebug(`activate :: command selected ${choice.callType}`);
 
 			console.log(`INFO :: activate :: attempting to perform ${choice.callType} call.`);
 		});
