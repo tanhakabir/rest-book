@@ -32,7 +32,8 @@ export class Response {
             this.config = {
                 timeout: response.config.timeout,
                 xsrfCookieName: response.config.xsrfCookieName,
-                xsrfHeaderName: response.config.xsrfHeaderName
+                xsrfHeaderName: response.config.xsrfHeaderName,
+                headers: response.config.headers
             };
 
             this.request = {

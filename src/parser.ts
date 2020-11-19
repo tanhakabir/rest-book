@@ -64,6 +64,10 @@ export class Parser {
 
 
         this.requestOptions.params = this._parseQueryParams();
+
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        this.requestOptions.headers = { "User-Agent": "postbox" };
+        this.requestOptions.headers = this._parseHeaders();
     }
 
     getAxiosOptions(): any {
@@ -129,10 +133,9 @@ export class Parser {
 
         for(const p of strParams) {
             let parts = p.split('=');
+            if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`); }
 
-            if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`)}
-
-            params[p.split('=')[0]] = p.split('=')[1];
+            params[parts[0]] = parts[1];
 
             // TODO clean value to raw form?
         }
@@ -140,8 +143,32 @@ export class Parser {
         return params;
     }
 
-    private _parseHeader() {
-        
+    private _parseHeaders(): any | undefined {
+        if (this.originalRequest.length < 2) { return undefined; }
+
+        let i = 1;
+
+        while(i < this.originalRequest.length &&
+            (this.originalRequest[i].trim().startsWith('?') || 
+             this.originalRequest[i].trim().startsWith('&'))) {
+          i++;
+        }
+
+        if(i >= this.originalRequest.length) { return undefined; }
+
+        let headers: {[key: string] : string} = {};
+
+        while(i < this.originalRequest.length && this.originalRequest[i]) {
+            let h = this.originalRequest[i];
+            let parts = h.split(/[\s:]/).filter(s => { return s; });
+
+            if (parts.length !== 2) { throw new Error(`Invalid header ${h}`); }
+
+            headers[parts[0]] = parts[1];
+            i++;
+        }
+
+        return headers;
     }
 
 }
