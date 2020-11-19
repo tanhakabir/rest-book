@@ -20,13 +20,16 @@ class Parser {
     constructor(cell, document) {
         const query = cell.document.getText();
         let linesOfRequest = query.split(os_1.EOL);
-        linesOfRequest = linesOfRequest.filter(s => { return s; });
+        if (linesOfRequest.filter(s => { return s; }).length === 0) {
+            throw new Error('Please provide request information (at minimum a URL) before running the cell!');
+        }
         common_1.logDebug(linesOfRequest);
         this.originalRequest = linesOfRequest;
         this.requestOptions = {
             method: this._parseMethod(),
             baseURL: this._parseBaseUrl()
         };
+        this.requestOptions.params = this._parseQueryParams();
     }
     getAxiosOptions() {
         return lodash_1.pickBy(this.requestOptions, lodash_1.identity);
@@ -61,6 +64,34 @@ class Parser {
             }
         }
         throw new Error('Invalid URL given!');
+    }
+    _parseQueryParams() {
+        let queryInUrl = this.originalRequest[0].split('?')[1];
+        let strParams = queryInUrl ? queryInUrl.split('&') : [];
+        if (this.originalRequest.length >= 2) {
+            let i = 1;
+            while (i < this.originalRequest.length &&
+                (this.originalRequest[i].trim().startsWith('?') ||
+                    this.originalRequest[i].trim().startsWith('&'))) {
+                strParams.push(this.originalRequest[i].trim().substring(1));
+                i++;
+            }
+        }
+        if (strParams.length === 0) {
+            return undefined;
+        }
+        let params = {};
+        for (const p of strParams) {
+            let parts = p.split('=');
+            if (parts.length !== 2) {
+                throw new Error(`Invalid query paramter for ${p}`);
+            }
+            params[p.split('=')[0]] = p.split('=')[1];
+            // TODO clean value to raw form?
+        }
+        return params;
+    }
+    _parseHeader() {
     }
 }
 exports.Parser = Parser;
