@@ -52,13 +52,13 @@ class CallsNotebookProvider {
                     displayOrder: ['x-application/PostBox', 'text/markdown']
                 },
                 cells: raw.map(item => {
-                    var _a;
+                    var _a, _b;
                     return ({
                         source: item.value,
                         language: item.language,
                         cellKind: item.kind,
-                        outputs: [],
-                        metadata: { editable: (_a = item.editable) !== null && _a !== void 0 ? _a : true, runnable: true }
+                        outputs: (_a = item.outputs) !== null && _a !== void 0 ? _a : [],
+                        metadata: { editable: (_b = item.editable) !== null && _b !== void 0 ? _b : true, runnable: true }
                     });
                 })
             };
@@ -88,7 +88,8 @@ class CallsNotebookProvider {
                     kind: cell.cellKind,
                     language: cell.language,
                     value: cell.document.getText(),
-                    editable: cell.metadata.editable
+                    editable: cell.metadata.editable,
+                    outputs: cell.outputs
                 });
             }
             yield vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));

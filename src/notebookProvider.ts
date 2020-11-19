@@ -8,7 +8,8 @@ interface RawCell {
 	language: string;
 	value: string;
 	kind: vscode.CellKind;
-	editable?: boolean;
+    editable?: boolean;
+    outputs: any | undefined;
 }
 
 type CancellationToken = { onCancellationRequested?: () => void };
@@ -65,7 +66,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
                 source: item.value,
                 language: item.language,
                 cellKind: item.kind,
-                outputs: [],
+                outputs: item.outputs ?? [],
                 metadata: { editable: item.editable ?? true, runnable: true }
             }))
         };
@@ -91,7 +92,8 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 				kind: cell.cellKind,
 				language: cell.language,
 				value: cell.document.getText(),
-				editable: cell.metadata.editable
+                editable: cell.metadata.editable,
+                outputs: cell.outputs
 			});
         }
 
