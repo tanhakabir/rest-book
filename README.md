@@ -1,4 +1,5 @@
 # PostBox
+_version 0.1_
 
 PostBox is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
 
