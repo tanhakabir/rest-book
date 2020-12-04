@@ -3,6 +3,7 @@
   "displayName": "Post Box",
   "description": "A Postman-like REST API Client for sending to and receiving from REST endpoints.",
   "version": "0.0.1",
+  "publisher": "tanha",
   "engines": {
     "vscode": "^1.50.0"
   },
