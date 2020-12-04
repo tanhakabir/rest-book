@@ -1,65 +1,75 @@
-# PostBox README
+# PostBox
 
-This is the README for your extension "PostBox". After writing up a brief description, we recommend including the following sections.
+PostBox is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
-
-\!\[feature X\]\(images/feature-x.png\)
-
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- Create and run REST Calls within cells.
+- Organize multiple REST Calls within one file.
+- Intermingle markdown for documenting your calls.
+- View rich HTML and image responses directly inside the Notebook.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Must be using the latest version of Visual Studio Code Insiders edition.
 
-## Extension Settings
+## Installation
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+1. Grab the latest VSIX file from the Releases section. 
+1. Inside Visual Studio Code go under the Extensions section and click on the 3 ellipsis in the top right of the pane.
+1. Click on `Install from VSIX...` and choose the downloaded VSIX.  
 
-For example:
 
-This extension contributes the following settings:
+## Usage
+1. Create a new file to store your REST Calls with a `.postbox` ending.
+1. Add an code cell by hovering over the middle of the Notebook and clicking the `+ Code`
+1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+```javascript
+https://www.google.com
+```
+
+is equivalent to:
+
+```javascript
+GET https://www.google.com
+```
+
+In subsequent lines immediately following the first line add any parameters or queries starting with `?` or `&` like this:
+
+```javascript
+GET https://www.google.com
+    ?query="fun"
+    &page=2
+```
+
+In the lines following without an empty line will be considered as the Request Headers:
+
+```javascript
+GET https://www.google.com
+    ?query="fun"
+    &page=2
+User-Agent: postbox
+Content-Type: application/json 
+```
+
+The last lines after a new line separator is the body of the call. Like the following:
+
+```javascript
+POST https://www.myapi.com
+User-Agent: postbox
+Content-Type: application/json 
+
+{
+    name: "Foo",
+    text: "Foo is the most bar of the Foos" 
+}
+```
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+When performing an incorrect query, currently the response will be empty and not an erroneous response.
 
-## Release Notes
+## Any Other issues
 
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Please submit your issue on the PostBox repository with exact reproduction steps.
