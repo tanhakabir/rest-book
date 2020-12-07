@@ -4,6 +4,9 @@
   "description": "A Postman-like REST API Client for sending to and receiving from REST endpoints.",
   "version": "0.0.1",
   "publisher": "tanha",
+  "repository": {
+    "url": "https://github.com/tanhakabir/PostBox"
+  },
   "engines": {
     "vscode": "^1.50.0"
   },
@@ -27,6 +30,7 @@
       {
         "viewType": "PostBox.restNotebook",
         "displayName": "PostBox: REST Calls",
+        "priority": "default",
         "selector": [
           {
             "filenamePattern": "*.postbox"
