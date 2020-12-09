@@ -15,17 +15,10 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:PostBox.commandRestCall",
     "onNotebook:PostBox.restNotebook"
   ],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "PostBox.commandRestCall",
-        "title": "PostBox: REST Call"
-      }
-    ],
     "notebookProvider": [
       {
         "viewType": "PostBox.restNotebook",

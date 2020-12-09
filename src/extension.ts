@@ -11,22 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "PostBox" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	let pickDisposableCommand = vscode.commands.registerCommand('PostBox.commandRestCall', () => {
-		// The code you place here will be executed every time your command is executed
-
-		commandRESTCall(context).then(choice => {
-			logDebug(`activate :: command selected ${choice.callType}`);
-
-			console.log(`INFO :: activate :: attempting to perform ${choice.callType} call.`);
-		});
-	});
-
-	context.subscriptions.push(pickDisposableCommand);
+	console.log('restbook is now active!');
 
 
 	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PostBox.restNotebook', new CallsNotebookProvider()))
