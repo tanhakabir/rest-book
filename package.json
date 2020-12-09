@@ -1,8 +1,8 @@
 {
   "name": "rest-book",
-  "displayName": "REST NoteBook",
+  "displayName": "REST Book",
   "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "tanha",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
@@ -22,7 +22,7 @@
     "notebookProvider": [
       {
         "viewType": "restbook.notebook",
-        "displayName": "REST Notebook",
+        "displayName": "REST Book",
         "priority": "default",
         "selector": [
           {
