@@ -16,7 +16,7 @@ type CancellationToken = { onCancellationRequested?: () => void };
 
 export class CallsNotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernel {
     id?: string | undefined;
-    label: string = 'PostBox: REST Calls';
+    label: string = 'REST Notebook';
     description?: string | undefined;
     detail?: string | undefined;
     isPreferred?: boolean | undefined;
@@ -32,7 +32,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 
     constructor() {
         vscode.notebook.registerNotebookKernelProvider({
-			viewType: 'PostBox.restNotebook',
+			viewType: 'restbook.notebook',
 		}, {
 			provideKernels: () => {
 				return [this];
@@ -56,11 +56,11 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         }
 
         const notebookData: vscode.NotebookData = {
-            languages: ['PostBox'],
+            languages: ['rest-book'],
             metadata: {
                 cellRunnable: true,
                 cellHasExecutionOrder: true,
-                displayOrder: ['x-application/PostBox', 'text/markdown']
+                displayOrder: ['x-application/rest-book', 'text/markdown']
             },
             cells: raw.map(item => ({
                 source: item.value,
