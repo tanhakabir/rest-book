@@ -1,5 +1,5 @@
 # REST Book
-_version 0.2.1_
+_version 0.2.2_
 
 REST Book is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
 
