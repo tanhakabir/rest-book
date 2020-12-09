@@ -2,10 +2,10 @@
   "name": "rest-book",
   "displayName": "REST NoteBook",
   "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "tanha",
   "repository": {
-    "url": "https://github.com/tanhakabir/PostBox"
+    "url": "https://github.com/tanhakabir/rest-book"
   },
   "engines": {
     "vscode": "^1.50.0"

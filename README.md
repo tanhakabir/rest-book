@@ -19,6 +19,8 @@ Must be using the latest version of Visual Studio Code Insiders edition.
 1. Grab the latest VSIX file from the Releases section. 
 1. Inside Visual Studio Code go under the Extensions section and click on the 3 ellipsis in the top right of the pane.
 1. Click on `Install from VSIX...` and choose the downloaded VSIX.  
+1. Close Visual Studio Code.
+1. Using Powershell or Terminal run `code-insiders --enable-proposed-api rest-book <path to folder you want to run notebook in>`.
 
 
 ## Usage
