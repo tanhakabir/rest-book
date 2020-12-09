@@ -24,7 +24,7 @@ Must be using the latest version of Visual Studio Code Insiders edition.
 
 
 ## Usage
-1. Create a new file to store your REST Calls with a `.postbox` ending.
+1. Create a new file to store your REST Calls with a `.restbook` ending.
 1. Add an code cell by hovering over the middle of the Notebook and clicking the `+ Code`
 1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
 
