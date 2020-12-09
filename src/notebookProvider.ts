@@ -56,11 +56,11 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         }
 
         const notebookData: vscode.NotebookData = {
-            languages: [NAME],
+            languages: ['rest-book'],
             metadata: {
                 cellRunnable: true,
                 cellHasExecutionOrder: true,
-                displayOrder: [`x-application/${NAME}`, 'text/markdown']
+                displayOrder: ['x-application/rest-book', 'text/markdown']
             },
             cells: raw.map(item => ({
                 source: item.value,

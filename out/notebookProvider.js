@@ -10,7 +10,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
-const common_1 = require("./common");
 const vscode = require("vscode");
 const parser_1 = require("./parser");
 const response_1 = require("./response");
@@ -46,11 +45,11 @@ class CallsNotebookProvider {
                 raw = [];
             }
             const notebookData = {
-                languages: [common_1.NAME],
+                languages: ['rest-book'],
                 metadata: {
                     cellRunnable: true,
                     cellHasExecutionOrder: true,
-                    displayOrder: [`x-application/${common_1.NAME}`, 'text/markdown']
+                    displayOrder: ['x-application/rest-book', 'text/markdown']
                 },
                 cells: raw.map(item => {
                     var _a, _b;
