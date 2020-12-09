@@ -32,7 +32,7 @@ class Parser {
         };
         this.requestOptions.params = this._parseQueryParams();
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let defaultHeaders = { "User-Agent": "rest-book" };
+        let defaultHeaders = { "User-Agent": common_1.NAME };
         this.requestOptions.headers = (_a = this._parseHeaders()) !== null && _a !== void 0 ? _a : defaultHeaders;
         this.requestOptions.data = this._parseBody();
     }

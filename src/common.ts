@@ -2,6 +2,8 @@ import { URL, parse } from 'url';
 
 export const DEBUG_MODE = false;
 
+export const NAME = 'rest-book';
+
 export function validateURL(url: string): boolean {
     const protocols = ['http', 'https'];
 
