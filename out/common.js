@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.logDebug = exports.validateURL = exports.DEBUG_MODE = void 0;
+exports.logDebug = exports.validateURL = exports.NAME = exports.DEBUG_MODE = void 0;
 const url_1 = require("url");
 exports.DEBUG_MODE = false;
+exports.NAME = 'rest-book';
 function validateURL(url) {
     const protocols = ['http', 'https'];
     try {

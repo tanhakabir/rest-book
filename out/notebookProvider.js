@@ -10,13 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
+const common_1 = require("./common");
 const vscode = require("vscode");
 const parser_1 = require("./parser");
 const response_1 = require("./response");
 const axios = require('axios').default;
 class CallsNotebookProvider {
     constructor() {
-        this.label = 'REST Notebook';
+        this.label = 'REST Book';
         this._onDidChangeNotebook = new vscode.EventEmitter();
         this.onDidChangeNotebook = this._onDidChangeNotebook.event;
         this.cancellations = new Map();
@@ -45,11 +46,11 @@ class CallsNotebookProvider {
                 raw = [];
             }
             const notebookData = {
-                languages: ['rest-book'],
+                languages: [common_1.NAME],
                 metadata: {
                     cellRunnable: true,
                     cellHasExecutionOrder: true,
-                    displayOrder: ['x-application/rest-book', 'text/markdown']
+                    displayOrder: [`x-application/${common_1.NAME}`, 'text/markdown']
                 },
                 cells: raw.map(item => {
                     var _a, _b;

@@ -52,7 +52,7 @@ In the lines following without an empty line will be considered as the Request H
 GET https://www.google.com
     ?query="fun"
     &page=2
-User-Agent: postbox
+User-Agent: rest-book
 Content-Type: application/json 
 ```
 
@@ -60,7 +60,7 @@ The last lines after a new line separator is the body of the call. Like the foll
 
 ```javascript
 POST https://www.myapi.com
-User-Agent: postbox
+User-Agent: rest-book
 Content-Type: application/json 
 
 {

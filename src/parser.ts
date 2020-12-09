@@ -1,6 +1,6 @@
 import { EOL } from 'os';
 import { pickBy, identity, isEmpty } from 'lodash';
-import { logDebug, validateURL } from './common';
+import { logDebug, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
 
 // following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
@@ -66,7 +66,7 @@ export class Parser {
         this.requestOptions.params = this._parseQueryParams();
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let defaultHeaders = { "User-Agent": "postbox" };
+        let defaultHeaders = { "User-Agent": NAME };
         this.requestOptions.headers = this._parseHeaders() ?? defaultHeaders;
 
         this.requestOptions.data = this._parseBody();

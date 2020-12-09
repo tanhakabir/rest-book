@@ -1,4 +1,4 @@
-import { DEBUG_MODE, validateURL } from './common';
+import { DEBUG_MODE, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Parser, Method } from './parser';
 import { Response } from './response';
@@ -16,7 +16,7 @@ type CancellationToken = { onCancellationRequested?: () => void };
 
 export class CallsNotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernel {
     id?: string | undefined;
-    label: string = 'REST Notebook';
+    label: string = 'REST Book';
     description?: string | undefined;
     detail?: string | undefined;
     isPreferred?: boolean | undefined;
@@ -56,11 +56,11 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         }
 
         const notebookData: vscode.NotebookData = {
-            languages: ['rest-book'],
+            languages: [NAME],
             metadata: {
                 cellRunnable: true,
                 cellHasExecutionOrder: true,
-                displayOrder: ['x-application/rest-book', 'text/markdown']
+                displayOrder: [`x-application/${NAME}`, 'text/markdown']
             },
             cells: raw.map(item => ({
                 source: item.value,
