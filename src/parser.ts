@@ -66,7 +66,7 @@ export class Parser {
         this.requestOptions.params = this._parseQueryParams();
 
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let defaultHeaders = { "User-Agent": "postbox" };
+        let defaultHeaders = { "User-Agent": "rest-book" };
         this.requestOptions.headers = this._parseHeaders() ?? defaultHeaders;
 
         this.requestOptions.data = this._parseBody();
