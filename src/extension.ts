@@ -10,10 +10,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('restbook is now active!');
+	console.log('rest-book is now active!');
 
 
-	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('PostBox.restNotebook', new CallsNotebookProvider()))
+	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('restbook.notebook', new CallsNotebookProvider()));
 }
 
 // this method is called when your extension is deactivated

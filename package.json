@@ -1,7 +1,7 @@
 {
-  "name": "PostBox",
-  "displayName": "Post Box",
-  "description": "A Postman-like REST API Client for sending to and receiving from REST endpoints.",
+  "name": "rest-book",
+  "displayName": "REST NoteBook",
+  "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
   "version": "0.0.1",
   "publisher": "tanha",
   "repository": {
@@ -15,18 +15,18 @@
     "Other"
   ],
   "activationEvents": [
-    "onNotebook:PostBox.restNotebook"
+    "onNotebook:restbook.notebook"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "notebookProvider": [
       {
-        "viewType": "PostBox.restNotebook",
-        "displayName": "PostBox: REST Calls",
+        "viewType": "restbook.notebook",
+        "displayName": "REST Notebook",
         "priority": "default",
         "selector": [
           {
-            "filenamePattern": "*.postbox"
+            "filenamePattern": "*.restbook"
           }
         ]
       }

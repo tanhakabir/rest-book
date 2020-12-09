@@ -16,12 +16,12 @@ const response_1 = require("./response");
 const axios = require('axios').default;
 class CallsNotebookProvider {
     constructor() {
-        this.label = 'PostBox: REST Calls';
+        this.label = 'REST Notebook';
         this._onDidChangeNotebook = new vscode.EventEmitter();
         this.onDidChangeNotebook = this._onDidChangeNotebook.event;
         this.cancellations = new Map();
         vscode.notebook.registerNotebookKernelProvider({
-            viewType: 'PostBox.restNotebook',
+            viewType: 'restbook.notebook',
         }, {
             provideKernels: () => {
                 return [this];
@@ -45,11 +45,11 @@ class CallsNotebookProvider {
                 raw = [];
             }
             const notebookData = {
-                languages: ['PostBox'],
+                languages: ['rest-book'],
                 metadata: {
                     cellRunnable: true,
                     cellHasExecutionOrder: true,
-                    displayOrder: ['x-application/PostBox', 'text/markdown']
+                    displayOrder: ['x-application/rest-book', 'text/markdown']
                 },
                 cells: raw.map(item => {
                     var _a, _b;
