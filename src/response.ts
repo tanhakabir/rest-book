@@ -10,43 +10,50 @@ export class Response {
 
     constructor(response: any) {
         logDebug(response);
+        let res = response;
+
+        if(response.response && response.status === undefined) {
+            res = response.response;
+        }
 
         try {
-            this.status = response.status;
-            this.statusText = response.statusText;
+            this.status = res.status;
+            this.statusText = res.statusText;
 
             this.headers = {
-                date: response.headers.date,
-                expires: response.headers.expires,
-                "cache-control": response.headers["cache-control"],
-                "content-type": response.headers["content-type"],
-                p3p: response.headers.p3p,
-                server: response.headers.server,
-                "x-xss-protection": response.headers["x-xss-protection"],
-                "x-frame-options": response.headers["x-frame-option"],
-                "set-cookie": response.headers["set-cookie"],
-                connection: response.headers.connection,
-                "transfer-encoding": response.headers["transfer-encoding"]
+                date: res.headers.date,
+                allow: res.headers.allow,
+                expires: res.headers.expires,
+                "cache-control": res.headers["cache-control"],
+                "content-type": res.headers["content-type"],
+                "content-length": res.headers["content-length"],
+                p3p: res.headers.p3p,
+                server: res.headers.server,
+                "x-xss-protection": res.headers["x-xss-protection"],
+                "x-frame-options": res.headers["x-frame-option"],
+                "set-cookie": res.headers["set-cookie"],
+                connection: res.headers.connection,
+                "transfer-encoding": res.headers["transfer-encoding"]
             };
 
             this.config = {
-                timeout: response.config.timeout,
-                xsrfCookieName: response.config.xsrfCookieName,
-                xsrfHeaderName: response.config.xsrfHeaderName,
-                headers: response.config.headers
+                timeout: res.config.timeout,
+                xsrfCookieName: res.config.xsrfCookieName,
+                xsrfHeaderName: res.config.xsrfHeaderName,
+                headers: res.config.headers
             };
 
             this.request = {
-                method: response.request.method,
+                method: res.request.method,
                 res: {
-                    httpVersion:  response.request.res.httpVersion,
-                    responseUrl: response.request.res.responseUrl
+                    httpVersion:  res.request.res.httpVersion,
+                    responseUrl: res.request.res.responseUrl
                 }
             };
 
-            this.data = response.data;
+            this.data = res.data;
         } catch {
-
+            throw new Error(response.message);
         }
     }
 
