@@ -33,16 +33,16 @@
       }
     ],
     "languages": [
-			{
-				"id": "rest-book",
-				"aliases": [
-					"REST Book"
-				],
-				"filenamePatterns": [
-					"*.rest-book.txt"
-				]
-			}
-		]
+      {
+        "id": "rest-book",
+        "aliases": [
+          "REST Book"
+        ],
+        "filenamePatterns": [
+          "*.rest-book.txt"
+        ]
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
