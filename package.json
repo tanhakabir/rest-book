@@ -42,7 +42,17 @@
           "*.rest-book.txt"
         ]
       }
-    ]
+    ],
+    "grammars": [
+			{
+				"language": "rest-book",
+				"scopeName": "source.rest-book",
+				"path": "./syntaxes/rest-book.tmGrammar.json",
+        "embeddedLanguages": {
+          "meta.embedded.block.javascript": "javascript"
+        }
+			}
+		]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
