@@ -1,0 +1,1 @@
+{"version":3,"file":"languageProvider.js","sourceRoot":"","sources":["../src/languageProvider.ts"],"names":[],"mappings":";;;AAAA,iCAAiC;AACjC,qCAA4C;AAE5C,MAAM,QAAQ,GAA4B,EAAE,QAAQ,EAAE,aAAI,EAAE,CAAA;AAE5D,SAAgB,wBAAwB;IACpC,MAAM,WAAW,GAAwB,EAAE,CAAC;IAE5C,OAAO,MAAM,CAAC,UAAU,CAAC,IAAI,CAAC,GAAG,WAAW,CAAC,CAAC;AAClD,CAAC;AAJD,4DAIC"}
