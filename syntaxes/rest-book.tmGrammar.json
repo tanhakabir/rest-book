@@ -1,0 +1,48 @@
+{
+    "scopeName": "source.rest-book",
+    "patterns": [
+        {
+            "name": "punctuation.quoted",
+            "match": "\\\".*\\\""
+        },
+        {
+            "name": "variable.other",
+            "match": "\\[_a-zA-Z][_a-zA-Z0-9]+"
+        },
+        {
+            "name": "constant.language",
+            "match": "\\b(GET|POST|PUT|DELETE)\\b"
+        },
+        {
+            "name": "constant.numeric.date",
+            "match": "\\d\\d\\d\\d-\\d\\d-\\d\\d"
+        },
+        {
+            "name": "constant.numeric.datetime",
+            "match": "\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ"
+        },
+        {
+            "name": "constant.numeric",
+            "match": "\\d+"
+        },
+        {
+            "name": "keyword.other",
+            "match": "([A-Za-z\\-]*):\\s"
+        },
+        {
+            "begin": "\\{",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.definition.dictionary.begin.json"
+                }
+            },
+            "end": "\\}",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.definition.dictionary.end.json"
+                }
+            },
+            "name": "meta.structure.dictionary.json"
+        }
+    ]
+}
