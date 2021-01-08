@@ -1,35 +1,26 @@
 {
     "scopeName": "source.rest-book",
-    "patterns": [
+    "patterns":[
         {
-            "name": "punctuation.quoted",
-            "match": "\\\".*\\\""
+            "include": "#constant"
         },
         {
-            "name": "variable.other",
-            "match": "\\[_a-zA-Z][_a-zA-Z0-9]+"
+            "include": "#headerkey"
         },
         {
+            "include": "#json"
+        }
+    ],
+    "repository": {
+        "constant": {
             "name": "constant.language",
             "match": "\\b(GET|POST|PUT|DELETE)\\b"
         },
-        {
-            "name": "constant.numeric.date",
-            "match": "\\d\\d\\d\\d-\\d\\d-\\d\\d"
-        },
-        {
-            "name": "constant.numeric.datetime",
-            "match": "\\d\\d\\d\\d-\\d\\d-\\d\\dT\\d\\d:\\d\\d:\\d\\dZ"
-        },
-        {
-            "name": "constant.numeric",
-            "match": "\\d+"
-        },
-        {
+        "headerkey": {
             "name": "keyword.other",
-            "match": "([A-Za-z\\-]*):\\s"
+            "match": "([A-Za-z\\-]+):\\s"
         },
-        {
+        "json": {
             "begin": "\\{",
             "beginCaptures": {
                 "0": {
@@ -42,7 +33,12 @@
                     "name": "punctuation.definition.dictionary.end.json"
                 }
             },
-            "name": "meta.structure.dictionary.json"
+            "name": "meta.embedded.block.json",
+            "patterns": [
+                {
+                    "include": "source.json"
+                }
+            ]
         }
-    ]
+    }
 }
