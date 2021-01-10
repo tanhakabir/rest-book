@@ -1,7 +1,7 @@
 import { DEBUG_MODE, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
-import { Parser, Method } from './parser';
-import { Response } from './response';
+import { RequestParser, Method } from './request';
+import { ResponseParser } from './response';
 const axios = require('axios').default;
 
 interface RawCell {
@@ -115,7 +115,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             cell.metadata.runStartTime = start;
             cell.outputs = [];
             const logger = (d: any) => {
-                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new Response(d).parse() }];
+                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new ResponseParser(d).parse() }];
             };
             const token: CancellationToken = { onCancellationRequested: undefined };
             this.cancellations.set(cell, token);
@@ -144,7 +144,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
                              token: CancellationToken): 
                              Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void> {
 
-        const parser = new Parser(cell, document);
+        const parser = new RequestParser(cell, document);
 
         try {
             const cancelTokenAxios = axios.CancelToken.source();
