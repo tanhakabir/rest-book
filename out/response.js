@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Response = void 0;
+exports.ResponseParser = void 0;
 const common_1 = require("./common");
-class Response {
+class ResponseParser {
     constructor(response) {
         common_1.logDebug(response);
         let res = response;
@@ -61,5 +61,5 @@ class Response {
     }
     ;
 }
-exports.Response = Response;
+exports.ResponseParser = ResponseParser;
 //# sourceMappingURL=response.js.map

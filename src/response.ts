@@ -1,6 +1,6 @@
 import { logDebug } from './common';
 
-export class Response {
+export class ResponseParser {
     private status: number| undefined;
     private statusText: string | undefined;
     private headers: any | undefined;

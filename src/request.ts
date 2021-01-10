@@ -39,7 +39,7 @@ export interface AxiosOptions {
     decompress?: boolean | true 
 }
 
-export class Parser {
+export class RequestParser {
     private originalRequest: string[];
     private requestOptions: AxiosOptions;
 

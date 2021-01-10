@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Parser = exports.Method = void 0;
+exports.RequestParser = exports.Method = void 0;
 const os_1 = require("os");
 const lodash_1 = require("lodash");
 const common_1 = require("./common");
@@ -16,7 +16,7 @@ var Method;
     Method["trace"] = "TRACE";
     Method["connect"] = "CONNECT";
 })(Method = exports.Method || (exports.Method = {}));
-class Parser {
+class RequestParser {
     constructor(cell, document) {
         var _a;
         const query = cell.document.getText();
@@ -139,5 +139,5 @@ class Parser {
         }
     }
 }
-exports.Parser = Parser;
-//# sourceMappingURL=parser.js.map
+exports.RequestParser = RequestParser;
+//# sourceMappingURL=request.js.map

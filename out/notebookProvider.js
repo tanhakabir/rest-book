@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
 const vscode = require("vscode");
-const parser_1 = require("./parser");
+const request_1 = require("./request");
 const response_1 = require("./response");
 const axios = require('axios').default;
 class CallsNotebookProvider {
@@ -112,7 +112,7 @@ class CallsNotebookProvider {
                 cell.metadata.runStartTime = start;
                 cell.outputs = [];
                 const logger = (d) => {
-                    cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new response_1.Response(d).parse() }];
+                    cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new response_1.ResponseParser(d).parse() }];
                 };
                 const token = { onCancellationRequested: undefined };
                 this.cancellations.set(cell, token);
@@ -137,7 +137,7 @@ class CallsNotebookProvider {
     }
     _performExecution(cell, document, logger, token) {
         return __awaiter(this, void 0, void 0, function* () {
-            const parser = new parser_1.Parser(cell, document);
+            const parser = new request_1.RequestParser(cell, document);
             try {
                 const cancelTokenAxios = axios.CancelToken.source();
                 let options = parser.getAxiosOptions();
