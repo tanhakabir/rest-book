@@ -9,6 +9,9 @@
         },
         {
             "include": "#json"
+        },
+        {
+            "include": "#xml"
         }
     ],
     "repository": {
@@ -37,6 +40,16 @@
             "patterns": [
                 {
                     "include": "source.json"
+                }
+            ]
+        },
+        "xml": {
+            "begin": "^\\s*(?=<\\S)",
+            "end": "^\\s*(\\#{3,}.*?)?\\s*$",
+            "name": "meta.embedded.block.xml",
+            "patterns": [
+                {
+                    "include": "text.xml"
                 }
             ]
         }
