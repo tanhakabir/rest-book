@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResponseHeaderField = exports.RequestHeaderField = exports.Method = void 0;
+exports.MIMEType = exports.ResponseHeaderField = exports.RequestHeaderField = exports.Method = void 0;
 // following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
 var Method;
 (function (Method) {
@@ -90,4 +90,25 @@ var ResponseHeaderField;
     ResponseHeaderField["connection"] = "Connection";
     ResponseHeaderField["transferEncoding"] = "Transfer-Encoding";
 })(ResponseHeaderField = exports.ResponseHeaderField || (exports.ResponseHeaderField = {}));
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+// https://en.wikipedia.org/wiki/Media_type
+var MIMEType;
+(function (MIMEType) {
+    MIMEType["json"] = "application/json";
+    MIMEType["octet"] = "application/octet-stream";
+    MIMEType["sql"] = "application/sql";
+    MIMEType["plain"] = "text/plain";
+    MIMEType["css"] = "text/css";
+    MIMEType["csv"] = "text/csv";
+    MIMEType["html"] = "text/html";
+    MIMEType["xml"] = "text/xml";
+    MIMEType["xmlApp"] = "application/xml";
+    MIMEType["js"] = "text/javascript";
+    MIMEType["jsApp"] = "application/javascript";
+    MIMEType["ecma"] = "application/ecmascript";
+    MIMEType["ecmaApp"] = "text/ecmascript";
+    MIMEType["graphql"] = "application/graphql";
+    MIMEType["ldJson"] = "application/ld+json";
+    MIMEType["wwwFormUrlEncoded"] = "application/x-www-form-urlencoded";
+})(MIMEType = exports.MIMEType || (exports.MIMEType = {}));
 //# sourceMappingURL=httpConstants.js.map

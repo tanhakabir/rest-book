@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { DEBUG_MODE, NAME } from './common';
-import { Method, RequestHeaderField } from './httpConstants';
+import { Method, MIMEType, RequestHeaderField } from './httpConstants';
 
 const selector: vscode.DocumentSelector = { language: NAME };
 export class MethodCompletionItemProvider implements vscode.CompletionItemProvider {
@@ -18,13 +18,20 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
             });
         }
 
-        // Request Headers
         for(const field of Object.values(RequestHeaderField)) {
             result.push({
                 label: field,
                 insertText: `${field}: `,
                 detail: 'HTTP request header field',
                 kind: vscode.CompletionItemKind.Field
+            });
+        }
+
+        for(const field of Object.values(MIMEType)) {
+            result.push({
+                label: field,
+                detail: 'HTTP MIME type',
+                kind: vscode.CompletionItemKind.EnumMember
             });
         }
         

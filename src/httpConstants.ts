@@ -86,3 +86,24 @@ export enum ResponseHeaderField {
     connection = "Connection",
     transferEncoding = "Transfer-Encoding"
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+// https://en.wikipedia.org/wiki/Media_type
+export enum MIMEType {
+    json = "application/json",
+    octet = "application/octet-stream",
+    sql = "application/sql",
+    plain = "text/plain",
+    css = "text/css",
+    csv = "text/csv",
+    html = "text/html",
+    xml = "text/xml",
+    xmlApp = "application/xml",
+    js ="text/javascript",
+    jsApp = "application/javascript",
+    ecma = "application/ecmascript",
+    ecmaApp = "text/ecmascript",
+    graphql = "application/graphql",
+    ldJson = "application/ld+json",
+    wwwFormUrlEncoded = "application/x-www-form-urlencoded",
+}

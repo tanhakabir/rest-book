@@ -16,13 +16,19 @@ class MethodCompletionItemProvider {
                 kind: vscode.CompletionItemKind.Method
             });
         }
-        // Request Headers
         for (const field of Object.values(httpConstants_1.RequestHeaderField)) {
             result.push({
                 label: field,
                 insertText: `${field}: `,
                 detail: 'HTTP request header field',
                 kind: vscode.CompletionItemKind.Field
+            });
+        }
+        for (const field of Object.values(httpConstants_1.MIMEType)) {
+            result.push({
+                label: field,
+                detail: 'HTTP MIME type',
+                kind: vscode.CompletionItemKind.EnumMember
             });
         }
         return result;
