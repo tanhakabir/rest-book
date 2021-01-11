@@ -152,7 +152,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
                              token: CancellationToken): 
                              Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void> {
 
-        const parser = new RequestParser(cell, document);
+        const parser = new RequestParser(cell.document.getText());
 
         try {
             const cancelTokenAxios = axios.CancelToken.source();

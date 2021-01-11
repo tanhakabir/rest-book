@@ -32,10 +32,8 @@ export class RequestParser {
     private originalRequest: string[];
     private requestOptions: AxiosOptions;
 
-    constructor(cell: vscode.NotebookCell, 
-                document: vscode.NotebookDocument) {
-
-        const query = cell.document.getText();
+    constructor(query: string) {
+        
         let linesOfRequest = query.split(EOL);
 
         if (linesOfRequest.filter(s => { return s; }).length === 0) {
