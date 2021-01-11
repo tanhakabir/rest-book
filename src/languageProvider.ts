@@ -9,11 +9,11 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const result: vscode.CompletionItem[] = [];
 
-        // Request Methods
         for(const field of Object.values(Method)) {
             result.push({
                 label: field,
                 insertText: `${field} `,
+                detail: 'HTTP request method',
                 kind: vscode.CompletionItemKind.Method
             });
         }
@@ -23,6 +23,7 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
             result.push({
                 label: field,
                 insertText: `${field}: `,
+                detail: 'HTTP request header field',
                 kind: vscode.CompletionItemKind.Field
             });
         }

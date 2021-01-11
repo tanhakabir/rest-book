@@ -8,11 +8,11 @@ const selector = { language: common_1.NAME };
 class MethodCompletionItemProvider {
     provideCompletionItems(document, position, token, context) {
         const result = [];
-        // Request Methods
         for (const field of Object.values(httpConstants_1.Method)) {
             result.push({
                 label: field,
                 insertText: `${field} `,
+                detail: 'HTTP request method',
                 kind: vscode.CompletionItemKind.Method
             });
         }
@@ -21,6 +21,7 @@ class MethodCompletionItemProvider {
             result.push({
                 label: field,
                 insertText: `${field}: `,
+                detail: 'HTTP request header field',
                 kind: vscode.CompletionItemKind.Field
             });
         }
