@@ -46,7 +46,7 @@
         "xml": {
             "begin": "^\\s*(?=<\\S)",
             "end": "^\\s*(\\#{3,}.*?)?\\s*$",
-            "name": "meta.embedded.block.json",
+            "name": "meta.embedded.block.xml",
             "patterns": [
                 {
                     "include": "text.xml"
