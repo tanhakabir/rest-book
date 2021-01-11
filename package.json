@@ -36,7 +36,7 @@
       {
         "id": "rest-book",
         "displayName": "REST Book Renderer",
-        "entrypoint": "./dist/renderer.js",
+        "entrypoint": "./out/custom-renderer/index.js",
         "mimeTypes": [
           "x-application/rest-book"
         ]
@@ -91,7 +91,9 @@
     "mocha": "^8.1.3",
     "typescript": "^4.0.2",
     "vscode-dts": "^0.3.1",
-    "vscode-test": "^1.4.0"
+    "vscode-test": "^1.4.0",
+    "webpack": "^5.12.3",
+    "webpack-cli": "^4.3.1"
   },
   "dependencies": {
     "@types/react": "^17.0.0",
