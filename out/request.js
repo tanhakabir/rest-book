@@ -1,21 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RequestParser = exports.Method = void 0;
+exports.RequestParser = void 0;
 const os_1 = require("os");
 const lodash_1 = require("lodash");
 const common_1 = require("./common");
-// following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
-var Method;
-(function (Method) {
-    Method["options"] = "OPTIONS";
-    Method["get"] = "GET";
-    Method["head"] = "HEAD";
-    Method["post"] = "POST";
-    Method["put"] = "PUT";
-    Method["delete"] = "DELETE";
-    Method["trace"] = "TRACE";
-    Method["connect"] = "CONNECT";
-})(Method = exports.Method || (exports.Method = {}));
+const httpConstants_1 = require("./httpConstants");
 class RequestParser {
     constructor(cell, document) {
         var _a;
@@ -48,12 +37,12 @@ class RequestParser {
             if (!common_1.validateURL(tokens[0])) {
                 throw new Error('Invalid URL given!');
             }
-            return Method.get;
+            return httpConstants_1.Method.get;
         }
-        if (!(tokens[0].toLowerCase() in Method)) {
+        if (!(tokens[0].toLowerCase() in httpConstants_1.Method)) {
             throw new Error('Invalid method given!');
         }
-        return Method[tokens[0].toLowerCase()];
+        return httpConstants_1.Method[tokens[0].toLowerCase()];
     }
     _parseBaseUrl() {
         const tokens = this.originalRequest[0].split(/[\s,]+/);

@@ -2,18 +2,7 @@ import { EOL } from 'os';
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
-
-// following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
-export enum Method {
-    options = "OPTIONS",
-    get = "GET",
-    head = "HEAD",
-    post = "POST",
-    put = "PUT",
-    delete = "DELETE",
-    trace = "TRACE",
-    connect = "CONNECT"
-}
+import { Method, RequestHeaderField } from './httpConstants';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined

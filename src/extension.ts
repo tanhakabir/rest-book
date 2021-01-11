@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { CallsNotebookProvider } from './notebookProvider';
+import { registerLanguageProvider } from './languageProvider';
 import { logDebug } from './common';
 
 // this method is called when your extension is activated
@@ -14,6 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('restbook.notebook', new CallsNotebookProvider()));
+	context.subscriptions.push(registerLanguageProvider());
 }
 
 // this method is called when your extension is deactivated
