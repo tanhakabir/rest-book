@@ -9,6 +9,7 @@ REST Book is a Visual Studio Code extension that allows you to perform REST call
 - Organize multiple REST Calls within one file.
 - Intermingle markdown for documenting your calls.
 - View rich HTML and image responses directly inside the Notebook.
+- Basic Authentication
 
 ## Requirements
 
@@ -68,6 +69,8 @@ Content-Type: application/json
     text: "Foo is the most bar of the Foos" 
 }
 ```
+
+To test these interactions, you can play around with this simple server: [SandboxServer](https://github.com/tanhakabir/SandboxServer)
 
 ## Known Issues
 
