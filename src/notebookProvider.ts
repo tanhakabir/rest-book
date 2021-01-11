@@ -1,6 +1,7 @@
 import { DEBUG_MODE, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
-import { RequestParser, Method } from './request';
+import { Method } from './httpConstants';
+import { RequestParser } from './request';
 import { ResponseParser } from './response';
 const axios = require('axios').default;
 

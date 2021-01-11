@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResponseParser = void 0;
 const common_1 = require("./common");
+const httpConstants_1 = require("./httpConstants");
 class ResponseParser {
     constructor(response) {
         common_1.logDebug(response);
@@ -12,21 +13,11 @@ class ResponseParser {
         try {
             this.status = res.status;
             this.statusText = res.statusText;
-            this.headers = {
-                date: res.headers.date,
-                allow: res.headers.allow,
-                expires: res.headers.expires,
-                "cache-control": res.headers["cache-control"],
-                "content-type": res.headers["content-type"],
-                "content-length": res.headers["content-length"],
-                p3p: res.headers.p3p,
-                server: res.headers.server,
-                "x-xss-protection": res.headers["x-xss-protection"],
-                "x-frame-options": res.headers["x-frame-option"],
-                "set-cookie": res.headers["set-cookie"],
-                connection: res.headers.connection,
-                "transfer-encoding": res.headers["transfer-encoding"]
-            };
+            // cyclical reference so we need to cherry pick fields
+            this.headers = {};
+            for (const field of Object.values(httpConstants_1.ResponseHeaderField)) {
+                this.headers[field] = res.headers[field.toLowerCase()];
+            }
             this.config = {
                 timeout: res.config.timeout,
                 xsrfCookieName: res.config.xsrfCookieName,

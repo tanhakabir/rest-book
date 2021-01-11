@@ -5,6 +5,7 @@ exports.deactivate = exports.activate = void 0;
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
 const notebookProvider_1 = require("./notebookProvider");
+const languageProvider_1 = require("./languageProvider");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -12,6 +13,7 @@ function activate(context) {
     // This line of code will only be executed once when your extension is activated
     console.log('rest-book is now active!');
     context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('restbook.notebook', new notebookProvider_1.CallsNotebookProvider()));
+    context.subscriptions.push(languageProvider_1.registerLanguageProvider());
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated

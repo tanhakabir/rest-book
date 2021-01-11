@@ -1,4 +1,5 @@
 import { logDebug } from './common';
+import { ResponseHeaderField } from './httpConstants';
 
 export class ResponseParser {
     private status: number| undefined;
@@ -20,21 +21,12 @@ export class ResponseParser {
             this.status = res.status;
             this.statusText = res.statusText;
 
-            this.headers = {
-                date: res.headers.date,
-                allow: res.headers.allow,
-                expires: res.headers.expires,
-                "cache-control": res.headers["cache-control"],
-                "content-type": res.headers["content-type"],
-                "content-length": res.headers["content-length"],
-                p3p: res.headers.p3p,
-                server: res.headers.server,
-                "x-xss-protection": res.headers["x-xss-protection"],
-                "x-frame-options": res.headers["x-frame-option"],
-                "set-cookie": res.headers["set-cookie"],
-                connection: res.headers.connection,
-                "transfer-encoding": res.headers["transfer-encoding"]
-            };
+            // cyclical reference so we need to cherry pick fields
+            this.headers = {};
+
+            for(const field of Object.values(ResponseHeaderField)) {
+                this.headers[field] = res.headers[field.toLowerCase()];
+            }
 
             this.config = {
                 timeout: res.config.timeout,
