@@ -1,6 +1,5 @@
 import { FunctionComponent, h } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
-import React = require('react');
 import { ResponseRendererElements } from '../common/response';
 
 export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements> }> = ({ response }) => {

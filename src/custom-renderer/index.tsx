@@ -1,5 +1,4 @@
 import { h, render } from 'preact';
-import React = require('react');
 import { Response } from './renderer';
 
 const api = acquireNotebookRendererApi('rest-book');

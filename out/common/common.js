@@ -1,14 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.logDebug = exports.validateURL = exports.NAME = exports.DEBUG_MODE = void 0;
-const url_1 = require("url");
-exports.DEBUG_MODE = false;
-exports.NAME = 'rest-book';
-function validateURL(url) {
+import * as url from 'url';
+const { URL, parse } = url;
+export const DEBUG_MODE = false;
+export const NAME = 'rest-book';
+export function validateURL(url) {
     const protocols = ['http', 'https'];
     try {
-        new url_1.URL(url);
-        const parsed = url_1.parse(url);
+        new URL(url);
+        const parsed = parse(url);
         logDebug(parsed.protocol);
         return protocols
             ? parsed.protocol
@@ -21,11 +19,9 @@ function validateURL(url) {
         return false;
     }
 }
-exports.validateURL = validateURL;
-function logDebug(item) {
-    if (exports.DEBUG_MODE) {
+export function logDebug(item) {
+    if (DEBUG_MODE) {
         console.log(item);
     }
 }
-exports.logDebug = logDebug;
 //# sourceMappingURL=common.js.map

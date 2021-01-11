@@ -18,7 +18,8 @@
     "onNotebook:restbook.notebook",
     "onLanguage:rest-book"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension-node.js",
+  "browser": "./dist/extension-web.js",
   "contributes": {
     "notebookProvider": [
       {
@@ -36,7 +37,7 @@
       {
         "id": "rest-book",
         "displayName": "REST Book Renderer",
-        "entrypoint": "./out/custom-renderer/index.js",
+        "entrypoint": "./dist/renderer.js",
         "mimeTypes": [
           "x-application/rest-book"
         ]
@@ -71,10 +72,14 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "webpack --mode none",
-    "lint": "eslint src --ext ts",
     "watch": "webpack --mode none --watch  --info-verbosity verbose",
-    "pretest": "npm run compile && npm run lint",
-    "test": "node ./out/test/runTest.js"
+    "lint": "eslint --config .eslintrc.json ./src/**/*.ts",
+    "ts-compile": "tsc -b",
+    "integration-test": "npm run ts-compile && node ./out/extension/test-integration/runTest.js",
+    "unit-test": "npm run ts-compile && npx mocha ./out/extension/test-unit",
+    "compile-lint-test": "npm run compile && npm run lint && npm run unit-test",
+    "precommit": "npm run lint",
+    "deploy": "npx vsce publish --web --noVerify"
   },
   "devDependencies": {
     "@types/glob": "^7.1.3",
@@ -89,7 +94,11 @@
     "eslint": "^7.9.0",
     "glob": "^7.1.6",
     "mocha": "^8.1.3",
+    "os": "^0.1.1",
+    "os-browserify": "^0.3.0",
+    "ts-loader": "^8.0.14",
     "typescript": "^4.0.2",
+    "url": "^0.11.0",
     "vscode-dts": "^0.3.1",
     "vscode-test": "^1.4.0",
     "webpack": "^5.12.3",

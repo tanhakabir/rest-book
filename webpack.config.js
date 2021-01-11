@@ -18,6 +18,8 @@ const config = {
 	},
 	resolve: {
 		extensions: ['.ts', '.js'],
+        fallback: { "url": require.resolve("url/"),
+                    "os": require.resolve("os-browserify/browser") }
 	},
 	module: {
 		rules: [
@@ -28,7 +30,7 @@ const config = {
 					{
 						loader: 'ts-loader',
 						options: {
-							configFile: path.resolve(__dirname, './src/extension/tsconfig.json'),
+							configFile: path.resolve(__dirname, 'src/extension/tsconfig.json'),
 							projectReferences: true,
 							compilerOptions: {
 								module: 'esnext',
@@ -82,7 +84,7 @@ const rendererConfig = {
 					{
 						loader: 'ts-loader',
 						options: {
-							configFile: path.resolve(__dirname, './src/renderer/tsconfig.json'),
+							configFile: path.resolve(__dirname, 'src/custom-renderer/tsconfig.json'),
 							projectReferences: true,
 							compilerOptions: {
 								module: 'esnext',

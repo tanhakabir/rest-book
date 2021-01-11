@@ -6,7 +6,7 @@ const selector: vscode.DocumentSelector = { language: NAME };
 export class MethodCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = [];
 
-    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken, context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+    provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const result: vscode.CompletionItem[] = [];
 
         for(const field of Object.values(Method)) {

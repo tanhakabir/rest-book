@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.MIMEType = exports.ResponseHeaderField = exports.RequestHeaderField = exports.Method = void 0;
 // following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
-var Method;
+export var Method;
 (function (Method) {
     Method["options"] = "OPTIONS";
     Method["get"] = "GET";
@@ -12,9 +9,9 @@ var Method;
     Method["delete"] = "DELETE";
     Method["trace"] = "TRACE";
     Method["connect"] = "CONNECT";
-})(Method = exports.Method || (exports.Method = {}));
+})(Method || (Method = {}));
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
-var RequestHeaderField;
+export var RequestHeaderField;
 (function (RequestHeaderField) {
     RequestHeaderField["wwwAuthentication"] = "WWW-Authenticate";
     RequestHeaderField["authorization"] = "Authorization";
@@ -73,8 +70,8 @@ var RequestHeaderField;
     RequestHeaderField["referer"] = "Referer";
     RequestHeaderField["referrerPolicy"] = "Referrer-Policy";
     RequestHeaderField["userAgent"] = "User-Agent";
-})(RequestHeaderField = exports.RequestHeaderField || (exports.RequestHeaderField = {}));
-var ResponseHeaderField;
+})(RequestHeaderField || (RequestHeaderField = {}));
+export var ResponseHeaderField;
 (function (ResponseHeaderField) {
     ResponseHeaderField["allow"] = "Allow";
     ResponseHeaderField["date"] = "Date";
@@ -89,10 +86,10 @@ var ResponseHeaderField;
     ResponseHeaderField["setCookie"] = "Set-Cookie";
     ResponseHeaderField["connection"] = "Connection";
     ResponseHeaderField["transferEncoding"] = "Transfer-Encoding";
-})(ResponseHeaderField = exports.ResponseHeaderField || (exports.ResponseHeaderField = {}));
+})(ResponseHeaderField || (ResponseHeaderField = {}));
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
 // https://en.wikipedia.org/wiki/Media_type
-var MIMEType;
+export var MIMEType;
 (function (MIMEType) {
     MIMEType["json"] = "application/json";
     MIMEType["octet"] = "application/octet-stream";
@@ -110,5 +107,5 @@ var MIMEType;
     MIMEType["graphql"] = "application/graphql";
     MIMEType["ldJson"] = "application/ld+json";
     MIMEType["wwwFormUrlEncoded"] = "application/x-www-form-urlencoded";
-})(MIMEType = exports.MIMEType || (exports.MIMEType = {}));
+})(MIMEType || (MIMEType = {}));
 //# sourceMappingURL=httpConstants.js.map

@@ -75,13 +75,13 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         return notebookData;
     }
 
-    async resolveNotebook(document: vscode.NotebookDocument, webview: vscode.NotebookCommunication): Promise<void> {
+    async resolveNotebook(_document: vscode.NotebookDocument, _webview: vscode.NotebookCommunication): Promise<void> {
         // TODO figure out what this method is for
     }
-    async saveNotebook(document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
+    async saveNotebook(document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void> {
         return this._save(document, document.uri);
     }
-    async saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, cancellation: vscode.CancellationToken): Promise<void> {
+    async saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void> {
         return this._save(document, targetResource);
     }
 
@@ -101,7 +101,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));
 	}
 
-    async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
+    async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, _cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
         await this._save(document, context.destination);
 		return {
 			id: context.destination.toString(),
@@ -147,7 +147,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
     }
 
     async _performExecution( cell: vscode.NotebookCell, 
-                             document: vscode.NotebookDocument, 
+                             _document: vscode.NotebookDocument, 
                              logger: (s: string) => void,
                              token: CancellationToken): 
                              Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void> {
@@ -172,7 +172,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         }
     }
 
-    cancelCellExecution(document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
+    cancelCellExecution(_document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
         this.cancellations.get(cell)?.onCancellationRequested?.();
     }
     async executeAllCells(document: vscode.NotebookDocument): Promise<void> {

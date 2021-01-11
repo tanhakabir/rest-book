@@ -1,4 +1,5 @@
-import { URL, parse } from 'url';
+import * as url from 'url';
+const { URL, parse } = url;
 
 export const DEBUG_MODE = false;
 

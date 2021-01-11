@@ -1,11 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ResponseParser = void 0;
-const common_1 = require("./common");
-const httpConstants_1 = require("./httpConstants");
-class ResponseParser {
+import { logDebug } from './common';
+import { ResponseHeaderField } from './httpConstants';
+export class ResponseParser {
     constructor(response) {
-        common_1.logDebug(response);
+        logDebug(response);
         let res = response;
         if (response.response && response.status === undefined) {
             res = response.response;
@@ -15,7 +12,7 @@ class ResponseParser {
             this.statusText = res.statusText;
             // cyclical reference so we need to cherry pick fields
             this.headers = {};
-            for (const field of Object.values(httpConstants_1.ResponseHeaderField)) {
+            for (const field of Object.values(ResponseHeaderField)) {
                 this.headers[field] = res.headers[field.toLowerCase()];
             }
             this.config = {
@@ -33,7 +30,7 @@ class ResponseParser {
             };
             this.data = res.data;
         }
-        catch (_a) {
+        catch {
             throw new Error(response.message);
         }
     }
@@ -64,5 +61,4 @@ class ResponseParser {
         };
     }
 }
-exports.ResponseParser = ResponseParser;
 //# sourceMappingURL=response.js.map

@@ -1,4 +1,5 @@
-import { EOL } from 'os';
+import * as os from 'os';
+const { EOL } = os;
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
@@ -33,7 +34,7 @@ export class RequestParser {
     private requestOptions: AxiosOptions;
 
     constructor(query: string) {
-        
+
         let linesOfRequest = query.split(EOL);
 
         if (linesOfRequest.filter(s => { return s; }).length === 0) {

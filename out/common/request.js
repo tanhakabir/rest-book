@@ -1,19 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.RequestParser = void 0;
-const os_1 = require("os");
-const lodash_1 = require("lodash");
-const common_1 = require("./common");
-const httpConstants_1 = require("./httpConstants");
-class RequestParser {
-    constructor(cell, document) {
+import * as os from 'os';
+const { EOL } = os;
+import { pickBy, identity, isEmpty } from 'lodash';
+import { logDebug, validateURL, NAME } from './common';
+import { Method } from './httpConstants';
+export class RequestParser {
+    constructor(query) {
         var _a;
-        const query = cell.document.getText();
-        let linesOfRequest = query.split(os_1.EOL);
+        let linesOfRequest = query.split(EOL);
         if (linesOfRequest.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
         }
-        common_1.logDebug(linesOfRequest);
+        logDebug(linesOfRequest);
         this.originalRequest = linesOfRequest;
         this.requestOptions = {
             method: this._parseMethod(),
@@ -21,12 +18,12 @@ class RequestParser {
         };
         this.requestOptions.params = this._parseQueryParams();
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let defaultHeaders = { "User-Agent": common_1.NAME };
+        let defaultHeaders = { "User-Agent": NAME };
         this.requestOptions.headers = (_a = this._parseHeaders()) !== null && _a !== void 0 ? _a : defaultHeaders;
         this.requestOptions.data = this._parseBody();
     }
     getAxiosOptions() {
-        return lodash_1.pickBy(this.requestOptions, lodash_1.identity);
+        return pickBy(this.requestOptions, identity);
     }
     _parseMethod() {
         const tokens = this.originalRequest[0].split(/[\s,]+/);
@@ -34,26 +31,26 @@ class RequestParser {
             throw new Error('Invalid request!');
         }
         if (tokens.length === 1) {
-            if (!common_1.validateURL(tokens[0])) {
+            if (!validateURL(tokens[0])) {
                 throw new Error('Invalid URL given!');
             }
-            return httpConstants_1.Method.get;
+            return Method.get;
         }
-        if (!(tokens[0].toLowerCase() in httpConstants_1.Method)) {
+        if (!(tokens[0].toLowerCase() in Method)) {
             throw new Error('Invalid method given!');
         }
-        return httpConstants_1.Method[tokens[0].toLowerCase()];
+        return Method[tokens[0].toLowerCase()];
     }
     _parseBaseUrl() {
         const tokens = this.originalRequest[0].split(/[\s,]+/);
         if (tokens.length === 0) {
             throw new Error('Invalid request!');
         }
-        if (common_1.validateURL(tokens[0])) {
+        if (validateURL(tokens[0])) {
             return tokens[0];
         }
         else if (tokens.length > 1) {
-            if (common_1.validateURL(tokens[1])) {
+            if (validateURL(tokens[1])) {
                 return tokens[1];
             }
         }
@@ -108,7 +105,7 @@ class RequestParser {
             headers[parts[0]] = parts[1];
             i++;
         }
-        return lodash_1.isEmpty(headers) ? undefined : headers;
+        return isEmpty(headers) ? undefined : headers;
     }
     _parseBody() {
         if (this.originalRequest.length < 3) {
@@ -123,10 +120,9 @@ class RequestParser {
         try {
             return JSON.parse(bodyStr);
         }
-        catch (_a) {
+        catch {
             return bodyStr;
         }
     }
 }
-exports.RequestParser = RequestParser;
 //# sourceMappingURL=request.js.map
