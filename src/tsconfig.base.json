@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "ES2019",
+		"outDir": "out",
+		"lib": ["ES2019"],
+		"sourceMap": true,
+		"rootDir": "src/extension",
+		"strict": true,
+		"moduleResolution": "Node",
+		"noUnusedParameters": true,
+		"forceConsistentCasingInFileNames": true,
+	},
+}
