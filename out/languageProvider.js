@@ -12,6 +12,7 @@ class MethodCompletionItemProvider {
         for (const field of Object.values(httpConstants_1.Method)) {
             result.push({
                 label: field,
+                insertText: `${field} `,
                 kind: vscode.CompletionItemKind.Method
             });
         }
@@ -19,6 +20,7 @@ class MethodCompletionItemProvider {
         for (const field of Object.values(httpConstants_1.RequestHeaderField)) {
             result.push({
                 label: field,
+                insertText: `${field}: `,
                 kind: vscode.CompletionItemKind.Field
             });
         }

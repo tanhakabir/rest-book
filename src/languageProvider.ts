@@ -13,6 +13,7 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
         for(const field of Object.values(Method)) {
             result.push({
                 label: field,
+                insertText: `${field} `,
                 kind: vscode.CompletionItemKind.Method
             });
         }
@@ -21,6 +22,7 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
         for(const field of Object.values(RequestHeaderField)) {
             result.push({
                 label: field,
+                insertText: `${field}: `,
                 kind: vscode.CompletionItemKind.Field
             });
         }

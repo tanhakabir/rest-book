@@ -13,8 +13,8 @@
     ],
     "repository": {
         "constant": {
-            "name": "constant.language",
-            "match": "\\b(GET|POST|PUT|DELETE)\\b"
+            "name": "support.function",
+            "match": "\\b(OPTIONS|GET|HEAD|POST|PUT|DELETE|TRACE|CONNECT)\\b"
         },
         "headerkey": {
             "name": "keyword.other",
