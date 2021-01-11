@@ -1,6 +1,15 @@
 import { logDebug } from './common';
 import { ResponseHeaderField } from './httpConstants';
 
+export interface ResponseRendererElements {
+    status: number,
+    statusText: string,
+    headers?: any | undefined,
+    config?: any | undefined,
+    request?: any | undefined,
+    data: any
+}
+
 export class ResponseParser {
     private status: number| undefined;
     private statusText: string | undefined;
@@ -49,17 +58,33 @@ export class ResponseParser {
         }
     }
 
-    parse() {
+    json() {
         return {
-            "application/json": {
-                status: this.status,
-                statusText: this.statusText,
-                headers: this.headers,
-                config: this.config,
-                request: this.request,
-                data: this.data
-            },
-            "text/html": this.data
+            status: this.status,
+            statusText: this.statusText,
+            headers: this.headers,
+            config: this.config,
+            request: this.request,
+            data: this.data
         };
-    };
+    }
+
+    html() {
+        return this.data;
+    }
+
+    renderer(): ResponseRendererElements {
+        if (!this.status || !this.statusText || !this.data) {
+            throw new Error("Corrupt response received! Missing one or more of response status, status text, and/or data!");
+        }
+
+        return {
+            status: this.status!,
+            statusText: this.statusText!,
+            headers: this.headers,
+            config: this.config,
+            request: this.request,
+            data: this.data!
+        };
+    }
 }

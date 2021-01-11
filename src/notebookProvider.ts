@@ -61,7 +61,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             metadata: {
                 cellRunnable: true,
                 cellHasExecutionOrder: true,
-                displayOrder: ['x-application/rest-book', 'text/markdown']
+                displayOrder: ['x-application/rest-book', 'application/json', 'text/markdown']
             },
             cells: raw.map(item => ({
                 source: item.value,
@@ -116,7 +116,14 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             cell.metadata.runStartTime = start;
             cell.outputs = [];
             const logger = (d: any) => {
-                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new ResponseParser(d).parse() }];
+                const response = new ResponseParser(d);
+                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, 
+                                                   data: {
+                                                    "application/json": response.json(),
+                                                    "text/html": response.html(),
+                                                    "x-application/rest-book": response.renderer()
+                                                   } 
+                                                }];
             };
             const token: CancellationToken = { onCancellationRequested: undefined };
             this.cancellations.set(cell, token);

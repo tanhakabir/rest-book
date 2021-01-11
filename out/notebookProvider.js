@@ -49,7 +49,7 @@ class CallsNotebookProvider {
                 metadata: {
                     cellRunnable: true,
                     cellHasExecutionOrder: true,
-                    displayOrder: ['x-application/rest-book', 'text/markdown']
+                    displayOrder: ['x-application/rest-book', 'application/json', 'text/markdown']
                 },
                 cells: raw.map(item => {
                     var _a, _b;
@@ -112,7 +112,14 @@ class CallsNotebookProvider {
                 cell.metadata.runStartTime = start;
                 cell.outputs = [];
                 const logger = (d) => {
-                    cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, data: new response_1.ResponseParser(d).parse() }];
+                    const response = new response_1.ResponseParser(d);
+                    cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich,
+                            data: {
+                                "application/json": response.json(),
+                                "text/html": response.html(),
+                                "x-application/rest-book": response.renderer()
+                            }
+                        }];
                 };
                 const token = { onCancellationRequested: undefined };
                 this.cancellations.set(cell, token);

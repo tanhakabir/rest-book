@@ -32,6 +32,16 @@
         ]
       }
     ],
+    "notebookOutputRenderer": [
+      {
+        "id": "rest-book",
+        "displayName": "REST Book Renderer",
+        "entrypoint": "./dist/renderer.js",
+        "mimeTypes": [
+          "x-application/rest-book"
+        ]
+      }
+    ],
     "languages": [
       {
         "id": "rest-book",
@@ -86,6 +96,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "lodash": "^4.17.20",
+    "preact": "^10.5.9",
     "user-home": "^2.0.0"
   }
 }

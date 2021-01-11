@@ -37,20 +37,32 @@ class ResponseParser {
             throw new Error(response.message);
         }
     }
-    parse() {
+    json() {
         return {
-            "application/json": {
-                status: this.status,
-                statusText: this.statusText,
-                headers: this.headers,
-                config: this.config,
-                request: this.request,
-                data: this.data
-            },
-            "text/html": this.data
+            status: this.status,
+            statusText: this.statusText,
+            headers: this.headers,
+            config: this.config,
+            request: this.request,
+            data: this.data
         };
     }
-    ;
+    html() {
+        return this.data;
+    }
+    renderer() {
+        if (!this.status || !this.statusText || !this.data) {
+            throw new Error("Corrupt response received! Missing one or more of response status, status text, and/or data!");
+        }
+        return {
+            status: this.status,
+            statusText: this.statusText,
+            headers: this.headers,
+            config: this.config,
+            request: this.request,
+            data: this.data
+        };
+    }
 }
 exports.ResponseParser = ResponseParser;
 //# sourceMappingURL=response.js.map
