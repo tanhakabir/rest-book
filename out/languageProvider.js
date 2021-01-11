@@ -24,6 +24,13 @@ class MethodCompletionItemProvider {
                 kind: vscode.CompletionItemKind.Field
             });
         }
+        for (const field of Object.values(httpConstants_1.MIMEType)) {
+            result.push({
+                label: field,
+                detail: 'HTTP MIME type',
+                kind: vscode.CompletionItemKind.EnumMember
+            });
+        }
         return result;
     }
 }
