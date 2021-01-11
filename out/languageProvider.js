@@ -16,7 +16,6 @@ class MethodCompletionItemProvider {
                 kind: vscode.CompletionItemKind.Method
             });
         }
-        // Request Headers
         for (const field of Object.values(httpConstants_1.RequestHeaderField)) {
             result.push({
                 label: field,

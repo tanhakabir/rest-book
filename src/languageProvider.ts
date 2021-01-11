@@ -18,7 +18,6 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
             });
         }
 
-        // Request Headers
         for(const field of Object.values(RequestHeaderField)) {
             result.push({
                 label: field,
