@@ -94,6 +94,7 @@
     "vscode-test": "^1.4.0"
   },
   "dependencies": {
+    "@types/react": "^17.0.0",
     "lodash": "^4.17.20",
     "preact": "^10.5.9",
     "user-home": "^2.0.0"
