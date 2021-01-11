@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { CallsNotebookProvider } from './notebookProvider';
 import { registerLanguageProvider } from './languageProvider';
-import { logDebug } from './common';
+import { logDebug } from '../common/common';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed

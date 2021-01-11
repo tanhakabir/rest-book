@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ResponseParser = void 0;
-const common_1 = require("./common/common");
-const httpConstants_1 = require("./common/httpConstants");
+const common_1 = require("./common");
+const httpConstants_1 = require("./httpConstants");
 class ResponseParser {
     constructor(response) {
         common_1.logDebug(response);

@@ -1,8 +1,8 @@
-import { DEBUG_MODE, validateURL, NAME } from './common';
+import { DEBUG_MODE, validateURL, NAME } from '../common/common';
 import * as vscode from 'vscode';
-import { Method } from './httpConstants';
-import { RequestParser } from './request';
-import { ResponseParser } from './response';
+import { Method } from '../common/httpConstants';
+import { RequestParser } from '../common/request';
+import { ResponseParser } from '../common/response';
 const axios = require('axios').default;
 
 interface RawCell {

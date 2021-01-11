@@ -11,8 +11,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CallsNotebookProvider = void 0;
 const vscode = require("vscode");
-const request_1 = require("./common/request");
-const response_1 = require("./common/response");
+const request_1 = require("../common/request");
+const response_1 = require("../common/response");
 const axios = require('axios').default;
 class CallsNotebookProvider {
     constructor() {

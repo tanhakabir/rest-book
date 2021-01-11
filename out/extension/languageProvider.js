@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerLanguageProvider = exports.MethodCompletionItemProvider = void 0;
 const vscode = require("vscode");
-const common_1 = require("./common/common");
-const httpConstants_1 = require("./common/httpConstants");
+const common_1 = require("../common/common");
+const httpConstants_1 = require("../common/httpConstants");
 const selector = { language: common_1.NAME };
 class MethodCompletionItemProvider {
     provideCompletionItems(document, position, token, context) {

@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RequestParser = void 0;
 const os_1 = require("os");
 const lodash_1 = require("lodash");
-const common_1 = require("./common/common");
-const httpConstants_1 = require("./common/httpConstants");
+const common_1 = require("./common");
+const httpConstants_1 = require("./httpConstants");
 class RequestParser {
     constructor(cell, document) {
         var _a;

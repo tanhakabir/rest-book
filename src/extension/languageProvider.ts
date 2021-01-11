@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { DEBUG_MODE, NAME } from './common';
-import { Method, MIMEType, RequestHeaderField } from './httpConstants';
+import { DEBUG_MODE, NAME } from '../common/common';
+import { Method, MIMEType, RequestHeaderField } from '../common/httpConstants';
 
 const selector: vscode.DocumentSelector = { language: NAME };
 export class MethodCompletionItemProvider implements vscode.CompletionItemProvider {
