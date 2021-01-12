@@ -9,14 +9,17 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
     const renderTabHeaders = () => {
         let result: h.JSX.Element[] = [];
 
-        result.push(<button class='tab-header' onClick={() => setActive(0)}>Data</button>);
+        //@ts-ignore
+        result.push(<button class='tab-header' onClick={() => setActive(0)} active={activeIndex === 0}>Data</button>);
 
         if(response.headers) {
-            result.push(<button class='tab-header' onClick={() => setActive(1)}>Headers</button>);
+            //@ts-ignore
+            result.push(<button class='tab-header' onClick={() => setActive(1)}  active={activeIndex === 1}>Headers</button>);
         }
 
         if(response.config) {
-            result.push(<button class='tab-header' onClick={() => setActive(2)}>Config</button>);
+            //@ts-ignore
+            result.push(<button class='tab-header' onClick={() => setActive(2)}  active={activeIndex === 2}>Config</button>);
         }
 
         return result;
@@ -24,9 +27,11 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
 
     return <div>
         <Status code={response.status} text={response.statusText} request={response.request} />
+        <br />
         <div id='tab-bar'>
           {renderTabHeaders()}
         </div>
+        <br />
         <DataTab data={response.data} active={activeIndex === 0}/>
         <TableTab dict={response.headers} active={activeIndex === 1}/>
         <TableTab dict={response.config} active={activeIndex === 2}/>
@@ -35,7 +40,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
 
 const Status: FunctionComponent<{ code: number, text: string, request?: any}> = ({ code, text, request }) => {
     return <div>
-        {code} {text} / {request.res.responseUrl} {request.res.httpVersion}
+        {request.method} {code} {text}   /   {request.res.responseUrl}
     </div>;
 };
 
