@@ -28,8 +28,8 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
           {renderTabHeaders()}
         </div>
         <DataTab data={response.data} active={activeIndex === 0}/>
-        <HeadersTab headers={response.headers} active={activeIndex === 1}/>
-        <ConfigTab config={response.config} active={activeIndex === 2}/>
+        <TableTab dict={response.headers} active={activeIndex === 1}/>
+        <TableTab dict={response.config} active={activeIndex === 2}/>
     </div>;
 };
 
@@ -39,29 +39,16 @@ const Status: FunctionComponent<{ code: number, text: string, request?: any}> = 
     </div>;
 };
 
-const HeadersTab: FunctionComponent<{ headers?: any, active: boolean}> = ({ headers, active }) => {
-    const renderFields = () => { return Object.keys(headers).map((key) => {
-        return <li>{key} :  {headers[key]}</li>;
-    })};
-
-    //@ts-ignore
-    return <div class='tab-content' hidden={!active}>
-        <ul>
-            {renderFields()}
-        </ul>
-    </div>;
-};
-
-const ConfigTab: FunctionComponent<{ config?: any, active: boolean}> = ({ config, active }) => {
-    const renderFields = () => { return Object.keys(config).map((key) => {
-        if(key === 'headers') {
+const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, active }) => {
+    const renderFields = () => { return Object.keys(dict).map((key) => {
+        if(typeof dict[key] === 'object') {
             return <ul>
-                {Object.keys(config.headers).map((hKey) => {
-                    return <li>{hKey} :  {config.headers[hKey]}</li>;
+                {Object.keys(dict[key]).map((subKey) => {
+                    return <li>{subKey} :  {dict[key][subKey]}</li>;
                 })}
             </ul>;
         }
-        return <li>{key} :  {config[key]}</li>;
+        return <li>{key} :  {dict[key]}</li>;
     })};
 
     //@ts-ignore
