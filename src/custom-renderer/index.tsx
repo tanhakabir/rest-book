@@ -1,5 +1,6 @@
 import { h, render } from 'preact';
 import { Response } from './renderer';
+import './style.css';
 
 const api = acquireNotebookRendererApi('rest-book');
 
