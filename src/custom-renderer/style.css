@@ -1,0 +1,7 @@
+.tab-content[hidden] {
+    display: none;
+}
+
+button[active] {
+    background-color:lavender;
+}
