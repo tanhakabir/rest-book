@@ -5,3 +5,13 @@
 button[active] {
     background-color:lavender;
 }
+
+#data-container {
+    max-height: 20em;
+    max-width: 100%;
+    overflow-y: scroll;
+}
+
+.request-url {
+    opacity: 0.5;
+}

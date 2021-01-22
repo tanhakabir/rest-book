@@ -4,8 +4,6 @@
 // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
 // Minimum TypeScript Version: 3.0
 
-// todo: update "Project" link above to docs site, once it becomes available
-
 export interface Disposable {
 	dispose(): void;
 }
