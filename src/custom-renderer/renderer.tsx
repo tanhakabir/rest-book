@@ -40,7 +40,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
 
 const Status: FunctionComponent<{ code: number, text: string, request?: any}> = ({ code, text, request }) => {
     return <div>
-        {request.method} {code} {text}   /   {request.res.responseUrl}
+        {request.method} {code} {text}   <span class='request-url'>/   {request.res.responseUrl}</span>
     </div>;
 };
 
@@ -66,7 +66,7 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, act
 
 const DataTab: FunctionComponent<{ data: any, active: boolean}> = ({ data, active }) => {
     //@ts-ignore
-    return <div class='tab-content' hidden={!active}>
+    return <div class='tab-content' id='data-container' hidden={!active}>
         {data}
     </div>;
 }
