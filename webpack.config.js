@@ -75,7 +75,7 @@ const rendererConfig = {
 		filename: 'renderer.js',
 	},
 	resolve: {
-		extensions: ['.ts', '.tsx', '.css'],
+		extensions: ['.ts', '.tsx', '.css']
 	},
 	module: {
 		rules: [

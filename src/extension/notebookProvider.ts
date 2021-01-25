@@ -1,8 +1,11 @@
 import { DEBUG_MODE, validateURL, NAME } from '../common/common';
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
 import { Method } from '../common/httpConstants';
 import { RequestParser } from '../common/request';
-import { ResponseParser } from '../common/response';
+import { ResponseParser, ResponseRendererElements } from '../common/response';
+import { URL } from 'url';
 const axios = require('axios').default;
 
 interface RawCell {
@@ -75,8 +78,15 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         return notebookData;
     }
 
-    async resolveNotebook(_document: vscode.NotebookDocument, _webview: vscode.NotebookCommunication): Promise<void> {
-        // TODO figure out what this method is for
+    async resolveNotebook(_document: vscode.NotebookDocument, webview: { readonly onDidReceiveMessage: vscode.Event<any>; postMessage(message: any): Thenable<boolean>; asWebviewUri(localResource: vscode.Uri): vscode.Uri; }): Promise<void>{
+        webview.onDidReceiveMessage((m) => {
+            switch(m.command) {
+                case 'save-response': 
+                    this.saveDataToFile(m.data);
+                    return;
+                default: break;
+            }
+        });
     }
     async saveNotebook(document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void> {
         return this._save(document, document.uri);
@@ -186,5 +196,31 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             this.cancellations.get(cell)?.onCancellationRequested?.();
         }
     }
+
+    async saveDataToFile(data: ResponseRendererElements) {
+        const workSpaceDir = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath ?? '');
+        if (!workSpaceDir) { return; }
+    
+        let name;
+        const url = data.request?.responseUrl;
+        if(url) {
+            let hostname = new URL(url).hostname;
+            hostname = hostname.replace(/^[A-Za-z0-9]+\./g, '');
+            hostname = hostname.replace(/\.[A-Za-z0-9]+$/g, '');
+            name = hostname.replace(/\./g, '-');
+        } else {
+            name = 'unknown-url';
+        }
+
+        let date = new Date().toDateString().replace(/\s/g, '-');
+        
+        const defaultPath = vscode.Uri.file(path.join(workSpaceDir, `response-${name}-${date}.json`));
+        const location = await vscode.window.showSaveDialog({ defaultUri: defaultPath });
+        if(!location) { return; }
+    
+        fs.writeFile(location?.fsPath, JSON.stringify(data, null, 4), { flag: 'w' }, (e) => {
+            vscode.window.showInformationMessage(e?.message || `Saved response to ${location}`);
+        });
+    };
     
 }

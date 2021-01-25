@@ -3,7 +3,7 @@ import { FunctionComponent, h } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { ResponseRendererElements } from '../common/response';
 
-export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements> }> = ({ response }) => {
+export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse: (d: any) => void }> = ({ response, saveResponse }) => {
     const [activeIndex, setActive] = useState(0);
 
     let darkMode = document.body.getAttribute('data-vscode-theme-kind')?.includes('dark') ?? false;
@@ -12,6 +12,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         <Status code={response.status} text={response.statusText} request={response.request} />
         <br />
         <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
+        <button onClick={() => saveResponse(response) }>Save Response</button>
         <br />
         <DataTab data={response.data} active={activeIndex === 0}/>
         <TableTab dict={response.headers} active={activeIndex === 1}/>

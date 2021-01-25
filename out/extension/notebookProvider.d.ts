@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { ResponseRendererElements } from '../common/response';
 declare type CancellationToken = {
     onCancellationRequested?: () => void;
 };
@@ -16,7 +17,11 @@ export declare class CallsNotebookProvider implements vscode.NotebookContentProv
     private cancellations;
     constructor();
     openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData>;
-    resolveNotebook(_document: vscode.NotebookDocument, _webview: vscode.NotebookCommunication): Promise<void>;
+    resolveNotebook(_document: vscode.NotebookDocument, webview: {
+        readonly onDidReceiveMessage: vscode.Event<any>;
+        postMessage(message: any): Thenable<boolean>;
+        asWebviewUri(localResource: vscode.Uri): vscode.Uri;
+    }): Promise<void>;
     saveNotebook(document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void>;
     saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void>;
     _save(document: vscode.NotebookDocument, targetResource: vscode.Uri): Promise<void>;
@@ -26,5 +31,6 @@ export declare class CallsNotebookProvider implements vscode.NotebookContentProv
     cancelCellExecution(_document: vscode.NotebookDocument, cell: vscode.NotebookCell): void;
     executeAllCells(document: vscode.NotebookDocument): Promise<void>;
     cancelAllCellsExecution(document: vscode.NotebookDocument): void;
+    saveDataToFile(data: ResponseRendererElements): Promise<void>;
 }
 export {};
