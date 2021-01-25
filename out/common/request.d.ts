@@ -29,4 +29,5 @@ export declare class RequestParser {
     private _parseQueryParams;
     private _parseHeaders;
     private _parseBody;
+    private attemptToLoadFile;
 }

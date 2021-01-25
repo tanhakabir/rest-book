@@ -1,7 +1,10 @@
 import * as os from 'os';
 const { EOL } = os;
+import * as fs from 'fs';
+import * as path from 'path';
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, validateURL, NAME } from './common';
+import * as vscode from 'vscode';
 import { Method } from './httpConstants';
 export class RequestParser {
     constructor(query) {
@@ -117,12 +120,31 @@ export class RequestParser {
         }
         i++;
         let bodyStr = this.originalRequest.slice(i).join('\n');
+        let fileContents = this.attemptToLoadFile(bodyStr);
+        if (fileContents) {
+            return fileContents;
+        }
         try {
             return JSON.parse(bodyStr);
         }
         catch {
             return bodyStr;
         }
+    }
+    attemptToLoadFile(possibleFilePath) {
+        var _a, _b;
+        try {
+            const workSpaceDir = path.dirname((_b = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath) !== null && _b !== void 0 ? _b : '');
+            if (!workSpaceDir) {
+                return;
+            }
+            const absolutePath = path.join(workSpaceDir, possibleFilePath);
+            return fs.readFileSync(absolutePath).toString();
+        }
+        catch (error) {
+            // File doesn't exist
+        }
+        return;
     }
 }
 //# sourceMappingURL=request.js.map

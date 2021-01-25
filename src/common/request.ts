@@ -1,5 +1,7 @@
 import * as os from 'os';
 const { EOL } = os;
+import * as fs from 'fs';
+import * as path from 'path';
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, validateURL, NAME } from './common';
 import * as vscode from 'vscode';
@@ -174,6 +176,9 @@ export class RequestParser {
 
         let bodyStr = this.originalRequest.slice(i).join('\n');
 
+        let fileContents = this._attemptToLoadFile(bodyStr);
+        if( fileContents ) { return fileContents; }
+
         try {
             return JSON.parse(bodyStr);
         } catch {
@@ -181,4 +186,16 @@ export class RequestParser {
         }
     }
 
+    private _attemptToLoadFile(possibleFilePath: string): string | undefined {
+        try {
+            const workSpaceDir = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath ?? '');
+            if (!workSpaceDir) { return; }
+
+            const absolutePath = path.join(workSpaceDir, possibleFilePath);
+            return fs.readFileSync(absolutePath).toString();
+        } catch (error) {
+            // File doesn't exist
+        }
+        return;
+    }
 }
