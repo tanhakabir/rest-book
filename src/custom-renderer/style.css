@@ -15,7 +15,7 @@ table .column {
     width: 150px;
 }
 
-button {
+button.tab {
     border: none;
     color: var(--vscode-editor-foreground);
     background-color: var(--vscode-input-background);
@@ -27,9 +27,13 @@ button:hover {
     cursor: pointer;
 }
 
-button[active] {
+button.tab[active] {
     background-color: var(--vscode-input-border);
     border-bottom: 2px solid var(--vscode-editor-foreground);
+}
+
+button.save-button {
+    margin-left: 20px;
 }
 
 #data-container {

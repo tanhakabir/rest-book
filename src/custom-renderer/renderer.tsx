@@ -11,8 +11,10 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
     return <div>
         <Status code={response.status} text={response.statusText} request={response.request} />
         <br />
-        <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
-        <button onClick={() => saveResponse(response) }>Save Response</button>
+        <div id='tab-bar'>
+            <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
+            <button class='save-button' onClick={() => saveResponse(response) }><i class='codicon codicon-save'></i>Save Response</button>
+        </div>
         <br />
         <DataTab data={response.data} active={activeIndex === 0}/>
         <TableTab dict={response.headers} active={activeIndex === 1}/>
@@ -26,29 +28,29 @@ const TabHeader:FunctionComponent<{activeTab: number, setActive: (i: number) => 
         let result: h.JSX.Element[] = [];
 
         //@ts-ignore
-        result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(0)} active={activeTab === 0}>Data</button>);
+        result.push(<button class='tab' dark-mode={darkMode} onClick={() => setActive(0)} active={activeTab === 0}>Data</button>);
 
         if(headersExist) {
             //@ts-ignore
-            result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(1)}  active={activeTab === 1}>Headers</button>);
+            result.push(<button class='tab' dark-mode={darkMode} onClick={() => setActive(1)}  active={activeTab === 1}>Headers</button>);
         }
 
         if(configExists) {
             //@ts-ignore
-            result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(2)}  active={activeTab === 2}>Config</button>);
+            result.push(<button class='tab' dark-mode={darkMode} onClick={() => setActive(2)}  active={activeTab === 2}>Config</button>);
         }
 
         if(requestExists) {
             //@ts-ignore
-            result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(3)}  active={activeTab === 3}>Request Sent</button>);
+            result.push(<button class='tab' dark-mode={darkMode} onClick={() => setActive(3)}  active={activeTab === 3}>Request Sent</button>);
         }
 
         return result;
     };
 
-    return <div id='tab-bar'>
+    return <span>
         {renderTabHeaders()}
-    </div>;
+    </span>;
 };
 
 // reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
