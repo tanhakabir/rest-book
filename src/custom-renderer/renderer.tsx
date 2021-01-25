@@ -38,29 +38,54 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
     </div>;
 };
 
+// reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 const Status: FunctionComponent<{ code: number, text: string, request?: any}> = ({ code, text, request }) => {
+    let statusType: string;
+    if(code < 200) {
+        statusType = 'info';
+    } else if (code < 300) {
+        statusType = 'success';
+    } else if (code < 400) {
+        statusType = 'redirect';
+    } else if (code < 500) {
+        statusType = 'client-err';
+    } else if (code < 600) {
+        statusType = 'server-err';
+    }
+
+    const generateCodeLabel = () => {
+        //@ts-ignore
+        return <span class='status-label' statusType={statusType}>{request.method} {code} {text}</span>;
+    };
+
     return <div>
-        {request.method} {code} {text}   <span class='request-url'>/   {request.res.responseUrl}</span>
+        {generateCodeLabel()}   <span class='request-url'>   {request.res.responseUrl}</span>
     </div>;
 };
 
 const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, active }) => {
     const renderFields = () => { return Object.keys(dict).map((key) => {
-        if(typeof dict[key] === 'object') {
-            return <ul>
-                {Object.keys(dict[key]).map((subKey) => {
-                    return <li>{subKey} :  {dict[key][subKey]}</li>;
-                })}
-            </ul>;
-        }
-        return <li>{key} :  {dict[key]}</li>;
-    })};
+            if(typeof dict[key] === 'object') {
+                return <tr>
+                    <td class='key column'>{key}</td>
+                    <td>
+                    <ul class='sub-list'>
+                        {Object.keys(dict[key]).map((subKey) => {
+                            return <li><span class='key'>{subKey}:</span>  {dict[key][subKey]}</li>;
+                        })}
+                    </ul>
+                    </td>
+                </tr>;
+            }
+            return <tr><td class='key column'>{key}</td> <td>{dict[key]}</td></tr>;
+        });
+    };
 
     //@ts-ignore
     return <div class='tab-content' hidden={!active}>
-        <ul>
+        <table>
             {renderFields()}
-        </ul>
+        </table>
     </div>;
 };
 
@@ -69,4 +94,4 @@ const DataTab: FunctionComponent<{ data: any, active: boolean}> = ({ data, activ
     return <div class='tab-content' id='data-container' hidden={!active}>
         {data}
     </div>;
-}
+};

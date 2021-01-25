@@ -2,8 +2,35 @@
     display: none;
 }
 
+table .sub-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+table .key {
+    font-weight: 500;
+}
+
+table .column {
+    width: 150px;
+}
+
+button {
+    border: none;
+    background-color: white;
+    padding: 10px 30px 10px 30px;
+    border-left: 0.2px solid #EEEEEE;
+    border-right: 0.2px solid #EEEEEE;
+}
+
+button:hover { 
+    cursor: pointer;
+}
+
+
 button[active] {
-    background-color:lavender;
+    background-color:rgb(239, 239, 250);
+    border-bottom: 2px solid black;
 }
 
 #data-container {
@@ -13,5 +40,33 @@ button[active] {
 }
 
 .request-url {
-    opacity: 0.5;
+    opacity: 0.6;
+}
+
+.status-label {
+    padding: 2px 10px 2px 10px;
+    margin: 0 2px;
+    font-size: 1.15em;
+    font-weight: 500;
+}
+
+.status-label[statusType="info"] {
+    background-color: #CCCCCC;
+    color: #333333;
+}
+.status-label[statusType="success"] {
+    background-color: #CCFF99;
+    color: #006600;
+}
+.status-label[statusType="redirect"] {
+    background-color: #99CCCC;
+    color: #003366;
+}
+.status-label[statusType="client-err"] {
+    background-color: #FFCC66;
+    color: #663300;
+}
+.status-label[statusType="server-err"] {
+    background-color: #FF9999;
+    color:#990000;
 }
