@@ -22,7 +22,7 @@ export declare class CallsNotebookProvider implements vscode.NotebookContentProv
     _save(document: vscode.NotebookDocument, targetResource: vscode.Uri): Promise<void>;
     backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, _cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup>;
     executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell): Promise<void>;
-    _performExecution(cell: vscode.NotebookCell, _document: vscode.NotebookDocument, logger: (s: string) => void, token: CancellationToken): Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void>;
+    _performExecution(cell: vscode.NotebookCell, _document: vscode.NotebookDocument, logger: (d: any, r: any) => void, token: CancellationToken): Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void>;
     cancelCellExecution(_document: vscode.NotebookDocument, cell: vscode.NotebookCell): void;
     executeAllCells(document: vscode.NotebookDocument): Promise<void>;
     cancelAllCellsExecution(document: vscode.NotebookDocument): void;

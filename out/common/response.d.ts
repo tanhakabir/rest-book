@@ -13,7 +13,7 @@ export declare class ResponseParser {
     private config;
     private request;
     private data;
-    constructor(response: any);
+    constructor(response: any, request: any);
     json(): {
         status: number | undefined;
         statusText: string | undefined;

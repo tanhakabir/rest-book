@@ -19,7 +19,9 @@ const config = {
 	resolve: {
 		extensions: ['.ts', '.js'],
         fallback: { "url": require.resolve("url/"),
-                    "os": require.resolve("os-browserify/browser") }
+                    "os": require.resolve("os-browserify/browser"),
+					"path": require.resolve("path-browserify"),
+					"fs": false }
 	},
 	module: {
 		rules: [

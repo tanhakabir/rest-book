@@ -1,7 +1,7 @@
 import { logDebug } from './common';
 import { ResponseHeaderField } from './httpConstants';
 export class ResponseParser {
-    constructor(response) {
+    constructor(response, request) {
         logDebug(response);
         let res = response;
         if (response.response && response.status === undefined) {
@@ -21,13 +21,15 @@ export class ResponseParser {
                 xsrfHeaderName: res.config.xsrfHeaderName,
                 headers: res.config.headers
             };
+            delete request.method;
+            delete request.baseURL;
+            delete request.url;
             this.request = {
                 method: res.request.method,
-                res: {
-                    httpVersion: res.request.res.httpVersion,
-                    responseUrl: res.request.res.responseUrl
-                }
+                httpVersion: res.request.res.httpVersion,
+                responseUrl: res.request.res.responseUrl
             };
+            this.request = { ...this.request, ...request };
             this.data = res.data;
         }
         catch {
