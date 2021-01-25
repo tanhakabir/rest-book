@@ -6,35 +6,41 @@ import { ResponseRendererElements } from '../common/response';
 export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements> }> = ({ response }) => {
     const [activeIndex, setActive] = useState(0);
 
+    let darkMode = document.body.getAttribute('data-vscode-theme-kind')?.includes('dark') ?? false;
+
+    return <div>
+        <Status code={response.status} text={response.statusText} request={response.request} />
+        <br />
+        <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} darkMode={darkMode}/>
+        <br />
+        <DataTab data={response.data} active={activeIndex === 0}/>
+        <TableTab dict={response.headers} active={activeIndex === 1}/>
+        <TableTab dict={response.config} active={activeIndex === 2}/>
+    </div>;
+};
+
+const TabHeader:FunctionComponent<{activeTab: number, setActive: (i: number) => void, headersExist: boolean, configExists:boolean, darkMode: boolean}> = ({activeTab, setActive, headersExist, configExists, darkMode}) => {
     const renderTabHeaders = () => {
         let result: h.JSX.Element[] = [];
 
         //@ts-ignore
-        result.push(<button class='tab-header' onClick={() => setActive(0)} active={activeIndex === 0}>Data</button>);
+        result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(0)} active={activeTab === 0}>Data</button>);
 
-        if(response.headers) {
+        if(headersExist) {
             //@ts-ignore
-            result.push(<button class='tab-header' onClick={() => setActive(1)}  active={activeIndex === 1}>Headers</button>);
+            result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(1)}  active={activeTab === 1}>Headers</button>);
         }
 
-        if(response.config) {
+        if(configExists) {
             //@ts-ignore
-            result.push(<button class='tab-header' onClick={() => setActive(2)}  active={activeIndex === 2}>Config</button>);
+            result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(2)}  active={activeTab === 2}>Config</button>);
         }
 
         return result;
     };
 
-    return <div>
-        <Status code={response.status} text={response.statusText} request={response.request} />
-        <br />
-        <div id='tab-bar'>
-          {renderTabHeaders()}
-        </div>
-        <br />
-        <DataTab data={response.data} active={activeIndex === 0}/>
-        <TableTab dict={response.headers} active={activeIndex === 1}/>
-        <TableTab dict={response.config} active={activeIndex === 2}/>
+    return <div id='tab-bar'>
+        {renderTabHeaders()}
     </div>;
 };
 
