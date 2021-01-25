@@ -115,8 +115,8 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
             const start = +new Date();
             cell.metadata.runStartTime = start;
             cell.outputs = [];
-            const logger = (d: any) => {
-                const response = new ResponseParser(d);
+            const logger = (d: any, r: any) => {
+                const response = new ResponseParser(d, r);
                 cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, 
                                                    data: {
                                                     "application/json": response.json(),
@@ -148,16 +148,17 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 
     async _performExecution( cell: vscode.NotebookCell, 
                              _document: vscode.NotebookDocument, 
-                             logger: (s: string) => void,
+                             logger: (d: any, r: any) => void,
                              token: CancellationToken): 
                              Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void> {
 
         const parser = new RequestParser(cell.document.getText());
+        let req = parser.getRequest();
 
         try {
             const cancelTokenAxios = axios.CancelToken.source();
 
-            let options = parser.getAxiosOptions();
+            let options = {...req};
             options['cancelToken'] = cancelTokenAxios.token;
 
             let response = await axios(options);
@@ -166,9 +167,9 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
                 cancelTokenAxios.cancel();
             };
 
-            logger(response);
+            logger(response, req);
         } catch (exception) {
-            logger(exception);
+            logger(exception, req);
         }
     }
 

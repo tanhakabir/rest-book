@@ -1,4 +1,4 @@
-export interface AxiosOptions {
+export interface Request {
     url?: string | undefined;
     method: string;
     baseURL: string;
@@ -23,11 +23,11 @@ export declare class RequestParser {
     private originalRequest;
     private requestOptions;
     constructor(query: string);
-    getAxiosOptions(): any;
+    getRequest(): any;
     private _parseMethod;
     private _parseBaseUrl;
     private _parseQueryParams;
     private _parseHeaders;
     private _parseBody;
-    private attemptToLoadFile;
+    private _attemptToLoadFile;
 }

@@ -11,15 +11,16 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
     return <div>
         <Status code={response.status} text={response.statusText} request={response.request} />
         <br />
-        <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} darkMode={darkMode}/>
+        <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
         <br />
         <DataTab data={response.data} active={activeIndex === 0}/>
         <TableTab dict={response.headers} active={activeIndex === 1}/>
         <TableTab dict={response.config} active={activeIndex === 2}/>
+        <TableTab dict={response.request} active={activeIndex === 3}/>
     </div>;
 };
 
-const TabHeader:FunctionComponent<{activeTab: number, setActive: (i: number) => void, headersExist: boolean, configExists:boolean, darkMode: boolean}> = ({activeTab, setActive, headersExist, configExists, darkMode}) => {
+const TabHeader:FunctionComponent<{activeTab: number, setActive: (i: number) => void, headersExist: boolean, configExists:boolean, requestExists: boolean, darkMode: boolean}> = ({activeTab, setActive, headersExist, configExists, requestExists, darkMode}) => {
     const renderTabHeaders = () => {
         let result: h.JSX.Element[] = [];
 
@@ -34,6 +35,11 @@ const TabHeader:FunctionComponent<{activeTab: number, setActive: (i: number) => 
         if(configExists) {
             //@ts-ignore
             result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(2)}  active={activeTab === 2}>Config</button>);
+        }
+
+        if(requestExists) {
+            //@ts-ignore
+            result.push(<button class='tab-header' dark-mode={darkMode} onClick={() => setActive(3)}  active={activeTab === 3}>Request Sent</button>);
         }
 
         return result;
@@ -65,7 +71,7 @@ const Status: FunctionComponent<{ code: number, text: string, request?: any}> = 
     };
 
     return <div>
-        {generateCodeLabel()}   <span class='request-url'>   {request.res.responseUrl}</span>
+        {generateCodeLabel()}   <span class='request-url'>   {request.responseUrl}</span>
     </div>;
 };
 
@@ -77,7 +83,13 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, act
                     <td>
                     <ul class='sub-list'>
                         {Object.keys(dict[key]).map((subKey) => {
-                            return <li><span class='key'>{subKey}:</span>  {dict[key][subKey]}</li>;
+                            let value;
+                            if(typeof dict[key][subKey] === 'object') {
+                                value = JSON.stringify(dict[key][subKey]);
+                            } else {
+                                value = dict[key][subKey];
+                            }
+                            return <li><span class='key'>{subKey}:</span>  {value}</li>;
                         })}
                     </ul>
                     </td>

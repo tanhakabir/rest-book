@@ -18,7 +18,7 @@ export class ResponseParser {
     private request: any | undefined;
     private data: any | undefined;
 
-    constructor(response: any) {
+    constructor(response: any, request: any) {
         logDebug(response);
         let res = response;
 
@@ -44,13 +44,18 @@ export class ResponseParser {
                 headers: res.config.headers
             };
 
+            
+            delete request.method;
+            delete request.baseURL;
+            delete request.url;
+
             this.request = {
                 method: res.request.method,
-                res: {
-                    httpVersion:  res.request.res.httpVersion,
-                    responseUrl: res.request.res.responseUrl
-                }
+                httpVersion:  res.request.res.httpVersion,
+                responseUrl: res.request.res.responseUrl
             };
+
+            this.request = { ...this.request, ...request };
 
             this.data = res.data;
         } catch {

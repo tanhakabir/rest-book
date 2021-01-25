@@ -9,7 +9,7 @@ import { Method, RequestHeaderField } from './httpConstants';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined
-export interface AxiosOptions {
+export interface Request {
     url?: string | undefined,
     method: string, 
     baseURL: string,
@@ -33,7 +33,7 @@ export interface AxiosOptions {
 
 export class RequestParser {
     private originalRequest: string[];
-    private requestOptions: AxiosOptions;
+    private requestOptions: Request;
 
     constructor(query: string) {
 
@@ -62,7 +62,7 @@ export class RequestParser {
         this.requestOptions.data = this._parseBody();
     }
 
-    getAxiosOptions(): any {
+    getRequest(): any {
         return pickBy(this.requestOptions, identity);
     }
 

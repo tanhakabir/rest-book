@@ -25,7 +25,7 @@ export class RequestParser {
         this.requestOptions.headers = (_a = this._parseHeaders()) !== null && _a !== void 0 ? _a : defaultHeaders;
         this.requestOptions.data = this._parseBody();
     }
-    getAxiosOptions() {
+    getRequest() {
         return pickBy(this.requestOptions, identity);
     }
     _parseMethod() {
@@ -120,7 +120,7 @@ export class RequestParser {
         }
         i++;
         let bodyStr = this.originalRequest.slice(i).join('\n');
-        let fileContents = this.attemptToLoadFile(bodyStr);
+        let fileContents = this._attemptToLoadFile(bodyStr);
         if (fileContents) {
             return fileContents;
         }
@@ -131,7 +131,7 @@ export class RequestParser {
             return bodyStr;
         }
     }
-    attemptToLoadFile(possibleFilePath) {
+    _attemptToLoadFile(possibleFilePath) {
         var _a, _b;
         try {
             const workSpaceDir = path.dirname((_b = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath) !== null && _b !== void 0 ? _b : '');
