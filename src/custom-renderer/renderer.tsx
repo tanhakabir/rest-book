@@ -2,7 +2,7 @@
 import { FunctionComponent, h } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import { ResponseRendererElements } from '../common/response';
-import * as Flame from 'vscode-codicons/src/icons/flame.svg';
+import * as Save from 'vscode-codicons/src/icons/save.svg';
 
 export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse: (d: any) => void }> = ({ response, saveResponse }) => {
     const [activeIndex, setActive] = useState(0);
@@ -14,7 +14,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         <br />
         <div id='tab-bar'>
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
-            <button class='save-button' onClick={() => saveResponse(response) }><Icon name={Flame}/>Save Response</button>
+            <button class='icon-button' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
         </div>
         <br />
         <DataTab data={response.data} active={activeIndex === 0}/>
