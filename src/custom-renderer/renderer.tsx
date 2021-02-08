@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { FunctionComponent, h } from 'preact';
 import { StateUpdater, useMemo, useState } from 'preact/hooks';
+import { v4 as uuidv4 } from 'uuid';
 import { ResponseRendererElements } from '../common/response';
 import * as Save from 'vscode-codicons/src/icons/save.svg';
 
 export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse: (d: any) => void }> = ({ response, saveResponse }) => {
     const [activeIndex, setActive] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState('');
+    const uuid = uuidv4();
+    const searchBarId = `search-bar-${uuid}`;
 
     let darkMode = document.body.getAttribute('data-vscode-theme-kind')?.includes('dark') ?? false;
 
@@ -16,8 +19,8 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         <div id='tab-bar'>
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
             <span>
-                <input id='search-bar' placeholder='Search for keyword'></input>
-                <button class='icon-button' onClick={() => handleSearchForKeywordClick(setSearchKeyword)}>Search</button>
+                <input id={searchBarId} placeholder='Search for keyword'></input>
+                <button class='icon-button' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}>Search</button>
                 <button class='icon-button' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
             </span>
         </div>
@@ -130,12 +133,14 @@ const Icon: FunctionComponent<{ name: string}> = ({ name: i}) => {
 };
 
 
-const handleSearchForKeywordClick = (setter: StateUpdater<string>) => {
-    const keyword = (document.getElementById('search-bar') as HTMLInputElement)?.value ?? '';
+const handleSearchForKeywordClick = (setter: StateUpdater<string>, searchBarId: string) => {
+    const keyword = (document.getElementById(searchBarId) as HTMLInputElement)?.value ?? '';
     setter(keyword);
+    console.log(keyword);
 };
 
 const searchForTermInText = (text: string, searchKeyword: string) => {
+    console.log(searchKeyword);
     let splitOnSearch = [text];
     if (searchKeyword !== '' && typeof text === 'string' && text) {
         splitOnSearch = text.split(searchKeyword);
