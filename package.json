@@ -87,6 +87,7 @@
     "@types/mocha": "^8.0.0",
     "@types/node": "^12.11.7",
     "@types/user-home": "^2.0.0",
+    "@types/uuid": "^8.3.0",
     "@types/vscode": "^1.50.0",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
@@ -110,9 +111,12 @@
     "webpack-cli": "^4.3.1"
   },
   "dependencies": {
+    "-": "0.0.1",
     "@types/react": "^17.0.0",
     "lodash": "^4.17.20",
     "preact": "^10.5.9",
-    "user-home": "^2.0.0"
+    "save-dev": "0.0.1-security",
+    "user-home": "^2.0.0",
+    "uuid": "^8.3.2"
   }
 }
