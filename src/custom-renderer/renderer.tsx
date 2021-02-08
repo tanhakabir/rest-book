@@ -21,9 +21,9 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         </div>
         <br />
         <DataTab data={response.data} active={activeIndex === 0} searchKeyword={searchKeyword}/>
-        <TableTab dict={response.headers} active={activeIndex === 1}/>
-        <TableTab dict={response.config} active={activeIndex === 2}/>
-        <TableTab dict={response.request} active={activeIndex === 3}/>
+        <TableTab dict={response.headers} active={activeIndex === 1} searchKeyword={searchKeyword}/>
+        <TableTab dict={response.config} active={activeIndex === 2} searchKeyword={searchKeyword}/>
+        <TableTab dict={response.request} active={activeIndex === 3} searchKeyword={searchKeyword}/>
     </div>;
 };
 
@@ -82,7 +82,7 @@ const Status: FunctionComponent<{ code: number, text: string, request?: any}> = 
     </div>;
 };
 
-const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, active }) => {
+const TableTab: FunctionComponent<{ dict?: any, active: boolean, searchKeyword: string}> = ({ dict, active, searchKeyword }) => {
     const renderFields = () => { return Object.keys(dict).map((key) => {
             if(typeof dict[key] === 'object') {
                 return <tr>
@@ -96,13 +96,13 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, act
                             } else {
                                 value = dict[key][subKey];
                             }
-                            return <li><span class='key'>{subKey}:</span>  {value}</li>;
+                            return <li><span class='key'>{subKey}:</span>  {searchForTermInText((value as string), searchKeyword)}</li>;
                         })}
                     </ul>
                     </td>
                 </tr>;
             }
-            return <tr><td class='key column'>{key}</td> <td>{dict[key]}</td></tr>;
+            return <tr><td class='key column'>{key}</td> <td>{searchForTermInText((dict[key] as string), searchKeyword)}</td></tr>;
         });
     };
 
@@ -115,20 +115,9 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, act
 };
 
 const DataTab: FunctionComponent<{ data: any, active: boolean, searchKeyword: string}> = ({ data, active, searchKeyword }) => {
-    let splitOnSearch = [data];
-    if (searchKeyword !== '') {
-        splitOnSearch = (data as string).split(searchKeyword);
-    }
-
     //@ts-ignore
     return <div class='tab-content' id='data-container' hidden={!active}>
-        {splitOnSearch.map((token, i) => {
-            if(i === splitOnSearch.length - 1) {
-                return <span> {token} </span>;
-            } else {
-                return <span> {token} <span dangerouslySetInnerHTML={{ __html: `<span class='search-term'>${searchKeyword}</span>` }} /> </span>;
-            }
-        })}
+        {searchForTermInText((data as string), searchKeyword)}
     </div>;
 };
 
@@ -142,4 +131,21 @@ const Icon: FunctionComponent<{ name: string}> = ({ name: i}) => {
 const handleSearchForKeywordClick = (setter: StateUpdater<string>) => {
     const keyword = (document.getElementById('search-bar') as HTMLInputElement)?.value ?? '';
     setter(keyword);
-}
+};
+
+const searchForTermInText = (text: string, searchKeyword: string) => {
+    let splitOnSearch = [text];
+    if (searchKeyword !== '' && typeof text === 'string' && text) {
+        splitOnSearch = text.split(searchKeyword);
+    }
+
+    return <span>
+        {splitOnSearch.map((token, i) => {
+            if(i === splitOnSearch.length - 1) {
+                return <span>{token}</span>;
+            } else {
+                return <span>{token}<span dangerouslySetInnerHTML={{ __html: `<span class='search-term'>${searchKeyword}</span>` }} /></span>;
+            }
+        })}
+    </span>;
+};
