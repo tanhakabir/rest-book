@@ -136,11 +136,9 @@ const Icon: FunctionComponent<{ name: string}> = ({ name: i}) => {
 const handleSearchForKeywordClick = (setter: StateUpdater<string>, searchBarId: string) => {
     const keyword = (document.getElementById(searchBarId) as HTMLInputElement)?.value ?? '';
     setter(keyword);
-    console.log(keyword);
 };
 
 const searchForTermInText = (text: string, searchKeyword: string) => {
-    console.log(searchKeyword);
     let splitOnSearch = [text];
     if (searchKeyword !== '' && typeof text === 'string' && text) {
         splitOnSearch = text.split(searchKeyword);
