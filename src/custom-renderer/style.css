@@ -2,6 +2,13 @@
     display: none;
 }
 
+.align-left {
+	float: left;
+}
+.align-right {
+	float: right;
+}
+
 table .sub-list {
     list-style: none;
     padding-left: 0;
@@ -80,4 +87,8 @@ button.tab[active] {
 .status-label[statusType="server-err"] {
     background-color: #FF9999;
     color:#990000;
+}
+
+.search-term {
+    background-color: yellow;
 }
