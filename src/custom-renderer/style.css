@@ -81,3 +81,8 @@ button.tab[active] {
     background-color: #FF9999;
     color:#990000;
 }
+
+
+.search-term {
+    background-color: yellow;
+}

@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { FunctionComponent, h } from 'preact';
-import { useMemo, useState } from 'preact/hooks';
+import { StateUpdater, useMemo, useState } from 'preact/hooks';
 import { ResponseRendererElements } from '../common/response';
 import * as Save from 'vscode-codicons/src/icons/save.svg';
 
 export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse: (d: any) => void }> = ({ response, saveResponse }) => {
     const [activeIndex, setActive] = useState(0);
+    const [searchKeyword, setSearchKeyword] = useState('');
 
     let darkMode = document.body.getAttribute('data-vscode-theme-kind')?.includes('dark') ?? false;
 
@@ -15,9 +16,11 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         <div id='tab-bar'>
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
             <button class='icon-button' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
+            <input id='search-bar' placeholder='Search for keyword'></input>
+            <button class='icon-button' onClick={() => handleSearchForKeywordClick(setSearchKeyword)}>Search</button>
         </div>
         <br />
-        <DataTab data={response.data} active={activeIndex === 0}/>
+        <DataTab data={response.data} active={activeIndex === 0} searchKeyword={searchKeyword}/>
         <TableTab dict={response.headers} active={activeIndex === 1}/>
         <TableTab dict={response.config} active={activeIndex === 2}/>
         <TableTab dict={response.request} active={activeIndex === 3}/>
@@ -111,10 +114,21 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean}> = ({ dict, act
     </div>;
 };
 
-const DataTab: FunctionComponent<{ data: any, active: boolean}> = ({ data, active }) => {
+const DataTab: FunctionComponent<{ data: any, active: boolean, searchKeyword: string}> = ({ data, active, searchKeyword }) => {
+    let splitOnSearch = [data];
+    if (searchKeyword !== '') {
+        splitOnSearch = (data as string).split(searchKeyword);
+    }
+
     //@ts-ignore
     return <div class='tab-content' id='data-container' hidden={!active}>
-        {data}
+        {splitOnSearch.map((token, i) => {
+            if(i === splitOnSearch.length - 1) {
+                return <span> {token} </span>;
+            } else {
+                return <span> {token} <span dangerouslySetInnerHTML={{ __html: `<span class='search-term'>${searchKeyword}</span>` }} /> </span>;
+            }
+        })}
     </div>;
 };
 
@@ -123,3 +137,9 @@ const Icon: FunctionComponent<{ name: string}> = ({ name: i}) => {
         dangerouslySetInnerHTML={{ __html: i }}
     />;
 };
+
+
+const handleSearchForKeywordClick = (setter: StateUpdater<string>) => {
+    const keyword = (document.getElementById('search-bar') as HTMLInputElement)?.value ?? '';
+    setter(keyword);
+}
