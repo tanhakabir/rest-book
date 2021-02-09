@@ -9,6 +9,9 @@
 		],
 		"jsx": "react",
 		"jsxFactory": "h",
+		"types": [
+			"vscode-notebook-renderer"
+		]
 	},
 	"references": [
 		{
