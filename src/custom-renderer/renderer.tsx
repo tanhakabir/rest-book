@@ -21,7 +21,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
             <input id={searchBarId} placeholder='Search for keyword'></input>
             <button class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
-            <button class='icon-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
+            <button class='save-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
         </div>
         <br />
         <DataTab data={response.data} active={activeIndex === 0} searchKeyword={searchKeyword}/>

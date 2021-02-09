@@ -28,43 +28,46 @@ svg {
     transform: translateY(7px);
 }
 
-.icon-button {
+.save-button {
     margin-left: 20px;
     background-color: var(--vscode-input-background);
     border: none;
     padding: 0px 10px 10px 10px;
-    color: var(--vscode-textLink-foreground);
-    border: 0.2px solid var(--vscode-textLink-foreground);
+    color: var(--vscode-inputOption-activeBorder);
+    border: 0.2px solid var(--vscode-inputOption-activeBorder);
 }
 
-.icon-button:hover {
-    color: var(--vscode-textLink-activeForeground);
+.save-button:hover {
+    color: var(--vscode-editor-foreground);
+    border-color: var(--vscode-editor-foreground);
 }
 
 .search-button {
     background: none;
     border: none;
     padding: 0px 10px 10px 10px;
-    color: var(--vscode-textLink-foreground);
+    color: var(--vscode-inputOption-activeBorder);
 }
 
 .search-button:hover {
-    color: var(--vscode-textLink-activeForeground);
+    color: var(--vscode-editor-foreground);
 }
 
 button.tab {
     border: none;
-    color: var(--vscode-editor-foreground);
+    color: var(--vscode-inputOption-activeBorder);
     background-color: var(--vscode-input-background);
     padding: 10px 30px 10px 30px;
     border: 0.2px solid var(--vscode-input-border);
 }
 
 button:hover { 
+    color: var(--vscode-editor-foreground);
     cursor: pointer;
 }
 
 button.tab[active] {
+    color: var(--vscode-editor-foreground);
     background-color: var(--vscode-input-border);
     border-bottom: 2px solid var(--vscode-editor-foreground);
 }
