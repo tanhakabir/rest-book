@@ -4,6 +4,7 @@ import { StateUpdater, useMemo, useState } from 'preact/hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseRendererElements } from '../common/response';
 import * as Save from 'vscode-codicons/src/icons/save.svg';
+import * as Search from 'vscode-codicons/src/icons/search.svg';
 
 export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse: (d: any) => void }> = ({ response, saveResponse }) => {
     const [activeIndex, setActive] = useState(0);
@@ -18,11 +19,9 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         <br />
         <div id='tab-bar'>
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
-            <span>
-                <input id={searchBarId} placeholder='Search for keyword'></input>
-                <button class='icon-button' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}>Search</button>
-                <button class='icon-button' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
-            </span>
+            <input id={searchBarId} placeholder='Search for keyword'></input>
+            <button class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
+            <button class='icon-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
         </div>
         <br />
         <DataTab data={response.data} active={activeIndex === 0} searchKeyword={searchKeyword}/>
