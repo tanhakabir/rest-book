@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { FunctionComponent, h } from 'preact';
-import { StateUpdater, useMemo, useState } from 'preact/hooks';
+import { StateUpdater, useEffect, useState } from 'preact/hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseRendererElements } from '../common/response';
 import * as Save from 'vscode-codicons/src/icons/save.svg';
@@ -11,8 +11,17 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
     const [searchKeyword, setSearchKeyword] = useState('');
     const uuid = uuidv4();
     const searchBarId = `search-bar-${uuid}`;
+    const searchButtonId = `search-button-${uuid}`;
 
     let darkMode = document.body.getAttribute('data-vscode-theme-kind')?.includes('dark') ?? false;
+
+    useEffect(() => {
+        document.getElementById(searchBarId)?.addEventListener('keypress', event => {
+            if (event.key === 'Enter') {
+                document.getElementById(searchButtonId)?.click();
+            }
+        });
+    });
 
     return <div>
         <Status code={response.status} text={response.statusText} request={response.request} />
@@ -20,7 +29,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
         <div id='tab-bar'>
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
             <input id={searchBarId} placeholder='Search for keyword'></input>
-            <button class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
+            <button id={searchButtonId} class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
             <button class='save-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
         </div>
         <br />
