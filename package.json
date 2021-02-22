@@ -15,34 +15,33 @@
     "Other"
   ],
   "activationEvents": [
-    "onNotebook:restbook.notebook",
+    "onNotebook:rest-book",
     "onLanguage:rest-book"
   ],
   "main": "./dist/extension-node.js",
   "browser": "./dist/extension-web.js",
   "contributes": {
-    "notebookProvider": [
-      {
-        "viewType": "restbook.notebook",
-        "displayName": "REST Book",
-        "priority": "default",
-        "selector": [
-          {
-            "filenamePattern": "*.restbook"
-          }
-        ]
-      }
-    ],
     "notebookOutputRenderer": [
-      {
-        "id": "rest-book",
-        "displayName": "REST Book Renderer",
-        "entrypoint": "./dist/renderer.js",
-        "mimeTypes": [
-          "x-application/rest-book"
-        ]
-      }
-    ],
+			{
+				"id": "rest-book",
+				"displayName": "REST Book Renderer",
+				"entrypoint": "./dist/renderer.js",
+				"mimeTypes": [
+					"x-application/rest-book"
+				]
+			}
+		],
+		"notebookProvider": [
+			{
+				"viewType": "rest-book",
+				"displayName": "REST Book",
+				"selector": [
+					{
+						"filenamePattern": "*.restbook"
+					}
+				]
+			}
+		],
     "languages": [
       {
         "id": "rest-book",

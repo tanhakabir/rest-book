@@ -1,4 +1,4 @@
-import { DEBUG_MODE, validateURL, NAME } from '../common/common';
+import { DEBUG_MODE, validateURL, NAME, MIME_TYPE } from '../common/common';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -8,41 +8,271 @@ import { ResponseParser, ResponseRendererElements } from '../common/response';
 import { URL } from 'url';
 const axios = require('axios').default;
 
-interface RawCell {
+interface RawNotebookCell {
 	language: string;
 	value: string;
-	kind: vscode.CellKind;
+	kind: vscode.NotebookCellKind;
     editable?: boolean;
     outputs: any | undefined;
 }
 
+interface RawCellOutput {
+	mime: string;
+	value: any;
+}
+
 type CancellationToken = { onCancellationRequested?: () => void };
 
-export class CallsNotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernel {
-    id?: string | undefined;
-    label: string = 'REST Book';
+class NotebookCellExecution {
+    private static _tokenPool = 0;
+	private static _tokens = new WeakMap<vscode.NotebookCell, number>();
+
+	private readonly _token: number = NotebookCellExecution._tokenPool++;
+
+    private readonly _startTime: number = Date.now();
+
+    private readonly _originalRunState: vscode.NotebookCellRunState | undefined;
+	readonly cts = new vscode.CancellationTokenSource();
+
+    constructor(readonly cell: vscode.NotebookCell) {
+        NotebookCellExecution._tokens.set(this.cell, this._token);
+        this._originalRunState = cell.metadata.runState;
+        this._replaceCell({ runState: vscode.NotebookCellRunState.Running, runStartTime: this._startTime});
+    }
+
+    private _isLatest(): boolean {
+		// TODO these checks should be provided by VS Code
+		return NotebookCellExecution._tokens.get(this.cell) === this._token;
+	}
+
+    private _replaceCell(meta?: any, outputs?: vscode.NotebookCellOutput[]): void {
+        const edit = new vscode.WorkspaceEdit();
+
+        if(meta) {
+            edit.replaceNotebookCellMetadata(this.cell.notebook.uri, this.cell.index, this.cell.metadata.with(meta));
+        }
+
+        if(outputs) {
+            edit.replaceNotebookCellOutput(this.cell.notebook.uri, this.cell.index, outputs);
+        }
+        
+        vscode.workspace.applyEdit(edit);
+    }
+
+    cancel(): void {
+        if(!this._isLatest()) { return; }
+
+        this.cts.cancel();
+        NotebookCellExecution._tokens.delete(this.cell);
+        this._replaceCell({ runState: this._originalRunState });
+    }
+
+    resolve(outputs: vscode.NotebookCellOutput[], message?: string): void {
+        if(!this._isLatest()) { return; }
+
+        this._replaceCell({ 
+                            executionOrder: this._token,
+                            runState: vscode.NotebookCellRunState.Success,
+                            lastRunDuration: Date.now() - this._startTime,
+                            statusMessage: message 
+                          },
+                          outputs);
+    }
+
+    reject(err: any): void {
+        if(!this._isLatest()) { return; }
+
+        this._replaceCell({
+                            executionOrder: this._token,
+                            statusMessage: 'Error',
+                            lastRunDuration: undefined,
+                            runState: vscode.NotebookCellRunState.Error
+                          },
+                          [new vscode.NotebookCellOutput([
+                                new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
+                                    ename: err instanceof Error && err.name || 'error',
+                                    evalue: err instanceof Error && err.message || JSON.stringify(err, undefined, 4),
+                                    traceback: []
+                                })
+                           ])]);
+    }
+
+    dispose(): void {
+		this.cts.dispose();
+	}
+}
+
+class NotebookDocumentExecution {
+    private static _tokenPool = 0;
+	private static _tokens = new WeakMap<vscode.NotebookDocument, number>();
+
+	private readonly _token: number = NotebookDocumentExecution._tokenPool++;
+
+	private readonly _originalRunState: vscode.NotebookRunState | undefined;
+
+	readonly cts = new vscode.CancellationTokenSource();
+
+    constructor(readonly document: vscode.NotebookDocument) {
+        NotebookDocumentExecution._tokens.set(this.document, this._token);
+		this._originalRunState = document.metadata.runState;
+        this._replaceDocument({ runState: vscode.NotebookRunState.Running });
+    }
+
+    private _isLatest(): boolean {
+		// TODO these checks should be provided by VS Code
+		return NotebookDocumentExecution._tokens.get(this.document) === this._token;
+	}
+
+    private _replaceDocument(meta: any) {
+        const edit = new vscode.WorkspaceEdit();
+        edit.replaceNotebookMetadata(this.document.uri, this.document.metadata.with(meta));
+		vscode.workspace.applyEdit(edit);
+    }
+
+    cancel(): void {
+        if(!this._isLatest()) { return; }
+
+        this.cts.cancel();
+        this._replaceDocument({ runState: this._originalRunState });
+        NotebookDocumentExecution._tokens.delete(this.document);
+    }
+
+    resolve(): void {
+        if(!this._isLatest()) { return; }
+        this._replaceDocument({ runState: vscode.NotebookRunState.Idle });
+    }
+
+    dispose(): void {
+		this.cts.dispose();
+	}
+}
+
+class NotebookKernel implements vscode.NotebookKernel {
+    readonly id = 'rest-book-kernel';
+    readonly label = 'REST Book Kernel';
+    readonly supportedLanguages = ['rest-book'];
+
     description?: string | undefined;
     detail?: string | undefined;
     isPreferred?: boolean | undefined;
     preloads?: vscode.Uri[] | undefined;
 
-    options?: vscode.NotebookDocumentContentOptions | undefined;
-    onDidChangeNotebookContentOptions?: vscode.Event<vscode.NotebookDocumentContentOptions> | undefined;
+    private readonly _cellExecutions = new WeakMap<vscode.NotebookCell, NotebookCellExecution>();
+    private readonly _documentExecutions = new WeakMap<vscode.NotebookDocument, NotebookDocumentExecution>();
 
-    private _onDidChangeNotebook = new vscode.EventEmitter<vscode.NotebookDocumentEditEvent>();
-    onDidChangeNotebook: vscode.Event<vscode.NotebookDocumentEditEvent> = this._onDidChangeNotebook.event;
+    async executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell): Promise<void> {
+        this.cancelCellExecution(document, cell);
 
-    private cancellations = new Map<vscode.NotebookCell, CancellationToken>();
+		const execution = new NotebookCellExecution(cell);
+		this._cellExecutions.set(cell, execution);
 
-    constructor() {
-        vscode.notebook.registerNotebookKernelProvider({
-			viewType: 'restbook.notebook',
-		}, {
-			provideKernels: () => {
-				return [this];
+		const d1 = vscode.notebook.onDidChangeNotebookCells(e => {
+			if (e.document !== document) { return; }
+			const didChange = e.changes.some(change => change.items.includes(cell) || change.deletedItems.includes(cell));
+			if (didChange) {
+				execution.cancel();
 			}
 		});
-	}
+
+		const d2 = vscode.workspace.onDidChangeTextDocument(e => {
+			if (e.document === cell.document) {
+				execution.cancel();
+			}
+		});
+
+		try {
+			return await this._doExecution(execution);
+		} finally {
+			d1.dispose();
+			d2.dispose();
+			execution.dispose();
+		}
+    }
+
+    private async _doExecution(execution: NotebookCellExecution): Promise<void> {
+        const doc = await vscode.workspace.openTextDocument(execution.cell.uri);
+
+        const metadata = {
+			startTime: Date.now()
+		};
+
+        const logger = (d: any, r: any) => {
+            const response = new ResponseParser(d, r);
+
+            execution.resolve([new vscode.NotebookCellOutput([
+                new vscode.NotebookCellOutputItem('text/html', response.html()),
+                new vscode.NotebookCellOutputItem('application/json', response.json()),
+                new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer())
+            ], metadata)]);
+        };
+
+        const parser = new RequestParser(doc.getText());
+        let req = parser.getRequest();
+
+        try {
+            const cancelTokenAxios = axios.CancelToken.source();
+
+            let options = {...req};
+            options['cancelToken'] = cancelTokenAxios.token;
+
+            let response = await axios(options);
+
+            execution.cts.token.onCancellationRequested(_ => cancelTokenAxios.cancel());
+
+            logger(response, req);
+        } catch (exception) {
+            logger(exception, req);
+        }
+        
+    }
+
+    async executeAllCells(document: vscode.NotebookDocument): Promise<void> {
+        this.cancelAllCellsExecution(document);
+
+        const execution = new NotebookDocumentExecution(document);
+		this._documentExecutions.set(document, execution);
+
+        try {
+			let currentCell: vscode.NotebookCell;
+
+			execution.cts.token.onCancellationRequested(() => this.cancelCellExecution(document, currentCell));
+
+			for (let cell of document.cells) {
+				if (cell.cellKind === vscode.NotebookCellKind.Code) {
+					currentCell = cell;
+					await this.executeCell(document, cell);
+
+					if (execution.cts.token.isCancellationRequested) {
+						break;
+					}
+				}
+			}
+		} finally {
+			execution.resolve();
+			execution.dispose();
+		}
+    }
+
+    cancelCellExecution(_document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
+        const execution = this._cellExecutions.get(cell);
+		if (execution) {
+			execution.cancel();
+		}
+    }
+
+    cancelAllCellsExecution(document: vscode.NotebookDocument): void {
+        const execution = this._documentExecutions.get(document);
+		if (execution) {
+			execution.cancel();
+		}
+    }
+    
+}
+
+export class NotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernelProvider {
+    provideKernels(_document: vscode.NotebookDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.NotebookKernel[]> {
+        return [new NotebookKernel()];
+    }
     
     async openNotebook(uri: vscode.Uri, openContext: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
         let actualUri = openContext.backupId ? vscode.Uri.parse(openContext.backupId) : uri;
@@ -52,26 +282,25 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 		} catch {
         }
         
-        let raw: RawCell[];
+        let raw: RawNotebookCell[];
         try {
-            raw = <RawCell[]>JSON.parse(contents);
+            raw = <RawNotebookCell[]>JSON.parse(contents);
         } catch {
             raw = [];
         }
 
         const notebookData: vscode.NotebookData = {
-            languages: ['rest-book'],
-            metadata: {
+            metadata: new vscode.NotebookDocumentMetadata().with({
                 cellRunnable: true,
                 cellHasExecutionOrder: true,
-                displayOrder: ['x-application/rest-book', 'application/json', 'text/markdown']
-            },
+                displayOrder: [MIME_TYPE, 'application/json', 'text/markdown']
+            }),
             cells: raw.map(item => ({
                 source: item.value,
                 language: item.language,
                 cellKind: item.kind,
                 outputs: item.outputs ?? [],
-                metadata: { editable: item.editable ?? true, runnable: true }
+                metadata: new vscode.NotebookCellMetadata().with({ editable: item.editable ?? true, runnable: true })
             }))
         };
 
@@ -82,7 +311,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
         webview.onDidReceiveMessage((m) => {
             switch(m.command) {
                 case 'save-response': 
-                    this.saveDataToFile(m.data);
+                    this._saveDataToFile(m.data);
                     return;
                 default: break;
             }
@@ -96,7 +325,7 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
     }
 
     async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri): Promise<void> {
-        let contents: RawCell[] = [];
+        let contents: RawNotebookCell[] = [];
 
         for(const cell of document.cells) {
             contents.push({
@@ -118,86 +347,8 @@ export class CallsNotebookProvider implements vscode.NotebookContentProvider, vs
 			delete: () => vscode.workspace.fs.delete(context.destination)
 		};
     }
-    
-    async executeCell(document: vscode.NotebookDocument, cell: vscode.NotebookCell): Promise<void> {
-        try {
-            cell.metadata.runState = vscode.NotebookCellRunState.Running;
-            const start = +new Date();
-            cell.metadata.runStartTime = start;
-            cell.outputs = [];
-            const logger = (d: any, r: any) => {
-                const response = new ResponseParser(d, r);
-                cell.outputs = [...cell.outputs, { outputKind: vscode.CellOutputKind.Rich, 
-                                                   data: {
-                                                    "application/json": response.json(),
-                                                    "text/html": response.html(),
-                                                    "x-application/rest-book": response.renderer()
-                                                   } 
-                                                }];
-            };
-            const token: CancellationToken = { onCancellationRequested: undefined };
-            this.cancellations.set(cell, token);
-            await this._performExecution(cell, document, logger, token);
-            cell.metadata.runState = vscode.NotebookCellRunState.Success;
-            cell.metadata.lastRunDuration = +new Date() - start;
-        } catch (e) {
-            cell.outputs = [...cell.outputs,
-                {
-                  outputKind: vscode.CellOutputKind.Error,
-                  ename: e.name,
-                  evalue: e.message,
-                //   traceback: [e.stack],
-                  traceback: [],
-                },
-            ];
-            cell.metadata.runState = vscode.NotebookCellRunState.Error;
-            cell.metadata.lastRunDuration = undefined;
-        }
-        
-    }
 
-    async _performExecution( cell: vscode.NotebookCell, 
-                             _document: vscode.NotebookDocument, 
-                             logger: (d: any, r: any) => void,
-                             token: CancellationToken): 
-                             Promise<vscode.CellStreamOutput | vscode.CellErrorOutput | vscode.CellDisplayOutput | undefined | void> {
-
-        const parser = new RequestParser(cell.document.getText());
-        let req = parser.getRequest();
-
-        try {
-            const cancelTokenAxios = axios.CancelToken.source();
-
-            let options = {...req};
-            options['cancelToken'] = cancelTokenAxios.token;
-
-            let response = await axios(options);
-
-            token.onCancellationRequested = () => {
-                cancelTokenAxios.cancel();
-            };
-
-            logger(response, req);
-        } catch (exception) {
-            logger(exception, req);
-        }
-    }
-
-    cancelCellExecution(_document: vscode.NotebookDocument, cell: vscode.NotebookCell): void {
-        this.cancellations.get(cell)?.onCancellationRequested?.();
-    }
-    async executeAllCells(document: vscode.NotebookDocument): Promise<void> {
-        for (const cell of document.cells) {
-            await this.executeCell(document, cell);
-        }
-    }
-    cancelAllCellsExecution(document: vscode.NotebookDocument): void {
-        for (const cell of document.cells) {
-            this.cancellations.get(cell)?.onCancellationRequested?.();
-        }
-    }
-
-    async saveDataToFile(data: ResponseRendererElements) {
+    private async _saveDataToFile(data: ResponseRendererElements) {
         const workSpaceDir = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath ?? '');
         if (!workSpaceDir) { return; }
     

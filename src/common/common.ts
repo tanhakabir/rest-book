@@ -4,6 +4,7 @@ const { URL, parse } = url;
 export const DEBUG_MODE = false;
 
 export const NAME = 'rest-book';
+export const MIME_TYPE = 'x-application/rest-book';
 
 export function validateURL(url: string): boolean {
     const protocols = ['http', 'https'];

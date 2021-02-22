@@ -1,7 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { CallsNotebookProvider } from './notebookProvider';
+import { NotebookProvider } from './notebookProvider';
 import { registerLanguageProvider } from './languageProvider';
 import { logDebug } from '../common/common';
 
@@ -13,8 +13,22 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('rest-book is now active!');
 
-
-	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('restbook.notebook', new CallsNotebookProvider()));
+	const notebookProvider = new NotebookProvider();
+	context.subscriptions.push(vscode.notebook.registerNotebookKernelProvider({ viewType: 'rest-book'}, notebookProvider));
+	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('rest-book', notebookProvider, {
+		transientOutputs: false,
+		transientMetadata: {
+			runnable: true,
+			inputCollapsed: true,
+			outputCollapsed: true,
+			runState: true,
+			runStartTime: true,
+			executionOrder: true,
+			lastRunDuration: true,
+			statusMessage: true,
+			editable: false
+		}
+	}));
 	context.subscriptions.push(registerLanguageProvider());
 }
 
