@@ -1,3 +1,8 @@
+.tab-bar {
+    display: flex;
+    justify-content: space-between;
+}
+
 .tab-content[hidden] {
     display: none;
 }
@@ -22,17 +27,28 @@ table .column {
     width: 150px;
 }
 
+input {
+    border: 1px solid var(--vscode-input-focus-border-color);
+    background-color: var(--vscode-input-background);
+    color: var(--vscode-input-placeholder-foreground);
+    padding: 10px;
+}
+
+input:active {
+    color: var(--vscode-input-foreground);
+}
+
 svg {
-    width: 25px;
+    width: 20px;
     padding-right: 5px;
-    transform: translateY(7px);
+    transform: translateY(5px);
 }
 
 .save-button {
     margin-left: 20px;
     background-color: var(--vscode-input-background);
     border: none;
-    padding: 0px 10px 10px 10px;
+    padding: 2px 10px 10px 10px;
     color: var(--vscode-inputOption-activeBorder);
     border: 0.2px solid var(--vscode-inputOption-activeBorder);
 }
