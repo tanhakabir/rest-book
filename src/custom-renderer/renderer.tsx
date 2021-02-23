@@ -26,11 +26,13 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
     return <div>
         <Status code={response.status} text={response.statusText} request={response.request} />
         <br />
-        <div id='tab-bar'>
+        <div class='tab-bar'>
             <TabHeader activeTab={activeIndex} setActive={setActive} headersExist={response.headers} configExists={response.config} requestExists={response.request} darkMode={darkMode}/>
-            <input id={searchBarId} placeholder='Search for keyword'></input>
-            <button id={searchButtonId} class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
-            <button class='save-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
+            <span class='tab-bar-tools'>
+                <input id={searchBarId} placeholder='Search for keyword'></input>
+                <button id={searchButtonId} class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
+                <button class='save-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button>
+            </span>
         </div>
         <br />
         <DataTab data={response.data} active={activeIndex === 0} searchKeyword={searchKeyword}/>
