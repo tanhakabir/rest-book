@@ -51,7 +51,7 @@ export class RequestParser {
         this.requestOptions = {
             method: this._parseMethod(),
             baseURL: this._parseBaseUrl(),
-            timeout: 100
+            timeout: 1000
         };
 
 
