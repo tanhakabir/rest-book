@@ -1,4 +1,4 @@
-import { DEBUG_MODE, validateURL, NAME, MIME_TYPE } from '../common/common';
+import { DEBUG_MODE, NAME, MIME_TYPE } from '../common/common';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';

@@ -20,6 +20,12 @@ export function validateURL(url) {
         return false;
     }
 }
+export function formatURL(url) {
+    if (!url.startsWith('http')) {
+        return `http://${url}`;
+    }
+    return url;
+}
 export function logDebug(item) {
     if (DEBUG_MODE) {
         console.log(item);

@@ -3,7 +3,8 @@ const { EOL } = os;
 import * as fs from 'fs';
 import * as path from 'path';
 import { pickBy, identity, isEmpty } from 'lodash';
-import { logDebug, validateURL, NAME } from './common';
+import validator from 'validator';
+import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method, RequestHeaderField } from './httpConstants';
 
@@ -72,7 +73,7 @@ export class RequestParser {
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
         if (tokens.length === 1) {
-            if (!validateURL(tokens[0])) {
+            if (!validator.isURL(tokens[0])) {
                 throw new Error('Invalid URL given!');
             }
 
@@ -91,11 +92,11 @@ export class RequestParser {
 
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
-        if (validateURL(tokens[0])) {
-            return tokens[0];
+        if (validator.isURL(tokens[0])) {
+            return formatURL(tokens[0]);
         } else if(tokens.length > 1) {
-            if(validateURL(tokens[1])) {
-                return tokens[1];
+            if(validator.isURL(tokens[1])) {
+                return formatURL(tokens[1]);
             }
         }
             
