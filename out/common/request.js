@@ -18,11 +18,12 @@ export class RequestParser {
         this.originalRequest = linesOfRequest;
         this.requestOptions = {
             method: this._parseMethod(),
-            baseURL: this._parseBaseUrl()
+            baseURL: this._parseBaseUrl(),
+            timeout: 100
         };
         this.requestOptions.params = this._parseQueryParams();
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let defaultHeaders = { "User-Agent": NAME, timeout: 100 };
+        let defaultHeaders = { "User-Agent": NAME };
         this.requestOptions.headers = (_a = this._parseHeaders()) !== null && _a !== void 0 ? _a : defaultHeaders;
         this.requestOptions.data = this._parseBody();
     }
