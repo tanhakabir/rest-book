@@ -1,4 +1,4 @@
-import { DEBUG_MODE, validateURL, NAME, MIME_TYPE } from '../common/common';
+import { DEBUG_MODE, NAME, MIME_TYPE } from '../common/common';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -206,8 +206,15 @@ class NotebookKernel implements vscode.NotebookKernel {
             ], metadata)]);
         };
 
-        const parser = new RequestParser(doc.getText());
-        let req = parser.getRequest();
+        let req;
+        
+        try {
+            const parser = new RequestParser(doc.getText());
+            req = parser.getRequest();
+        } catch (err) {
+            execution.reject(err);
+            return;
+        }
 
         try {
             const cancelTokenAxios = axios.CancelToken.source();
@@ -221,6 +228,9 @@ class NotebookKernel implements vscode.NotebookKernel {
 
             logger(response, req);
         } catch (exception) {
+            if (exception.isAxiosError) {
+                execution.reject(exception);
+            }
             logger(exception, req);
         }
         

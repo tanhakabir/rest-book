@@ -3,7 +3,8 @@ const { EOL } = os;
 import * as fs from 'fs';
 import * as path from 'path';
 import { pickBy, identity, isEmpty } from 'lodash';
-import { logDebug, validateURL, NAME } from './common';
+import validator from 'validator';
+import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method } from './httpConstants';
 export class RequestParser {
@@ -17,7 +18,8 @@ export class RequestParser {
         this.originalRequest = linesOfRequest;
         this.requestOptions = {
             method: this._parseMethod(),
-            baseURL: this._parseBaseUrl()
+            baseURL: this._parseBaseUrl(),
+            timeout: 1000
         };
         this.requestOptions.params = this._parseQueryParams();
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -34,7 +36,7 @@ export class RequestParser {
             throw new Error('Invalid request!');
         }
         if (tokens.length === 1) {
-            if (!validateURL(tokens[0])) {
+            if (!validator.isURL(tokens[0])) {
                 throw new Error('Invalid URL given!');
             }
             return Method.get;
@@ -49,12 +51,12 @@ export class RequestParser {
         if (tokens.length === 0) {
             throw new Error('Invalid request!');
         }
-        if (validateURL(tokens[0])) {
-            return tokens[0];
+        if (validator.isURL(tokens[0])) {
+            return formatURL(tokens[0]);
         }
         else if (tokens.length > 1) {
-            if (validateURL(tokens[1])) {
-                return tokens[1];
+            if (validator.isURL(tokens[1])) {
+                return formatURL(tokens[1]);
             }
         }
         throw new Error('Invalid URL given!');
