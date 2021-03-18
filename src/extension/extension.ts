@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { NotebookProvider } from './notebookProvider';
 import { registerLanguageProvider } from './languageProvider';
+import { registerCommands } from './commands';
 import { logDebug } from '../common/common';
 
 // this method is called when your extension is activated
@@ -30,6 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}));
 	context.subscriptions.push(registerLanguageProvider());
+	context.subscriptions.push(registerCommands());
 }
 
 // this method is called when your extension is deactivated
