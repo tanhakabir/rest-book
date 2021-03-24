@@ -59,17 +59,28 @@ class NotebookKernel implements vscode.NotebookKernel {
 		};
 
         const logger = (d: any, r: any) => {
-            const response = new ResponseParser(d, r);
+            try {
+                const response = new ResponseParser(d, r);
 
-            console.log("OUTPUT");
-            console.log(response.json());
-            execution.replaceOutput([new vscode.NotebookCellOutput([
-                new vscode.NotebookCellOutputItem('text/html', response.html()),
-                new vscode.NotebookCellOutputItem('application/json', response.json()),
-                new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer())
-            ], metadata)]);
-    
-            execution.end({ success: true });
+                console.log("OUTPUT");
+                console.log(response.json());
+                execution.replaceOutput([new vscode.NotebookCellOutput([
+                    new vscode.NotebookCellOutputItem('text/html', response.html()),
+                    new vscode.NotebookCellOutputItem('application/json', response.json()),
+                    new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer())
+                ], metadata)]);
+        
+                execution.end({ success: true });
+            } catch (_) {
+                execution.replaceOutput([new vscode.NotebookCellOutput([
+                    new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
+                        ename: d instanceof Error && d.name || 'error',
+                        evalue: d instanceof Error && d.message || JSON.stringify(d, undefined, 4),
+                        traceback: []
+                    })
+                ])]);
+                execution.end({ success: false });
+            }
         };
 
         let req;
@@ -101,17 +112,6 @@ class NotebookKernel implements vscode.NotebookKernel {
 
             logger(response, req);
         } catch (exception) {
-            if (exception.isAxiosError) {
-                execution.replaceOutput([new vscode.NotebookCellOutput([
-                    new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
-                        ename: exception instanceof Error && exception.name || 'error',
-                        evalue: exception instanceof Error && exception.message || JSON.stringify(exception, undefined, 4),
-                        traceback: []
-                    })
-                ])]);
-                execution.end({ success: false });
-            }
-
             logger(exception, req);
         }
         
