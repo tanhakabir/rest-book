@@ -36,22 +36,19 @@ class NotebookKernel implements vscode.NotebookKernel {
 
 
     async executeCellsRequest(document: vscode.NotebookDocument, ranges: vscode.NotebookCellRange[]): Promise<void> {
+        console.log(ranges);
         const cells: vscode.NotebookCell[] = [];
 		for (let range of ranges) {
 			for (let i = range.start; i < range.end; i++) {
-				cells.push(document.cells[i]);
+                let cell = document.cells[i];
+				const execution = vscode.notebook.createNotebookCellExecutionTask(cell.notebook.uri, cell.index, this.id)!;
+			    await this._doExecution(execution);
 			}
-		}
-
-		const all = new Set<vscode.NotebookCell>();
-
-		for (const cell of all) {
-			const execution = vscode.notebook.createNotebookCellExecutionTask(cell.notebook.uri, cell.index, this.id)!;
-			await this._doExecution(execution);
 		}
     }
 
     private async _doExecution(execution: vscode.NotebookCellExecutionTask): Promise<void> {
+        console.log("DO EXEC");
         const doc = await vscode.workspace.openTextDocument(execution.cell.document.uri);
 
         execution.executionOrder = ++this._executionOrder;
@@ -64,6 +61,8 @@ class NotebookKernel implements vscode.NotebookKernel {
         const logger = (d: any, r: any) => {
             const response = new ResponseParser(d, r);
 
+            console.log("OUTPUT");
+            console.log(response.json());
             execution.replaceOutput([new vscode.NotebookCellOutput([
                 new vscode.NotebookCellOutputItem('text/html', response.html()),
                 new vscode.NotebookCellOutputItem('application/json', response.json()),
@@ -126,7 +125,6 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
     }
     
     async openNotebook(uri: vscode.Uri, context: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
-        console.log("OPEN NOTEBOOK");
         let actualUri = context.backupId ? vscode.Uri.parse(context.backupId) : uri;
 		let contents = '';
 		try {
@@ -148,8 +146,6 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
 			item.outputs ? [new vscode.NotebookCellOutput(item.outputs.map(raw => new vscode.NotebookCellOutputItem(raw.mime, raw.value)))] : [],
 			new vscode.NotebookCellMetadata().with({ editable: item.editable ?? true })
 		));
-
-        console.log(cells);
 
         return new vscode.NotebookData(
 			cells,
