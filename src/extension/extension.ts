@@ -12,23 +12,19 @@ export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('rest-book is now active!');
-
+	
 	const notebookProvider = new NotebookProvider();
-	context.subscriptions.push(vscode.notebook.registerNotebookKernelProvider({ viewType: 'rest-book'}, notebookProvider));
+	context.subscriptions.push(vscode.notebook.registerNotebookKernelProvider({ viewType: 'rest-book' }, notebookProvider));
 	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('rest-book', notebookProvider, {
 		transientOutputs: false,
 		transientMetadata: {
-			runnable: true,
 			inputCollapsed: true,
 			outputCollapsed: true,
-			runState: true,
-			runStartTime: true,
-			executionOrder: true,
-			lastRunDuration: true,
 			statusMessage: true,
-			editable: false
+			editable: false,
 		}
 	}));
+
 	context.subscriptions.push(registerLanguageProvider());
 }
 

@@ -5,7 +5,7 @@ import './style.css';
 const api = acquireNotebookRendererApi('rest-book');
 
 api.onDidCreateOutput(event => {
-	const data = event.output.data[event.mimeType];
+	const data = event.value.data[event.mime];
 	render(<Response response={data} saveResponse={saveDataToFile}/>, event.element);
 });
 
