@@ -65,9 +65,9 @@ class NotebookKernel implements vscode.NotebookKernel {
                 console.log("OUTPUT");
                 console.log(response.json());
                 execution.replaceOutput([new vscode.NotebookCellOutput([
-                    new vscode.NotebookCellOutputItem('text/html', response.html()),
+                    new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer()),
                     new vscode.NotebookCellOutputItem('application/json', response.json()),
-                    new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer())
+                    new vscode.NotebookCellOutputItem('text/html', response.html())
                 ], metadata)]);
         
                 execution.end({ success: true });
