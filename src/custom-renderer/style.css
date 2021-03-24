@@ -92,6 +92,7 @@ button.tab[active] {
     max-height: 20em;
     max-width: 100%;
     overflow-y: scroll;
+    font-family: Menlo, Monaco, "Courier New", monospace;
 }
 
 .request-url {
