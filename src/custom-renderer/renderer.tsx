@@ -130,10 +130,10 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean, searchKeyword: 
 };
 
 const DataTab: FunctionComponent<{ data: any, active: boolean, searchKeyword: string}> = ({ data, active, searchKeyword }) => {
-    console.log(data);
-    //@ts-ignore
+    const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
+
     return <div class='tab-content' id='data-container' hidden={!active}>
-        {searchForTermInText((JSON.stringify(data)), searchKeyword)}
+        {searchForTermInText(dataStr, searchKeyword)}
     </div>;
 };
 
