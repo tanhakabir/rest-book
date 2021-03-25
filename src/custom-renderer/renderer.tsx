@@ -130,9 +130,10 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean, searchKeyword: 
 };
 
 const DataTab: FunctionComponent<{ data: any, active: boolean, searchKeyword: string}> = ({ data, active, searchKeyword }) => {
+    console.log(data);
     //@ts-ignore
     return <div class='tab-content' id='data-container' hidden={!active}>
-        {searchForTermInText((data as string), searchKeyword)}
+        {searchForTermInText((JSON.stringify(data)), searchKeyword)}
     </div>;
 };
 
@@ -153,6 +154,8 @@ const searchForTermInText = (text: string, searchKeyword: string) => {
     if (searchKeyword !== '' && typeof text === 'string' && text) {
         splitOnSearch = text.split(searchKeyword);
     }
+
+    console.log(splitOnSearch);
 
     return <span>
         {splitOnSearch.map((token, i) => {

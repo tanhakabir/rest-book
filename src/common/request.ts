@@ -74,7 +74,7 @@ export class RequestParser {
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
         if (tokens.length === 1) {
-            if (!validator.isURL(tokens[0])) {
+            if (!validator.isURL(tokens[0]) || !tokens[0].includes('localhost')) {
                 throw new Error('Invalid URL given!');
             }
 
@@ -93,10 +93,10 @@ export class RequestParser {
 
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
-        if (validator.isURL(tokens[0])) {
+        if (validator.isURL(tokens[0]) || tokens[0].includes('localhost')) {
             return formatURL(tokens[0]);
         } else if(tokens.length > 1) {
-            if(validator.isURL(tokens[1])) {
+            if(validator.isURL(tokens[1]) || tokens[1].includes('localhost')) {
                 return formatURL(tokens[1]);
             }
         }

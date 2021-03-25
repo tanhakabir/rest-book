@@ -11,10 +11,7 @@ document.head.appendChild(link);
 const api = acquireNotebookRendererApi('rest-book');
 
 api.onDidCreateOutput(event => {
-	console.log("RENDERER");
-	console.log(event);
 	const data = event.value;
-	console.log(data);
 	render(<Response response={data} saveResponse={saveDataToFile}/>, event.element);
 });
 
