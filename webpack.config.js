@@ -21,6 +21,7 @@ const config = {
         fallback: { "url": require.resolve("url/"),
                     "os": require.resolve("os-browserify/browser"),
 					"path": require.resolve("path-browserify"),
+					"util": require.resolve("util/"),
 					"fs": false }
 	},
 	module: {

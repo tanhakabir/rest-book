@@ -2,13 +2,13 @@
   "name": "rest-book",
   "displayName": "REST Book",
   "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "publisher": "tanha",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
   },
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.54.0"
   },
   "enableProposedApi": true,
   "categories": [
@@ -111,6 +111,7 @@
     "ts-loader": "^8.0.18",
     "typescript": "^4.2.3",
     "url": "^0.11.0",
+    "util": "^0.12.3",
     "validator": "^13.5.2",
     "vscode-codicons": "0.0.14",
     "vscode-dts": "^0.3.1",

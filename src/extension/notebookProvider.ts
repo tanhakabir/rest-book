@@ -48,7 +48,6 @@ class NotebookKernel implements vscode.NotebookKernel {
     }
 
     private async _doExecution(execution: vscode.NotebookCellExecutionTask): Promise<void> {
-        console.log("DO EXEC");
         const doc = await vscode.workspace.openTextDocument(execution.cell.document.uri);
 
         execution.executionOrder = ++this._executionOrder;
@@ -62,8 +61,6 @@ class NotebookKernel implements vscode.NotebookKernel {
             try {
                 const response = new ResponseParser(d, r);
 
-                console.log("OUTPUT");
-                console.log(response.json());
                 execution.replaceOutput([new vscode.NotebookCellOutput([
                     new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer()),
                     new vscode.NotebookCellOutputItem('application/json', response.json()),
