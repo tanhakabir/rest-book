@@ -2,8 +2,8 @@
   "name": "rest-book",
   "displayName": "REST Book",
   "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
-  "version": "0.2.4",
-  "publisher": "tanha",
+  "version": "0.2.5",
+  "publisher": "tanhakabir",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
   },
