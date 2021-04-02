@@ -132,3 +132,10 @@ button.tab[active] {
 .search-term {
     background-color: yellow;
 }
+
+
+@media (max-width: 800px) {
+    button.tab {
+        padding: 10px 15px 10px 15px;
+    }
+}
