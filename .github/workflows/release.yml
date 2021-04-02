@@ -14,9 +14,7 @@ jobs:
         with:
           node-version: ^12
       - run: npm i
-        working-directory: extension
       - run: npm i -g vsce
       - run: vsce publish -p $VSCE_TOKEN
-        working-directory: extension
         env:
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
