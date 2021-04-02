@@ -209,10 +209,10 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
         let name;
         const url = data.request?.responseUrl;
         if(url) {
-            name = url;
-            name = name.replace(/^[A-Za-z0-9]+\./g, '');
-            name = name.replace(/\.[A-Za-z0-9]+$/g, '');
-            name = name.replace(/\./g, '-');
+            let hostname = new Url(url).hostname ?? '';
+            hostname = hostname.replace(/^[A-Za-z0-9]+\./g, '');
+            hostname = hostname.replace(/\.[A-Za-z0-9]+$/g, '');
+            name = hostname.replace(/\./g, '-');
         } else {
             name = 'unknown-url';
         }
