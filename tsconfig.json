@@ -1,7 +1,4 @@
 {
-	"compilerOptions": {
-		"target": "es2015"
-	},
 	"references": [
 		{
 			"path": "./src/custom-renderer"
