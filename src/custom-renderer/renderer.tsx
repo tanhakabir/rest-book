@@ -155,8 +155,6 @@ const searchForTermInText = (text: string, searchKeyword: string) => {
         splitOnSearch = text.split(searchKeyword);
     }
 
-    console.log(splitOnSearch);
-
     return <span>
         {splitOnSearch.map((token, i) => {
             if(i === splitOnSearch.length - 1) {

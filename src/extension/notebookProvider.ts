@@ -36,15 +36,12 @@ class NotebookKernel implements vscode.NotebookKernel {
 
 
     async executeCellsRequest(document: vscode.NotebookDocument, ranges: vscode.NotebookCellRange[]): Promise<void> {
-        console.log(ranges);
-        const cells: vscode.NotebookCell[] = [];
-		for (let range of ranges) {
-			for (let i = range.start; i < range.end; i++) {
-                let cell = document.cells[i];
-				const execution = vscode.notebook.createNotebookCellExecutionTask(cell.notebook.uri, cell.index, this.id)!;
+        for(let range of ranges) {
+            for(let cell of document.getCells(range)) {
+                const execution = vscode.notebook.createNotebookCellExecutionTask(cell.notebook.uri, cell.index, this.id)!;
 			    await this._doExecution(execution);
-			}
-		}
+            }
+        }
     }
 
     private async _doExecution(execution: vscode.NotebookCellExecutionTask): Promise<void> {
