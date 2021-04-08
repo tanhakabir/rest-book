@@ -3,7 +3,6 @@
 👉👉👉 Latest VS Code Insiders is required and at times this extension might be broken.
 
 # REST Book
-_version 0.2.4_
 
 REST Book is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
 
