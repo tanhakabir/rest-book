@@ -178,7 +178,7 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
 
         let contents: RawNotebookCell[] = [];
 
-        for(const cell of document.cells) {
+        for(const cell of document.getCells()) {
             contents.push({
 				kind: cell.kind,
 				language: cell.document.languageId,
