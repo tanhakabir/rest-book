@@ -113,19 +113,11 @@ class NotebookKernel implements vscode.NotebookKernel {
     
 }
 
-export class NotebookProvider implements vscode.NotebookContentProvider, vscode.NotebookKernelProvider {
-    provideKernels(_document: vscode.NotebookDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.NotebookKernel[]> {
-        return [new NotebookKernel()];
-    }
-    
-    async openNotebook(uri: vscode.Uri, context: vscode.NotebookDocumentOpenContext): Promise<vscode.NotebookData> {
-        let actualUri = context.backupId ? vscode.Uri.parse(context.backupId) : uri;
-		let contents = '';
-		try {
-			contents = new TextDecoder().decode(await vscode.workspace.fs.readFile(actualUri));
-		} catch {
-		}
+export class NotebookProvider implements vscode.NotebookSerializer, vscode.NotebookKernelProvider {
+    async dataToNotebook(data: Uint8Array): Promise<vscode.NotebookData> {
+        var contents = new TextDecoder().decode(data);    // convert to String to make JSON object
 
+        // Read file contents
 		let raw: RawNotebookCell[];
 		try {
 			raw = <RawNotebookCell[]>JSON.parse(contents);
@@ -133,7 +125,8 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
 			raw = [];
 		}
 
-        const cells = raw.map(item => new vscode.NotebookCellData(
+        // Create array of Notebook cells for the VS Code API from file contents
+		const cells = raw.map(item => new vscode.NotebookCellData(
 			item.kind,
 			item.value,
 			item.language,
@@ -141,10 +134,44 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
 			new vscode.NotebookCellMetadata().with({ editable: item.editable ?? true })
 		));
 
-        return new vscode.NotebookData(
+        // Pass read and formatted Notebook Data to VS Code to display Notebook with saved cells
+		return new vscode.NotebookData(
 			cells,
 			new vscode.NotebookDocumentMetadata().with({ cellHasExecutionOrder: true, })
 		);
+    }
+    async notebookToData(data: vscode.NotebookData): Promise<Uint8Array> {
+        // function to take output renderer data to a format to save to the file
+		function asRawOutput(cell: vscode.NotebookCellData): RawCellOutput[] {
+			let result: RawCellOutput[] = [];
+			for (let output of cell.outputs ?? []) {
+				for (let item of output.outputs) {
+					result.push({ mime: item.mime, value: item.value });
+				}
+			}
+			return result;
+		}
+
+        // Map the Notebook data into the format we want to save the Notebook data as
+
+		let contents: RawNotebookCell[] = [];
+
+		for (const cell of data.cells) {
+			contents.push({
+				kind: cell.kind,
+				language: cell.language,
+				value: cell.source,
+				outputs: asRawOutput(cell)
+			});
+		}
+
+        // Give a string of all the data to save and VS Code will handle the rest 
+		return new TextEncoder().encode(JSON.stringify(contents));
+    }
+
+
+    provideKernels(_document: vscode.NotebookDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.NotebookKernel[]> {
+        return [new NotebookKernel()];
     }
 
     async resolveNotebook(_document: vscode.NotebookDocument, webview: { readonly onDidReceiveMessage: vscode.Event<any>; postMessage(message: any): Thenable<boolean>; asWebviewUri(localResource: vscode.Uri): vscode.Uri; }): Promise<void>{
@@ -156,47 +183,6 @@ export class NotebookProvider implements vscode.NotebookContentProvider, vscode.
                 default: break;
             }
         });
-    }
-    async saveNotebook(document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void> {
-		return this._save(document, document.uri);
-	}
-
-	async saveNotebookAs(targetResource: vscode.Uri, document: vscode.NotebookDocument, _cancellation: vscode.CancellationToken): Promise<void> {
-		return this._save(document, targetResource);
-	}
-
-    async _save(document: vscode.NotebookDocument, targetResource: vscode.Uri): Promise<void> {
-        function asRawOutput(cell: vscode.NotebookCell): RawCellOutput[] {
-			let result: RawCellOutput[] = [];
-			for (let output of cell.outputs) {
-				for (let item of output.outputs) {
-					result.push({ mime: item.mime, value: item.value });
-				}
-			}
-			return result;
-		}
-
-        let contents: RawNotebookCell[] = [];
-
-        for(const cell of document.getCells()) {
-            contents.push({
-				kind: cell.kind,
-				language: cell.document.languageId,
-				value: cell.document.getText(),
-                editable: cell.metadata.editable,
-                outputs: asRawOutput(cell)
-			});
-        }
-
-		await vscode.workspace.fs.writeFile(targetResource, Buffer.from(JSON.stringify(contents, undefined, 2)));
-	}
-
-    async backupNotebook(document: vscode.NotebookDocument, context: vscode.NotebookDocumentBackupContext, _cancellation: vscode.CancellationToken): Promise<vscode.NotebookDocumentBackup> {
-        await this._save(document, context.destination);
-		return {
-			id: context.destination.toString(),
-			delete: () => vscode.workspace.fs.delete(context.destination)
-		};
     }
 
     private async _saveDataToFile(data: ResponseRendererElements) {
