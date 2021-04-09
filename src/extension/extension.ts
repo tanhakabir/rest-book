@@ -15,7 +15,7 @@ export function activate(context: vscode.ExtensionContext) {
 	
 	const notebookProvider = new NotebookProvider();
 	context.subscriptions.push(vscode.notebook.registerNotebookKernelProvider({ viewType: 'rest-book' }, notebookProvider));
-	context.subscriptions.push(vscode.notebook.registerNotebookContentProvider('rest-book', notebookProvider, {
+	context.subscriptions.push(vscode.notebook.registerNotebookSerializer('rest-book', notebookProvider, {
 		transientOutputs: false,
 		transientMetadata: {
 			inputCollapsed: true,
