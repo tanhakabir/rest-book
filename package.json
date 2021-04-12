@@ -23,12 +23,6 @@
   "main": "./dist/extension-node.js",
   "browser": "./dist/extension-web.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "rest-book.newNotebook",
-        "title": "REST Book: Create a new blank REST Notebook"
-      }
-    ],
     "notebookOutputRenderer": [
       {
         "id": "rest-book",
