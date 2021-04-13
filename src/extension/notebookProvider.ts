@@ -137,7 +137,7 @@ export class NotebookProvider implements vscode.NotebookSerializer, vscode.Noteb
         // Pass read and formatted Notebook Data to VS Code to display Notebook with saved cells
 		return new vscode.NotebookData(
 			cells,
-			new vscode.NotebookDocumentMetadata().with({ cellHasExecutionOrder: true, })
+			new vscode.NotebookDocumentMetadata()
 		);
     }
     async notebookToData(data: vscode.NotebookData): Promise<Uint8Array> {
