@@ -130,7 +130,7 @@ export class NotebookProvider implements vscode.NotebookSerializer, vscode.Noteb
 			item.value,
 			item.language,
 			item.outputs ? [new vscode.NotebookCellOutput(item.outputs.map(raw => new vscode.NotebookCellOutputItem(raw.mime, raw.value)))] : [],
-			new vscode.NotebookCellMetadata().with({ editable: item.editable ?? true })
+			new vscode.NotebookCellMetadata()
 		));
 
         // Pass read and formatted Notebook Data to VS Code to display Notebook with saved cells
