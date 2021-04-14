@@ -30,7 +30,6 @@ class NotebookKernel implements vscode.NotebookKernel {
     description?: string | undefined;
     detail?: string | undefined;
     isPreferred?: boolean | undefined;
-    preloads?: vscode.Uri[] | undefined;
 
     private _executionOrder = 0;
 
