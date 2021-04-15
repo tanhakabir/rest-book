@@ -22,16 +22,35 @@ interface RawCellOutput {
 	value: any;
 }
 
-class NotebookKernel implements vscode.NotebookKernel {
+export class NotebookKernel {
     readonly id = 'rest-book-kernel';
     readonly label = 'REST Book Kernel';
     readonly supportedLanguages = ['rest-book'];
 
-    description?: string | undefined;
-    detail?: string | undefined;
-    isPreferred?: boolean | undefined;
+    private readonly _controller: vscode.NotebookController;
+	private _executionOrder = 0;
 
-    private _executionOrder = 0;
+	constructor() {
+		this._controller = vscode.notebook.createNotebookController({
+			id: 'rest-book-kernel',
+			label: 'REST Book',
+			description: 'REST Book to make REST calls.',
+			supportedLanguages: ['rest-book'],
+			selector: { viewType: 'rest-book' },
+			hasExecutionOrder: true,
+			executeHandler: this._executeAll.bind(this)
+		});
+	}
+
+	dispose(): void {
+		this._controller.dispose();
+	}
+
+    private _executeAll(executions: vscode.NotebookCellExecutionTask[]): void {
+		for (let exec of executions) {
+			this._doExecution(exec);
+		}
+	}
 
 
     async executeCellsRequest(document: vscode.NotebookDocument, ranges: vscode.NotebookCellRange[]): Promise<void> {

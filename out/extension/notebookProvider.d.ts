@@ -1,4 +1,16 @@
 import * as vscode from 'vscode';
+export declare class NotebookKernel {
+    readonly id = "rest-book-kernel";
+    readonly label = "REST Book Kernel";
+    readonly supportedLanguages: string[];
+    private readonly _controller;
+    private _executionOrder;
+    constructor();
+    dispose(): void;
+    private _executeAll;
+    executeCellsRequest(document: vscode.NotebookDocument, ranges: vscode.NotebookCellRange[]): Promise<void>;
+    private _doExecution;
+}
 export declare class NotebookProvider implements vscode.NotebookSerializer, vscode.NotebookKernelProvider {
     dataToNotebook(data: Uint8Array): Promise<vscode.NotebookData>;
     notebookToData(data: vscode.NotebookData): Promise<Uint8Array>;
