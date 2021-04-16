@@ -12,8 +12,7 @@
   },
   "enableProposedApi": true,
   "categories": [
-    "Notebooks",
-    "Other"
+    "Notebooks"
   ],
   "icon": "rest-book.png",
   "activationEvents": [

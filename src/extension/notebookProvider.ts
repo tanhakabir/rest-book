@@ -46,25 +46,14 @@ export class NotebookKernel {
 		this._controller.dispose();
 	}
 
-    private _executeAll(executions: vscode.NotebookCellExecutionTask[]): void {
-		for (let exec of executions) {
-			this._doExecution(exec);
+    private _executeAll(cells: vscode.NotebookCell[], _controller: vscode.NotebookController): void {
+		for (let cell of cells) {
+			this._doExecution(cell);
 		}
 	}
 
-
-    async executeCellsRequest(document: vscode.NotebookDocument, ranges: vscode.NotebookCellRange[]): Promise<void> {
-        for(let range of ranges) {
-            for(let cell of document.getCells(range)) {
-                const execution = vscode.notebook.createNotebookCellExecutionTask(cell.notebook.uri, cell.index, this.id)!;
-			    await this._doExecution(execution);
-            }
-        }
-    }
-
-    private async _doExecution(execution: vscode.NotebookCellExecutionTask): Promise<void> {
-        const doc = await vscode.workspace.openTextDocument(execution.cell.document.uri);
-
+    private async _doExecution(cell: vscode.NotebookCell): Promise<void> {
+        const execution = this._controller.createNotebookCellExecutionTask(cell);
         execution.executionOrder = ++this._executionOrder;
 		execution.start({ startTime: Date.now() });
 
@@ -98,7 +87,7 @@ export class NotebookKernel {
         let req;
         
         try {
-            const parser = new RequestParser(doc.getText());
+            const parser = new RequestParser(cell.document.getText());
             req = parser.getRequest();
         } catch (err) {
             execution.replaceOutput([new vscode.NotebookCellOutput([
@@ -131,8 +120,9 @@ export class NotebookKernel {
     
 }
 
-export class NotebookProvider implements vscode.NotebookSerializer, vscode.NotebookKernelProvider {
-    async dataToNotebook(data: Uint8Array): Promise<vscode.NotebookData> {
+export class NotebookSerializer implements vscode.NotebookSerializer {
+
+    deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken) {
         var contents = new TextDecoder().decode(data);    // convert to String to make JSON object
 
         // Read file contents
@@ -158,7 +148,8 @@ export class NotebookProvider implements vscode.NotebookSerializer, vscode.Noteb
 			new vscode.NotebookDocumentMetadata()
 		);
     }
-    async notebookToData(data: vscode.NotebookData): Promise<Uint8Array> {
+
+    serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken) {
         // function to take output renderer data to a format to save to the file
 		function asRawOutput(cell: vscode.NotebookCellData): RawCellOutput[] {
 			let result: RawCellOutput[] = [];
@@ -185,11 +176,6 @@ export class NotebookProvider implements vscode.NotebookSerializer, vscode.Noteb
 
         // Give a string of all the data to save and VS Code will handle the rest 
 		return new TextEncoder().encode(JSON.stringify(contents));
-    }
-
-
-    provideKernels(_document: vscode.NotebookDocument, _token: vscode.CancellationToken): vscode.ProviderResult<vscode.NotebookKernel[]> {
-        return [new NotebookKernel()];
     }
 
     async resolveNotebook(_document: vscode.NotebookDocument, webview: { readonly onDidReceiveMessage: vscode.Event<any>; postMessage(message: any): Thenable<boolean>; asWebviewUri(localResource: vscode.Uri): vscode.Uri; }): Promise<void>{
