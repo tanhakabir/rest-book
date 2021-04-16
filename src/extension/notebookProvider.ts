@@ -122,7 +122,7 @@ export class NotebookKernel {
 
 export class NotebookSerializer implements vscode.NotebookSerializer {
 
-    deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken) {
+    async deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): Promise<vscode.NotebookData> {
         var contents = new TextDecoder().decode(data);    // convert to String to make JSON object
 
         // Read file contents
@@ -149,7 +149,7 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 		);
     }
 
-    serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken) {
+    async serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Promise<Uint8Array> {
         // function to take output renderer data to a format to save to the file
 		function asRawOutput(cell: vscode.NotebookCellData): RawCellOutput[] {
 			let result: RawCellOutput[] = [];
