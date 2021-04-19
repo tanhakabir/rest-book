@@ -20,19 +20,16 @@ REST Book is a Visual Studio Code extension that allows you to perform REST call
 
 Must be using the latest version of Visual Studio Code Insiders edition.
 
-## Installation
-
-1. Grab the latest VSIX file from the Releases section.
-1. Inside Visual Studio Code go under the Extensions section and click on the 3 ellipsis in the top right of the pane.
-1. Click on `Install from VSIX...` and choose the downloaded VSIX.  
-1. Close Visual Studio Code.
-1. Using Powershell or Terminal run `code-insiders --enable-proposed-api rest-book <path to folder you want to run notebook in>`.
-
 ## Usage
 
 1. Create a new file to store your REST Calls with a `.restbook` ending.
+![New file creation](docs/images/new-file.gif)
 1. Add an code cell by hovering over the middle of the Notebook and clicking the `+ Code`
 1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
+![Making a call to my Express Server](docs/images/make-call.gif)
+
+
+### More examples
 
 ```javascript
 google.com
@@ -79,7 +76,7 @@ To test these interactions, you can play around with this simple server: [Sandbo
 
 ## Known Issues
 
-When performing an incorrect query, currently the response will be empty and not an erroneous response.
+Unable to save responses. This should be fixed soon in the next few versions of VS Code Insiders.
 
 ## Any Other issues
 

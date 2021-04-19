@@ -61,7 +61,7 @@ export class NotebookKernel {
 			startTime: Date.now()
 		};
 
-        const logger = (d: any, r: any) => {
+        const logger = (d: any, r: RequestParser) => {
             try {
                 const response = new ResponseParser(d, r);
 
