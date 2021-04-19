@@ -6,6 +6,8 @@
 
 REST Book is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
 
+![Example of REST Book notebook that REST calls made to an Express App](docs/images/express-app.png)
+
 ## Features
 
 - Create and run REST Calls within cells.
@@ -33,13 +35,13 @@ Must be using the latest version of Visual Studio Code Insiders edition.
 1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
 
 ```javascript
-https://www.google.com
+google.com
 ```
 
 is equivalent to:
 
 ```javascript
-GET https://www.google.com
+GET google.com
 ```
 
 In subsequent lines immediately following the first line add any parameters or queries starting with `?` or `&` like this:
