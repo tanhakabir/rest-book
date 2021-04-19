@@ -31,15 +31,15 @@ export class NotebookKernel {
 	private _executionOrder = 0;
 
 	constructor() {
-		this._controller = vscode.notebook.createNotebookController({
-			id: 'rest-book-kernel',
-			label: 'REST Book',
-			description: 'REST Book to make REST calls.',
-			supportedLanguages: ['rest-book'],
-			selector: { viewType: 'rest-book' },
-			hasExecutionOrder: true,
-			executeHandler: this._executeAll.bind(this)
-		});
+        this._controller = vscode.notebook.createNotebookController(
+			'rest-book-kernel',
+			{ viewType: 'rest-book' },
+			'REST Book',
+		);
+		this._controller.supportedLanguages = ['rest-book'];
+		this._controller.hasExecutionOrder = true;
+		this._controller.description = 'A notebook for making REST calls.';
+		this._controller.executeHandler = this._executeAll.bind(this);
 	}
 
 	dispose(): void {

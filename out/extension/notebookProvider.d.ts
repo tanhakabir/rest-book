@@ -11,8 +11,8 @@ export declare class NotebookKernel {
     private _doExecution;
 }
 export declare class NotebookSerializer implements vscode.NotebookSerializer {
-    deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): vscode.NotebookData;
-    serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Uint8Array;
+    deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): Promise<vscode.NotebookData>;
+    serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Promise<Uint8Array>;
     resolveNotebook(_document: vscode.NotebookDocument, webview: {
         readonly onDidReceiveMessage: vscode.Event<any>;
         postMessage(message: any): Thenable<boolean>;
