@@ -82,10 +82,8 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const result: vscode.CompletionItem[] = [];
 
-        if(position.line === 0) { return result; }
-
-        let text = document.lineAt(position.line).text;
-        let startingIndex = text.lastIndexOf(' ');
+        let text = document.lineAt(position.line).text.substring(0, position.character);
+        let startingIndex = (text.lastIndexOf(' ') > text.lastIndexOf('=') ? text.lastIndexOf(' ') : text.lastIndexOf('=')) + 1;
         let varName = text.substring(startingIndex).trim();
 
         const tokens: string[] = varName.split('.').filter(Boolean).map(s => s.replace('.', ''));

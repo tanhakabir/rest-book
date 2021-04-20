@@ -79,12 +79,14 @@ export class RequestParser {
             throw new Error('Invalid request!');
         }
         if (tokens.length === 1) {
-            this.baseUrl = tokens[0];
-            return formatURL(tokens[0]);
+            let url = tokens[0].split('?')[0];
+            this.baseUrl = url;
+            return formatURL(url);
         }
         else if (tokens.length === 2) {
-            this.baseUrl = tokens[1];
-            return formatURL(tokens[1]);
+            let url = tokens[1].split('?')[0];
+            this.baseUrl = url;
+            return formatURL(url);
         }
         throw new Error('Invalid URL given!');
     }
@@ -109,7 +111,18 @@ export class RequestParser {
             if (parts.length !== 2) {
                 throw new Error(`Invalid query paramter for ${p}`);
             }
-            params[parts[0]] = parts[1];
+            let loadedFromVariable = attemptToLoadVariable(parts[1]);
+            if (loadedFromVariable) {
+                if (typeof loadedFromVariable === 'string') {
+                    params[parts[0]] = loadedFromVariable;
+                }
+                else {
+                    params[parts[0]] = JSON.stringify(loadedFromVariable);
+                }
+            }
+            else {
+                params[parts[0]] = parts[1];
+            }
             // TODO clean value to raw form?
         }
         return params;
@@ -134,7 +147,18 @@ export class RequestParser {
             if (parts.length !== 2) {
                 throw new Error(`Invalid header ${h}`);
             }
-            headers[parts[0]] = parts[1];
+            let loadedFromVariable = attemptToLoadVariable(parts[1]);
+            if (loadedFromVariable) {
+                if (typeof loadedFromVariable === 'string') {
+                    headers[parts[0]] = loadedFromVariable;
+                }
+                else {
+                    headers[parts[0]] = JSON.stringify(loadedFromVariable);
+                }
+            }
+            else {
+                headers[parts[0]] = parts[1];
+            }
             i++;
         }
         return isEmpty(headers) ? undefined : headers;

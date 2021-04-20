@@ -37,10 +37,19 @@ export function updateCache(request, response) {
     variableCache[varName] = response;
 }
 export function attemptToLoadVariable(text) {
-    let toResolve = _createVariableDeclarationsFromCache();
-    toResolve += ` ${text}`;
+    let declaration = _createVariableDeclarationsFromCache();
+    const tokens = text.split('.');
+    let toResolve = ` ${tokens[0]}`;
+    for (let i = 1; i < tokens.length; i++) {
+        if (tokens[i].includes('-') || tokens[i].includes(' ')) {
+            toResolve += `["${tokens[i]}"]`;
+        }
+        else {
+            toResolve += `.${tokens[i]}`;
+        }
+    }
     try {
-        return eval(toResolve);
+        return eval(declaration + toResolve);
     }
     catch {
         return undefined;
