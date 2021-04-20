@@ -7,33 +7,37 @@ const selector: vscode.DocumentSelector = { language: NAME };
 export class KeywordCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = [];
 
-    provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const result: vscode.CompletionItem[] = [];
 
+        let autocompleteMethod: Boolean = position.line === 0 ? true : false;
+
         for(const field of Object.values(Method)) {
-            result.push({
-                label: field,
-                insertText: `${field} `,
-                detail: 'HTTP request method',
-                kind: vscode.CompletionItemKind.Method
-            });
+            if(document.lineAt(position).text.includes(field)) {
+                autocompleteMethod = false;
+            }
         }
 
-        for(const field of Object.values(RequestHeaderField)) {
-            result.push({
-                label: field,
-                insertText: `${field}: `,
-                detail: 'HTTP request header field',
-                kind: vscode.CompletionItemKind.Field
-            });
+        if(autocompleteMethod) {
+            for(const field of Object.values(Method)) {
+                result.push({
+                    label: field,
+                    insertText: `${field} `,
+                    detail: 'HTTP request method',
+                    kind: vscode.CompletionItemKind.Method
+                });
+            }
         }
 
-        for(const field of Object.values(MIMEType)) {
-            result.push({
-                label: field,
-                detail: 'HTTP MIME type',
-                kind: vscode.CompletionItemKind.EnumMember
-            });
+        if(position.line !== 0) {
+            for(const field of Object.values(RequestHeaderField)) {
+                result.push({
+                    label: field,
+                    insertText: `${field}: `,
+                    detail: 'HTTP request header field',
+                    kind: vscode.CompletionItemKind.Field
+                });
+            }
         }
 
         for(const url of getBaseUrls()) {
@@ -54,20 +58,37 @@ export class KeywordCompletionItemProvider implements vscode.CompletionItemProvi
     }
 }
 
+export class HeaderCompletionItemProvider implements vscode.CompletionItemProvider {
+    static readonly triggerCharacters = [':'];
+
+    provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+        const result: vscode.CompletionItem[] = [];
+
+        for(const field of Object.values(MIMEType)) {
+            result.push({
+                label: field,
+                detail: 'HTTP MIME type',
+                kind: vscode.CompletionItemKind.EnumMember
+            });
+        }
+        
+        return result;
+    }
+}
+
 export class VariableCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = ['.'];
 
-    provideCompletionItems(document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const result: vscode.CompletionItem[] = [];
 
-        if(!document.getText().includes('\n')) { return result; }
+        if(position.line === 0) { return result; }
 
-        let text = document.getText().substring(document.getText().lastIndexOf('\n'), document.getText().length - 1);
+        let text = document.lineAt(position.line).text;
         let startingIndex = text.lastIndexOf(' ');
         let varName = text.substring(startingIndex).trim();
-        console.log(varName);
 
-        const tokens: string[] = varName.split('.');
+        const tokens: string[] = varName.split('.').filter(Boolean).map(s => s.replace('.', ''));
 
         if(tokens.length < 1) { return result; }
 

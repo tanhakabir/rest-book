@@ -15,6 +15,7 @@ REST Book is a Visual Studio Code extension that allows you to perform REST call
 - Intermingle markdown for documenting your calls.
 - View rich HTML and image responses directly inside the Notebook.
 - Basic Authentication
+- Use data from one call in the next
 
 ## Requirements
 
@@ -71,6 +72,15 @@ Content-Type: application/json
     text: "Foo is the most bar of the Foos" 
 }
 ```
+
+You can also assign the responses from calls to a variable and use the data from that response in future calls. To do this you would just declare a variable with `let ` and the name of your variable and then a `=` like so:
+
+```javascript
+let foo = GET google.com
+```
+
+And then in future cells you can reference `foo` in the body of your calls. Here's a short example:
+![Example of someone declaring foo to be the response of a GET call to google.com and then creating a new cell after and seeing the auto-complete suggestions for foo.](docs/images/cross-cell-variable.gif)
 
 To test these interactions, you can play around with this simple server: [SandboxServer](https://github.com/tanhakabir/SandboxServer)
 
