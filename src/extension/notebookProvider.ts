@@ -6,6 +6,7 @@ import { TextDecoder, TextEncoder } from "util";
 import { Method } from '../common/httpConstants';
 import { RequestParser } from '../common/request';
 import { ResponseParser, ResponseRendererElements } from '../common/response';
+import { updateCache } from '../common/cache';
 import { Url } from 'url';
 const axios = require('axios').default;
 
@@ -61,9 +62,10 @@ export class NotebookKernel {
 			startTime: Date.now()
 		};
 
-        const logger = (d: any, r: RequestParser) => {
+        const logger = (d: any, r: any, requestParser: RequestParser) => {
             try {
                 const response = new ResponseParser(d, r);
+                updateCache(requestParser, response);
 
                 execution.replaceOutput([new vscode.NotebookCellOutput([
                     new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer()),
@@ -85,9 +87,10 @@ export class NotebookKernel {
         };
 
         let req;
+        let parser;
         
         try {
-            const parser = new RequestParser(cell.document.getText());
+            parser = new RequestParser(cell.document.getText());
             req = parser.getRequest();
         } catch (err) {
             execution.replaceOutput([new vscode.NotebookCellOutput([
@@ -111,9 +114,9 @@ export class NotebookKernel {
 
             let response = await axios(options);
 
-            logger(response, req);
+            logger(response, req, parser);
         } catch (exception) {
-            logger(exception, req);
+            logger(exception, req, parser);
         }
         
     }

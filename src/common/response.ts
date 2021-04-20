@@ -92,4 +92,8 @@ export class ResponseParser {
             data: this.data!
         };
     }
+
+    cache() {
+        
+    }
 }

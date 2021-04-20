@@ -22,8 +22,14 @@ export interface Request {
 export declare class RequestParser {
     private originalRequest;
     private requestOptions;
+    private baseUrl?;
+    private variableName;
     constructor(query: string);
     getRequest(): any;
+    getBaseUrl(): string | undefined;
+    getVariableName(): string | undefined;
+    private _parseVariableName;
+    private _stripVariableDeclaration;
     private _parseMethod;
     private _parseBaseUrl;
     private _parseQueryParams;

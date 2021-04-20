@@ -6,6 +6,7 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method, RequestHeaderField } from './httpConstants';
+import { attemptToLoadVariable, attemptToLoadVariableInObject } from './cache';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined
@@ -34,6 +35,8 @@ export interface Request {
 export class RequestParser {
     private originalRequest: string[];
     private requestOptions: Request;
+    private baseUrl?: string;
+    private variableName: string | undefined;
 
     constructor(query: string) {
 
@@ -47,12 +50,13 @@ export class RequestParser {
 
         this.originalRequest = linesOfRequest;
 
+        this.variableName = this._parseVariableName();
+
         this.requestOptions = {
             method: this._parseMethod(),
             baseURL: this._parseBaseUrl(),
             timeout: 1000
         };
-
 
         this.requestOptions.params = this._parseQueryParams();
 
@@ -67,8 +71,41 @@ export class RequestParser {
         return pickBy(this.requestOptions, identity);
     }
 
+    getBaseUrl(): string | undefined {
+        return this.baseUrl;
+    }
+
+    getVariableName(): string | undefined {
+        return this.variableName;
+    }
+
+    private _parseVariableName(): string | undefined {
+        let firstLine = this.originalRequest[0].trimLeft();
+        if(!firstLine.startsWith('let ')) { return undefined; }
+
+        let endIndexOfVarName = firstLine.indexOf('=') + 1;
+        let varDeclaration = firstLine.substring(0, endIndexOfVarName);
+
+        let variableName = varDeclaration.replace('let ', '');
+        variableName = variableName.replace('=', '');
+        variableName = variableName.trim();
+
+        if (variableName.includes(' ')) { throw new Error('Invalid declaration of variable!'); }
+
+        return variableName;
+    }
+
+    private _stripVariableDeclaration(): string {
+        let firstLine = this.originalRequest[0].trimLeft();
+        if(!firstLine.startsWith('let ')) { return firstLine; }
+
+        let endIndexOfVarName = firstLine.indexOf('=') + 1;
+
+        return firstLine.substring(endIndexOfVarName).trim();
+    }
+
     private _parseMethod(): Method {
-        const tokens: string[] = this.originalRequest[0].split(/[\s,]+/);
+        const tokens: string[] = this._stripVariableDeclaration().split(/[\s,]+/);
 
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
@@ -84,13 +121,15 @@ export class RequestParser {
     }
 
     private _parseBaseUrl(): string {
-        const tokens: string[] = this.originalRequest[0].split(/[\s,]+/);
+        const tokens: string[] = this._stripVariableDeclaration().split(/[\s,]+/);
 
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
         if(tokens.length === 1) {
+            this.baseUrl = tokens[0];
             return formatURL(tokens[0]);
         } else if (tokens.length === 2) {
+            this.baseUrl = tokens[1];
             return formatURL(tokens[1]);
         }
             
@@ -98,7 +137,7 @@ export class RequestParser {
     }
 
     private _parseQueryParams(): {[key: string] : string} | undefined {
-        let queryInUrl = this.originalRequest[0].split('?')[1];
+        let queryInUrl = this._stripVariableDeclaration().split('?')[1];
         let strParams: string[] = queryInUrl ? queryInUrl.split('&') : [];
 
         if (this.originalRequest.length >= 2) { 
@@ -174,9 +213,16 @@ export class RequestParser {
         let fileContents = this._attemptToLoadFile(bodyStr);
         if( fileContents ) { return fileContents; }
 
+        let variableContents = attemptToLoadVariable(bodyStr);
+        if( variableContents ) { 
+            return variableContents;
+        }
+
         try {
-            return JSON.parse(bodyStr);
-        } catch {
+            let bodyObj = JSON.parse(bodyStr);
+            // attemptToLoadVariableInObject(bodyObj); // TODO problems parsing body when given var name without quotes
+            return bodyObj;
+        } catch (e) {
             return bodyStr;
         }
     }

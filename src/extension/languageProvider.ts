@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
 import { DEBUG_MODE, NAME } from '../common/common';
+import { getVariableNames, getBaseUrls, findMatchingVariable, variableCache } from '../common/cache';
 import { Method, MIMEType, RequestHeaderField } from '../common/httpConstants';
 
 const selector: vscode.DocumentSelector = { language: NAME };
-export class MethodCompletionItemProvider implements vscode.CompletionItemProvider {
+export class KeywordCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = [];
 
     provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
@@ -34,16 +35,68 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
                 kind: vscode.CompletionItemKind.EnumMember
             });
         }
+
+        for(const url of getBaseUrls()) {
+            result.push({
+                label: url,
+                kind: vscode.CompletionItemKind.Keyword
+            });
+        }
+
+        for(const variable of getVariableNames()) {
+            result.push({
+                label: variable,
+                kind: vscode.CompletionItemKind.Variable
+            });
+        }
         
         return result;
     }
 }
 
+export class VariableCompletionItemProvider implements vscode.CompletionItemProvider {
+    static readonly triggerCharacters = ['.'];
+
+    provideCompletionItems(document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+        const result: vscode.CompletionItem[] = [];
+
+        if(!document.getText().includes('\n')) { return result; }
+
+        let text = document.getText().substring(document.getText().lastIndexOf('\n'), document.getText().length - 1);
+        let startingIndex = text.lastIndexOf(' ');
+        let varName = text.substring(startingIndex).trim();
+        console.log(varName);
+
+        const tokens: string[] = varName.split('.');
+
+        if(tokens.length < 1) { return result; }
+
+        let matchingData = findMatchingVariable(tokens[0]);
+
+        for(let i = 1; i < tokens.length; i++) {
+            matchingData = matchingData[tokens[i]];
+        }
+
+        if(matchingData && typeof matchingData === 'object') {
+            for(let key of Object.keys(matchingData)) {
+                result.push({
+                    label: key,
+                    kind: vscode.CompletionItemKind.Variable
+                });
+            }
+        }
+        
+        return result;
+    }
+}
+
+
 export function registerLanguageProvider(): vscode.Disposable {
     const disposables: vscode.Disposable[] = [];
 
     // TODO add hover provider or definition provider
-    disposables.push(vscode.languages.registerCompletionItemProvider(selector, new MethodCompletionItemProvider(), ...MethodCompletionItemProvider.triggerCharacters));
+    disposables.push(vscode.languages.registerCompletionItemProvider(selector, new KeywordCompletionItemProvider(), ...KeywordCompletionItemProvider.triggerCharacters));
+    disposables.push(vscode.languages.registerCompletionItemProvider(selector, new VariableCompletionItemProvider(), ...VariableCompletionItemProvider.triggerCharacters));
 
     return vscode.Disposable.from(...disposables);
 }

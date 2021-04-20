@@ -6,6 +6,7 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method } from './httpConstants';
+import { attemptToLoadVariable } from './cache';
 export class RequestParser {
     constructor(query) {
         var _a;
@@ -15,6 +16,7 @@ export class RequestParser {
         }
         logDebug(linesOfRequest);
         this.originalRequest = linesOfRequest;
+        this.variableName = this._parseVariableName();
         this.requestOptions = {
             method: this._parseMethod(),
             baseURL: this._parseBaseUrl(),
@@ -29,8 +31,37 @@ export class RequestParser {
     getRequest() {
         return pickBy(this.requestOptions, identity);
     }
+    getBaseUrl() {
+        return this.baseUrl;
+    }
+    getVariableName() {
+        return this.variableName;
+    }
+    _parseVariableName() {
+        let firstLine = this.originalRequest[0].trimLeft();
+        if (!firstLine.startsWith('let ')) {
+            return undefined;
+        }
+        let endIndexOfVarName = firstLine.indexOf('=') + 1;
+        let varDeclaration = firstLine.substring(0, endIndexOfVarName);
+        let variableName = varDeclaration.replace('let ', '');
+        variableName = variableName.replace('=', '');
+        variableName = variableName.trim();
+        if (variableName.includes(' ')) {
+            throw new Error('Invalid declaration of variable!');
+        }
+        return variableName;
+    }
+    _stripVariableDeclaration() {
+        let firstLine = this.originalRequest[0].trimLeft();
+        if (!firstLine.startsWith('let ')) {
+            return firstLine;
+        }
+        let endIndexOfVarName = firstLine.indexOf('=') + 1;
+        return firstLine.substring(endIndexOfVarName).trim();
+    }
     _parseMethod() {
-        const tokens = this.originalRequest[0].split(/[\s,]+/);
+        const tokens = this._stripVariableDeclaration().split(/[\s,]+/);
         if (tokens.length === 0) {
             throw new Error('Invalid request!');
         }
@@ -43,20 +74,22 @@ export class RequestParser {
         return Method[tokens[0].toLowerCase()];
     }
     _parseBaseUrl() {
-        const tokens = this.originalRequest[0].split(/[\s,]+/);
+        const tokens = this._stripVariableDeclaration().split(/[\s,]+/);
         if (tokens.length === 0) {
             throw new Error('Invalid request!');
         }
         if (tokens.length === 1) {
+            this.baseUrl = tokens[0];
             return formatURL(tokens[0]);
         }
         else if (tokens.length === 2) {
+            this.baseUrl = tokens[1];
             return formatURL(tokens[1]);
         }
         throw new Error('Invalid URL given!');
     }
     _parseQueryParams() {
-        let queryInUrl = this.originalRequest[0].split('?')[1];
+        let queryInUrl = this._stripVariableDeclaration().split('?')[1];
         let strParams = queryInUrl ? queryInUrl.split('&') : [];
         if (this.originalRequest.length >= 2) {
             let i = 1;
@@ -120,10 +153,16 @@ export class RequestParser {
         if (fileContents) {
             return fileContents;
         }
-        try {
-            return JSON.parse(bodyStr);
+        let variableContents = attemptToLoadVariable(bodyStr);
+        if (variableContents) {
+            return variableContents;
         }
-        catch {
+        try {
+            let bodyObj = JSON.parse(bodyStr);
+            // attemptToLoadVariableInObject(bodyObj); // TODO problems parsing body when given var name without quotes
+            return bodyObj;
+        }
+        catch (e) {
             return bodyStr;
         }
     }
