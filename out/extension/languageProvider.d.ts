@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 export declare class KeywordCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters: never[];
-    provideCompletionItems(_document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>>;
+    provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>>;
 }
 export declare class HeaderCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters: string[];
