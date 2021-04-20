@@ -24,4 +24,5 @@ export declare class ResponseParser {
     };
     html(): any;
     renderer(): ResponseRendererElements;
+    cache(): void;
 }

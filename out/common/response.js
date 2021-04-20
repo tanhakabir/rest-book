@@ -62,5 +62,7 @@ export class ResponseParser {
             data: this.data
         };
     }
+    cache() {
+    }
 }
 //# sourceMappingURL=response.js.map

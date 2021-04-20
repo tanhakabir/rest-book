@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { DEBUG_MODE, NAME } from '../common/common';
+import { getVariableNames, getBaseUrls } from '../common/cache';
 import { Method, MIMEType, RequestHeaderField } from '../common/httpConstants';
 
 const selector: vscode.DocumentSelector = { language: NAME };
@@ -32,6 +33,20 @@ export class MethodCompletionItemProvider implements vscode.CompletionItemProvid
                 label: field,
                 detail: 'HTTP MIME type',
                 kind: vscode.CompletionItemKind.EnumMember
+            });
+        }
+
+        for(const url of getBaseUrls()) {
+            result.push({
+                label: url,
+                kind: vscode.CompletionItemKind.Keyword
+            });
+        }
+
+        for(const variable of getVariableNames()) {
+            result.push({
+                label: variable,
+                kind: vscode.CompletionItemKind.Variable
             });
         }
         
