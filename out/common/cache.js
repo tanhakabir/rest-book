@@ -3,6 +3,25 @@ export var baseUrlCache = new Set();
 export function getVariableNames() {
     return Object.keys(variableCache);
 }
+export function findMatchingDataInVariableCache(varName, cache) {
+    for (let key of Object.keys(cache)) {
+        if (key === varName) {
+            return cache[key];
+        }
+        if (typeof cache[key] === 'object') {
+            return findMatchingDataInVariableCache(varName, cache[key]);
+        }
+    }
+    return undefined;
+}
+export function findMatchingVariable(name) {
+    for (let key of Object.keys(variableCache)) {
+        if (key === name) {
+            return variableCache[name];
+        }
+    }
+    return undefined;
+}
 export function getBaseUrls() {
     return [...baseUrlCache];
 }
@@ -16,7 +35,6 @@ export function updateCache(request, response) {
         return;
     }
     variableCache[varName] = response;
-    console.log(variableCache);
 }
 export function attemptToLoadVariable(text) {
     let toResolve = _createVariableDeclarationsFromCache();
@@ -29,7 +47,7 @@ export function attemptToLoadVariable(text) {
     }
 }
 export function attemptToLoadVariableInObject(body) {
-    return _attemptToLoadVariableInObjectHelper(body);
+    _attemptToLoadVariableInObjectHelper(body);
 }
 function _attemptToLoadVariableInObjectHelper(obj) {
     for (let key of Object.keys(obj)) {

@@ -6,7 +6,7 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method } from './httpConstants';
-import { attemptToLoadVariable, attemptToLoadVariableInObject } from './cache';
+import { attemptToLoadVariable } from './cache';
 export class RequestParser {
     constructor(query) {
         var _a;
@@ -159,7 +159,8 @@ export class RequestParser {
         }
         try {
             let bodyObj = JSON.parse(bodyStr);
-            return attemptToLoadVariableInObject(bodyObj);
+            // attemptToLoadVariableInObject(bodyObj); // TODO problems parsing body when given var name without quotes
+            return bodyObj;
         }
         catch (e) {
             return bodyStr;

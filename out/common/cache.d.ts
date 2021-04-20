@@ -5,7 +5,9 @@ export declare var variableCache: {
 };
 export declare var baseUrlCache: Set<string>;
 export declare function getVariableNames(): string[];
+export declare function findMatchingDataInVariableCache(varName: string, cache: any): any | undefined;
+export declare function findMatchingVariable(name: string): any | undefined;
 export declare function getBaseUrls(): string[];
 export declare function updateCache(request: RequestParser, response: ResponseParser): void;
 export declare function attemptToLoadVariable(text: string): any | undefined;
-export declare function attemptToLoadVariableInObject(body: any): any;
+export declare function attemptToLoadVariableInObject(body: any): void;

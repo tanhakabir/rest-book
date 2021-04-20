@@ -220,7 +220,8 @@ export class RequestParser {
 
         try {
             let bodyObj = JSON.parse(bodyStr);
-            return attemptToLoadVariableInObject(bodyObj);
+            // attemptToLoadVariableInObject(bodyObj); // TODO problems parsing body when given var name without quotes
+            return bodyObj;
         } catch (e) {
             return bodyStr;
         }
