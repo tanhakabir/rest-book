@@ -5,6 +5,9 @@
             "include": "#constant"
         },
         {
+            "include": "#keyword"
+        },
+        {
             "include": "#headerkey"
         },
         {
@@ -22,6 +25,10 @@
         "headerkey": {
             "name": "keyword.other",
             "match": "([A-Za-z\\-]+):\\s"
+        },
+        "keyword": {
+            "name": "keyword.control",
+            "match": "\\b(let|=)\\b"
         },
         "json": {
             "begin": "\\{",

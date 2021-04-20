@@ -6,6 +6,7 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method } from './httpConstants';
+import { attemptToLoadVariable, attemptToLoadVariableInObject } from './cache';
 export class RequestParser {
     constructor(query) {
         var _a;
@@ -152,10 +153,15 @@ export class RequestParser {
         if (fileContents) {
             return fileContents;
         }
-        try {
-            return JSON.parse(bodyStr);
+        let variableContents = attemptToLoadVariable(bodyStr);
+        if (variableContents) {
+            return variableContents;
         }
-        catch {
+        try {
+            let bodyObj = JSON.parse(bodyStr);
+            return attemptToLoadVariableInObject(bodyObj);
+        }
+        catch (e) {
             return bodyStr;
         }
     }

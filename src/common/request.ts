@@ -6,6 +6,7 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method, RequestHeaderField } from './httpConstants';
+import { attemptToLoadVariable, attemptToLoadVariableInObject } from './cache';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined
@@ -212,9 +213,15 @@ export class RequestParser {
         let fileContents = this._attemptToLoadFile(bodyStr);
         if( fileContents ) { return fileContents; }
 
+        let variableContents = attemptToLoadVariable(bodyStr);
+        if( variableContents ) { 
+            return variableContents;
+        }
+
         try {
-            return JSON.parse(bodyStr);
-        } catch {
+            let bodyObj = JSON.parse(bodyStr);
+            return attemptToLoadVariableInObject(bodyObj);
+        } catch (e) {
             return bodyStr;
         }
     }

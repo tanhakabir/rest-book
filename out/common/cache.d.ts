@@ -4,6 +4,8 @@ export declare var variableCache: {
     [key: string]: ResponseParser;
 };
 export declare var baseUrlCache: Set<string>;
-export declare function updateCache(request: RequestParser, response: ResponseParser): void;
 export declare function getVariableNames(): string[];
 export declare function getBaseUrls(): string[];
+export declare function updateCache(request: RequestParser, response: ResponseParser): void;
+export declare function attemptToLoadVariable(text: string): any | undefined;
+export declare function attemptToLoadVariableInObject(body: any): any;
