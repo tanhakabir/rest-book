@@ -15,10 +15,4 @@ export declare class NotebookKernel {
 export declare class NotebookSerializer implements vscode.NotebookSerializer {
     deserializeNotebook(content: Uint8Array, _token: vscode.CancellationToken): Promise<vscode.NotebookData>;
     serializeNotebook(data: vscode.NotebookData, _token: vscode.CancellationToken): Promise<Uint8Array>;
-    resolveNotebook(_document: vscode.NotebookDocument, webview: {
-        readonly onDidReceiveMessage: vscode.Event<any>;
-        postMessage(message: any): Thenable<boolean>;
-        asWebviewUri(localResource: vscode.Uri): vscode.Uri;
-    }): Promise<void>;
-    private _saveDataToFile;
 }
