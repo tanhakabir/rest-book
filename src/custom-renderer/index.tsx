@@ -17,6 +17,7 @@ api.onDidCreateOutput(event => {
 
 
 const saveDataToFile = async (data: any) => {
+	console.log("SAVE");
 	api.postMessage({
 		command: 'save-response',
 		data: data

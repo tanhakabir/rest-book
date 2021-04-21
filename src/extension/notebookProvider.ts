@@ -41,6 +41,8 @@ export class NotebookKernel {
 		this._controller.hasExecutionOrder = true;
 		this._controller.description = 'A notebook for making REST calls.';
 		this._controller.executeHandler = this._executeAll.bind(this);
+
+        this._controller.onDidReceiveMessage(this._handleMessage.bind(this));
 	}
 
 	dispose(): void {
@@ -121,12 +123,46 @@ export class NotebookKernel {
         
     }
     
+    private async _handleMessage(event: any): Promise<any> {
+        switch(event.message.command) {
+            case 'save-response': 
+                this._saveDataToFile(event.message.data);
+                return;
+            default: break;
+        }
+    }
+
+    private async _saveDataToFile(data: ResponseRendererElements) {
+        const workSpaceDir = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath ?? '');
+        if (!workSpaceDir) { return; }
+    
+        let name;
+        const url = data.request?.responseUrl;
+        if(url) {
+            let hostname = new Url(url).hostname ?? '';
+            hostname = hostname.replace(/^[A-Za-z0-9]+\./g, '');
+            hostname = hostname.replace(/\.[A-Za-z0-9]+$/g, '');
+            name = hostname.replace(/\./g, '-');
+        } else {
+            name = 'unknown-url';
+        }
+
+        let date = new Date().toDateString().replace(/\s/g, '-');
+        
+        const defaultPath = vscode.Uri.file(path.join(workSpaceDir, `response-${name}-${date}.json`));
+        const location = await vscode.window.showSaveDialog({ defaultUri: defaultPath });
+        if(!location) { return; }
+    
+        fs.writeFile(location?.fsPath, JSON.stringify(data, null, 4), { flag: 'w' }, (e) => {
+            vscode.window.showInformationMessage(e?.message || `Saved response to ${location}`);
+        });
+    };
 }
 
 export class NotebookSerializer implements vscode.NotebookSerializer {
 
-    async deserializeNotebook(data: Uint8Array, _token: vscode.CancellationToken): Promise<vscode.NotebookData> {
-        var contents = new TextDecoder().decode(data);    // convert to String to make JSON object
+    async deserializeNotebook(content: Uint8Array, _token: vscode.CancellationToken): Promise<vscode.NotebookData> {
+        var contents = new TextDecoder().decode(content);    // convert to String to make JSON object
 
         // Read file contents
 		let raw: RawNotebookCell[];
@@ -179,43 +215,5 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 
         // Give a string of all the data to save and VS Code will handle the rest 
 		return new TextEncoder().encode(JSON.stringify(contents));
-    }
-
-    async resolveNotebook(_document: vscode.NotebookDocument, webview: { readonly onDidReceiveMessage: vscode.Event<any>; postMessage(message: any): Thenable<boolean>; asWebviewUri(localResource: vscode.Uri): vscode.Uri; }): Promise<void>{
-        webview.onDidReceiveMessage((m) => {
-            switch(m.command) {
-                case 'save-response': 
-                    this._saveDataToFile(m.data);
-                    return;
-                default: break;
-            }
-        });
-    }
-
-    private async _saveDataToFile(data: ResponseRendererElements) {
-        const workSpaceDir = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath ?? '');
-        if (!workSpaceDir) { return; }
-    
-        let name;
-        const url = data.request?.responseUrl;
-        if(url) {
-            let hostname = new Url(url).hostname ?? '';
-            hostname = hostname.replace(/^[A-Za-z0-9]+\./g, '');
-            hostname = hostname.replace(/\.[A-Za-z0-9]+$/g, '');
-            name = hostname.replace(/\./g, '-');
-        } else {
-            name = 'unknown-url';
-        }
-
-        let date = new Date().toDateString().replace(/\s/g, '-');
-        
-        const defaultPath = vscode.Uri.file(path.join(workSpaceDir, `response-${name}-${date}.json`));
-        const location = await vscode.window.showSaveDialog({ defaultUri: defaultPath });
-        if(!location) { return; }
-    
-        fs.writeFile(location?.fsPath, JSON.stringify(data, null, 4), { flag: 'w' }, (e) => {
-            vscode.window.showInformationMessage(e?.message || `Saved response to ${location}`);
-        });
-    };
-    
+    }    
 }
