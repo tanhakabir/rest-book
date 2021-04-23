@@ -32,11 +32,10 @@ export class NotebookKernel {
 	private _executionOrder = 0;
 
 	constructor() {
-        this._controller = vscode.notebook.createNotebookController(
-			'rest-book-kernel',
-			{ viewType: 'rest-book' },
-			'REST Book',
-		);
+        this._controller = vscode.notebook.createNotebookController('rest-book-kernel', 
+                                                                    'rest-book', 
+                                                                    'REST Book');
+
 		this._controller.supportedLanguages = ['rest-book'];
 		this._controller.hasExecutionOrder = true;
 		this._controller.description = 'A notebook for making REST calls.';
@@ -49,7 +48,7 @@ export class NotebookKernel {
 		this._controller.dispose();
 	}
 
-    private _executeAll(cells: vscode.NotebookCell[], _controller: vscode.NotebookController): void {
+    private _executeAll(cells: vscode.NotebookCell[], _notebook: vscode.NotebookDocument, _controller: vscode.NotebookController): void {
 		for (let cell of cells) {
 			this._doExecution(cell);
 		}
