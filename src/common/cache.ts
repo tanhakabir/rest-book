@@ -1,5 +1,6 @@
 import { ResponseParser } from './response';
 import { RequestParser } from './request';
+var stringify = require('json-stringify-safe');
 
 export var variableCache: { [key: string]: ResponseParser } = {};
 export var baseUrlCache: Set<string> = new Set();
@@ -83,7 +84,7 @@ function _createVariableDeclarationsFromCache(): string {
     let ret = '';
 
     for(let varName of Object.keys(variableCache)) {
-        ret += `let ${varName} = ${JSON.stringify(variableCache[varName].renderer())}; `;
+        ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
     }
 
     return ret;

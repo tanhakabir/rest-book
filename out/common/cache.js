@@ -1,3 +1,4 @@
+var stringify = require('json-stringify-safe');
 export var variableCache = {};
 export var baseUrlCache = new Set();
 export function getVariableNames() {
@@ -72,7 +73,7 @@ function _attemptToLoadVariableInObjectHelper(obj) {
 function _createVariableDeclarationsFromCache() {
     let ret = '';
     for (let varName of Object.keys(variableCache)) {
-        ret += `let ${varName} = ${JSON.stringify(variableCache[varName].renderer())}; `;
+        ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
     }
     return ret;
 }
