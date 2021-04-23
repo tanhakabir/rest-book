@@ -2,6 +2,7 @@ import * as os from 'os';
 const { EOL } = os;
 import * as fs from 'fs';
 import * as path from 'path';
+var stringify = require('json-stringify-safe');
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
@@ -117,7 +118,7 @@ export class RequestParser {
                     params[parts[0]] = loadedFromVariable;
                 }
                 else {
-                    params[parts[0]] = JSON.stringify(loadedFromVariable);
+                    params[parts[0]] = stringify(loadedFromVariable);
                 }
             }
             else {
@@ -153,7 +154,7 @@ export class RequestParser {
                     headers[parts[0]] = loadedFromVariable;
                 }
                 else {
-                    headers[parts[0]] = JSON.stringify(loadedFromVariable);
+                    headers[parts[0]] = stringify(loadedFromVariable);
                 }
             }
             else {
