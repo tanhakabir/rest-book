@@ -1,9 +1,10 @@
 import { logDebug } from './common';
 import { ResponseHeaderField } from './httpConstants';
-import { cleanForSecrets } from './secrets';
+import * as secrets from './secrets';
 export class ResponseParser {
-    constructor(response, request) {
+    constructor(response, request, reqParser) {
         logDebug(response);
+        this.reqParser = reqParser;
         let res = response;
         if (response.response && response.status === undefined) {
             res = response.response;
@@ -65,22 +66,41 @@ export class ResponseParser {
         };
     }
     _cleanForSecrets() {
-        // only need to clean config and request
-        if (this.request.responseUrl) {
-            this.request.responseUrl = cleanForSecrets(this.request.responseUrl);
-        }
-        if (this.request.data) {
-            this.request.data = cleanForSecrets(this.request.data);
-        }
-        if (this.request.headers) {
-            for (let key of Object.keys(this.request.headers)) {
-                this.request.headers[key] = cleanForSecrets(this.request.headers[key]);
+        try {
+            // only need to clean config and request
+            if (this.request.responseUrl && this.reqParser.wasReplacedBySecret(this.request.responseUrl)) {
+                this.request.responseUrl = secrets.cleanForSecrets(this.request.responseUrl);
+            }
+            if (this.request.data && typeof this.request.data === 'string' && this.reqParser.wasReplacedBySecret(this.request.data)) {
+                this.request.data = secrets.cleanForSecrets(this.request.data);
+            }
+            if (this.request.headers && typeof this.request.headers === 'object') {
+                for (let key of Object.keys(this.request.headers)) {
+                    if (this.reqParser.wasReplacedBySecret(this.request.headers[key])) {
+                        this.request.headers[key] = secrets.cleanForSecrets(this.request.headers[key]);
+                    }
+                }
+            }
+            if (this.request.params && typeof this.request.params === 'object') {
+                for (let key of Object.keys(this.request.params)) {
+                    if (this.reqParser.wasReplacedBySecret(this.request.params[key])) {
+                        this.request.params[key] = secrets.cleanForSecrets(this.request.params[key]);
+                    }
+                }
+            }
+            if (this.config.headers && typeof this.config.headers === 'object') {
+                for (let key of Object.keys(this.config.headers)) {
+                    if (this.reqParser.wasReplacedBySecret(this.config.headers[key])) {
+                        this.config.headers[key] = secrets.cleanForSecrets(this.config.headers[key]);
+                    }
+                }
+            }
+            else if (this.config.headers && typeof this.config.headers === 'string' && this.reqParser.wasReplacedBySecret(this.config.headers)) {
+                this.config.headers = secrets.cleanForSecrets(this.config.headers);
             }
         }
-        if (this.config.headers) {
-            for (let key of Object.keys(this.config.headers)) {
-                this.config.headers[key] = cleanForSecrets(this.config.headers[key]);
-            }
+        catch (e) {
+            console.log(e);
         }
     }
 }

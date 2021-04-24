@@ -1,3 +1,4 @@
+import { RequestParser } from './request';
 export interface ResponseRendererElements {
     status: number;
     statusText: string;
@@ -13,7 +14,8 @@ export declare class ResponseParser {
     private config;
     private request;
     private data;
-    constructor(response: any, request: any);
+    private reqParser;
+    constructor(response: any, request: any, reqParser: RequestParser);
     json(): {
         status: number | undefined;
         statusText: string | undefined;

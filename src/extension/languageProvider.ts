@@ -46,13 +46,6 @@ export class KeywordCompletionItemProvider implements vscode.CompletionItemProvi
                 kind: vscode.CompletionItemKind.Keyword
             });
         }
-
-        for(const variable of getVariableNames()) {
-            result.push({
-                label: variable,
-                kind: vscode.CompletionItemKind.Variable
-            });
-        }
         
         return result;
     }
@@ -76,6 +69,23 @@ export class HeaderCompletionItemProvider implements vscode.CompletionItemProvid
     }
 }
 
+export class CacheVariableCompletionItemProvider implements vscode.CompletionItemProvider {
+    static readonly triggerCharacters = ['$'];
+
+    provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+        const result: vscode.CompletionItem[] = [];
+
+        for(const variable of getVariableNames()) {
+            result.push({
+                label: variable,
+                kind: vscode.CompletionItemKind.Variable
+            });
+        }
+        
+        return result;
+    }
+}
+
 export class VariableCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = ['.'];
 
@@ -90,7 +100,7 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
 
         if(tokens.length < 1) { return result; }
 
-        let matchingData = findMatchingVariable(tokens[0]);
+        let matchingData = findMatchingVariable(tokens[0].substring(1));
 
         for(let i = 1; i < tokens.length; i++) {
             matchingData = matchingData[tokens[i]];
@@ -115,6 +125,8 @@ export function registerLanguageProvider(): vscode.Disposable {
 
     // TODO add hover provider or definition provider
     disposables.push(vscode.languages.registerCompletionItemProvider(selector, new KeywordCompletionItemProvider(), ...KeywordCompletionItemProvider.triggerCharacters));
+    disposables.push(vscode.languages.registerCompletionItemProvider(selector, new HeaderCompletionItemProvider(), ...HeaderCompletionItemProvider.triggerCharacters));
+    disposables.push(vscode.languages.registerCompletionItemProvider(selector, new CacheVariableCompletionItemProvider(), ...CacheVariableCompletionItemProvider.triggerCharacters));
     disposables.push(vscode.languages.registerCompletionItemProvider(selector, new VariableCompletionItemProvider(), ...VariableCompletionItemProvider.triggerCharacters));
 
     return vscode.Disposable.from(...disposables);

@@ -7,10 +7,11 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method } from './httpConstants';
-import { attemptToLoadVariable } from './cache';
+import * as cache from './cache';
 export class RequestParser {
     constructor(query) {
         var _a;
+        this.valuesReplacedBySecrets = [];
         let linesOfRequest = query.split(EOL);
         if (linesOfRequest.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
@@ -37,6 +38,23 @@ export class RequestParser {
     }
     getVariableName() {
         return this.variableName;
+    }
+    wasReplacedBySecret(text) {
+        if (typeof text === 'string') {
+            for (let replaced of this.valuesReplacedBySecrets) {
+                if (text.includes(replaced)) {
+                    return true;
+                }
+            }
+        }
+        else if (typeof text === 'number') {
+            for (let replaced of this.valuesReplacedBySecrets) {
+                if (`${text}`.includes(replaced)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     _parseVariableName() {
         let firstLine = this.originalRequest[0].trimLeft();
@@ -112,19 +130,7 @@ export class RequestParser {
             if (parts.length !== 2) {
                 throw new Error(`Invalid query paramter for ${p}`);
             }
-            let loadedFromVariable = attemptToLoadVariable(parts[1]);
-            if (loadedFromVariable) {
-                if (typeof loadedFromVariable === 'string') {
-                    params[parts[0]] = loadedFromVariable;
-                }
-                else {
-                    params[parts[0]] = stringify(loadedFromVariable);
-                }
-            }
-            else {
-                params[parts[0]] = parts[1];
-            }
-            // TODO clean value to raw form?
+            params[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
         }
         return params;
     }
@@ -148,18 +154,7 @@ export class RequestParser {
             if (parts.length !== 2) {
                 throw new Error(`Invalid header ${h}`);
             }
-            let loadedFromVariable = attemptToLoadVariable(parts[1]);
-            if (loadedFromVariable) {
-                if (typeof loadedFromVariable === 'string') {
-                    headers[parts[0]] = loadedFromVariable;
-                }
-                else {
-                    headers[parts[0]] = stringify(loadedFromVariable);
-                }
-            }
-            else {
-                headers[parts[0]] = parts[1];
-            }
+            headers[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
             i++;
         }
         return isEmpty(headers) ? undefined : headers;
@@ -178,9 +173,14 @@ export class RequestParser {
         if (fileContents) {
             return fileContents;
         }
-        let variableContents = attemptToLoadVariable(bodyStr);
-        if (variableContents) {
-            return variableContents;
+        if (bodyStr.startsWith('$')) {
+            let variableContents = cache.attemptToLoadVariable(bodyStr.substr(1));
+            if (variableContents) {
+                if (bodyStr.startsWith('$secrets')) {
+                    this.valuesReplacedBySecrets.push(variableContents);
+                }
+                return variableContents;
+            }
         }
         try {
             let bodyObj = JSON.parse(bodyStr);
@@ -205,6 +205,24 @@ export class RequestParser {
             // File doesn't exist
         }
         return;
+    }
+    _attemptToLoadVariable(text) {
+        if (!text.startsWith('$')) {
+            return text;
+        }
+        let loadedFromVariable = cache.attemptToLoadVariable(text.substring(1));
+        if (loadedFromVariable) {
+            if (typeof loadedFromVariable === 'string') {
+                if (text.startsWith('$secrets')) {
+                    this.valuesReplacedBySecrets.push(loadedFromVariable);
+                }
+                return loadedFromVariable;
+            }
+            else {
+                return stringify(loadedFromVariable);
+            }
+        }
+        return text;
     }
 }
 //# sourceMappingURL=request.js.map

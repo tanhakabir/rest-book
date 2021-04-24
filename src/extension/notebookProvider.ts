@@ -65,7 +65,7 @@ export class NotebookKernel {
 
         const logger = (d: any, r: any, requestParser: RequestParser) => {
             try {
-                const response = new ResponseParser(d, r);
+                const response = new ResponseParser(d, r, requestParser);
                 updateCache(requestParser, response);
 
                 execution.replaceOutput([new vscode.NotebookCellOutput([

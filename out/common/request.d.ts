@@ -24,10 +24,12 @@ export declare class RequestParser {
     private requestOptions;
     private baseUrl?;
     private variableName;
+    private valuesReplacedBySecrets;
     constructor(query: string);
     getRequest(): any;
     getBaseUrl(): string | undefined;
     getVariableName(): string | undefined;
+    wasReplacedBySecret(text: string): boolean;
     private _parseVariableName;
     private _stripVariableDeclaration;
     private _parseMethod;
@@ -36,4 +38,5 @@ export declare class RequestParser {
     private _parseHeaders;
     private _parseBody;
     private _attemptToLoadFile;
+    private _attemptToLoadVariable;
 }

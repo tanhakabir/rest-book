@@ -7,7 +7,7 @@ import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method, RequestHeaderField } from './httpConstants';
-import { attemptToLoadVariable, attemptToLoadVariableInObject } from './cache';
+import * as cache from './cache';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined
@@ -38,6 +38,7 @@ export class RequestParser {
     private requestOptions: Request;
     private baseUrl?: string;
     private variableName: string | undefined;
+    private valuesReplacedBySecrets: string[] = [];
 
     constructor(query: string) {
 
@@ -78,6 +79,24 @@ export class RequestParser {
 
     getVariableName(): string | undefined {
         return this.variableName;
+    }
+
+    wasReplacedBySecret(text: string): boolean {
+        if(typeof text === 'string') {
+            for(let replaced of this.valuesReplacedBySecrets) {
+                if(text.includes(replaced)) {
+                    return true;
+                }
+            }
+        } else if(typeof text === 'number') {
+            for(let replaced of this.valuesReplacedBySecrets) {
+                if(`${text}`.includes(replaced)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private _parseVariableName(): string | undefined {
@@ -164,18 +183,7 @@ export class RequestParser {
             let parts = p.split('=');
             if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`); }
 
-            let loadedFromVariable = attemptToLoadVariable(parts[1]);
-            if(loadedFromVariable) {
-                if(typeof loadedFromVariable === 'string') {
-                    params[parts[0]] = loadedFromVariable;
-                } else {
-                    params[parts[0]] = stringify(loadedFromVariable);
-                }
-            } else {
-                params[parts[0]] = parts[1];
-            }
-            
-            // TODO clean value to raw form?
+            params[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
         }
 
         return params;
@@ -202,16 +210,7 @@ export class RequestParser {
 
             if (parts.length !== 2) { throw new Error(`Invalid header ${h}`); }
 
-            let loadedFromVariable = attemptToLoadVariable(parts[1]);
-            if(loadedFromVariable) {
-                if(typeof loadedFromVariable === 'string') {
-                    headers[parts[0]] = loadedFromVariable;
-                } else {
-                    headers[parts[0]] = stringify(loadedFromVariable);
-                }
-            } else {
-                headers[parts[0]] = parts[1];
-            }
+            headers[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
             i++;
         }
 
@@ -234,9 +233,14 @@ export class RequestParser {
         let fileContents = this._attemptToLoadFile(bodyStr);
         if( fileContents ) { return fileContents; }
 
-        let variableContents = attemptToLoadVariable(bodyStr);
-        if( variableContents ) { 
-            return variableContents;
+        if(bodyStr.startsWith('$')) {
+            let variableContents = cache.attemptToLoadVariable(bodyStr.substr(1));
+            if( variableContents ) { 
+                if(bodyStr.startsWith('$secrets')) {
+                    this.valuesReplacedBySecrets.push(variableContents);
+                }
+                return variableContents;
+            }
         }
 
         try {
@@ -259,5 +263,25 @@ export class RequestParser {
             // File doesn't exist
         }
         return;
+    }
+
+    private _attemptToLoadVariable(text: string): string {
+        if(!text.startsWith('$')) {
+            return text;
+        }
+
+        let loadedFromVariable = cache.attemptToLoadVariable(text.substring(1));
+        if(loadedFromVariable) {
+            if(typeof loadedFromVariable === 'string') {
+                if(text.startsWith('$secrets')) {
+                    this.valuesReplacedBySecrets.push(loadedFromVariable);
+                }
+                return loadedFromVariable;
+            } else {
+                return stringify(loadedFromVariable);
+            }
+        }
+
+        return text;
     }
 }

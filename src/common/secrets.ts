@@ -44,9 +44,21 @@ function _saveSecrets() {
 }
 
 export function cleanForSecrets(text: string): string {
-    let ret = text;
-    for(let key of Object.keys(secrets)) {
-        ret = ret.replace(secrets[key], `SECRET:${key}`);
+    if(typeof text === 'string') {
+        let ret = text;
+        for(let key of Object.keys(secrets)) {
+            ret = ret.replace(secrets[key], `[SECRET ${key}]`);
+        }
+        return ret;
+    } 
+
+    if(typeof text === 'number') {
+        for(let key of Object.keys(secrets)) {
+            if(text === secrets[key]) {
+                return `[SECRET ${key}]`;
+            }
+        }
     }
-    return ret;
+
+    return text;
 }
