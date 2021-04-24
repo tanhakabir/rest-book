@@ -1,11 +1,11 @@
-import { secrets, hasNoSecrets } from './secrets';
+import { SECRETS, hasNoSecrets } from './secrets';
 var stringify = require('json-stringify-safe');
 export var variableCache = {};
 export var baseUrlCache = new Set();
 export function getVariableNames() {
     let varCacheKeys = Object.keys(variableCache);
     if (!hasNoSecrets()) {
-        varCacheKeys.push('secrets');
+        varCacheKeys.push('SECRETS');
     }
     return varCacheKeys;
 }
@@ -21,8 +21,8 @@ export function findMatchingDataInVariableCache(varName, cache) {
     return undefined;
 }
 export function findMatchingVariable(name) {
-    if (name === 'secrets' && !hasNoSecrets()) {
-        return secrets;
+    if (name === 'SECRETS' && !hasNoSecrets()) {
+        return SECRETS;
     }
     for (let key of Object.keys(variableCache)) {
         if (key === name) {
@@ -84,7 +84,7 @@ function _createVariableDeclarationsFromCache() {
         ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
     }
     if (!hasNoSecrets()) {
-        ret += `let secrets = ${stringify(secrets)}; `;
+        ret += `let SECRETS = ${stringify(SECRETS)}; `;
     }
     return ret;
 }

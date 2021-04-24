@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-export declare var secrets: {
+export declare var SECRETS: {
     [key: string]: string;
 };
 export declare function hasNoSecrets(): boolean;

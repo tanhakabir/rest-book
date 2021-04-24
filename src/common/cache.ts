@@ -1,6 +1,6 @@
 import { ResponseParser } from './response';
 import { RequestParser } from './request';
-import { secrets, hasNoSecrets } from './secrets';
+import { SECRETS, hasNoSecrets } from './secrets';
 var stringify = require('json-stringify-safe');
 
 export var variableCache: { [key: string]: ResponseParser } = {};
@@ -8,7 +8,7 @@ export var baseUrlCache: Set<string> = new Set();
 
 export function getVariableNames(): string[] {
     let varCacheKeys: string[] = Object.keys(variableCache);
-    if(!hasNoSecrets()) { varCacheKeys.push('secrets'); }
+    if(!hasNoSecrets()) { varCacheKeys.push('SECRETS'); }
     return varCacheKeys;
 }
 
@@ -25,8 +25,8 @@ export function findMatchingDataInVariableCache(varName: string, cache: any): an
 }
 
 export function findMatchingVariable(name: string): any | undefined {
-    if(name === 'secrets' && !hasNoSecrets()) {
-        return secrets;
+    if(name === 'SECRETS' && !hasNoSecrets()) {
+        return SECRETS;
     }
 
     for(let key of Object.keys(variableCache)) {
@@ -94,7 +94,7 @@ function _createVariableDeclarationsFromCache(): string {
         ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
     }
 
-    if(!hasNoSecrets()) { ret += `let secrets = ${stringify(secrets)}; `; }
+    if(!hasNoSecrets()) { ret += `let SECRETS = ${stringify(SECRETS)}; `; }
 
     return ret;
 }

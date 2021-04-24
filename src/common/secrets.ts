@@ -3,10 +3,10 @@ var stringify = require('json-stringify-safe');
 
 const SECRETS_KEY = 'rest-book-secrets';
 var extContext: vscode.ExtensionContext;
-export var secrets: { [key: string]: string} = {};
+export var SECRETS: { [key: string]: string} = {};
 
 export function hasNoSecrets(): boolean {
-    return Object.keys(secrets).length === 0;
+    return Object.keys(SECRETS).length === 0;
 }
 
 export function initializeSecretsRegistry(context: vscode.ExtensionContext) {
@@ -14,47 +14,47 @@ export function initializeSecretsRegistry(context: vscode.ExtensionContext) {
 
     context.secrets.get(SECRETS_KEY).then((contents: any) => {
         try {
-            secrets = JSON.parse(contents);
+            SECRETS = JSON.parse(contents);
         } catch {
-            secrets = {};
+            SECRETS = {};
         }
     });
 }
 
 export function getNamesOfSecrets(): string[] {
-    return Object.keys(secrets);
+    return Object.keys(SECRETS);
 }
 
 export function getSecret(name: string): string | undefined {
-    return secrets[name];
+    return SECRETS[name];
 }
 
 export function addSecret(name: string, value: string) {
-    secrets[name] = value;
+    SECRETS[name] = value;
     _saveSecrets();
 }
 
 export function deleteSecret(name: string) {
-    delete secrets[name];
+    delete SECRETS[name];
     _saveSecrets();
 }
 
 function _saveSecrets() {
-    extContext.secrets.store(SECRETS_KEY, stringify(secrets));
+    extContext.secrets.store(SECRETS_KEY, stringify(SECRETS));
 }
 
 export function cleanForSecrets(text: string): string {
     if(typeof text === 'string') {
         let ret = text;
-        for(let key of Object.keys(secrets)) {
-            ret = ret.replace(secrets[key], `[SECRET ${key}]`);
+        for(let key of Object.keys(SECRETS)) {
+            ret = ret.replace(SECRETS[key], `[SECRET ${key}]`);
         }
         return ret;
     } 
 
     if(typeof text === 'number') {
-        for(let key of Object.keys(secrets)) {
-            if(text === secrets[key]) {
+        for(let key of Object.keys(SECRETS)) {
+            if(text === SECRETS[key]) {
                 return `[SECRET ${key}]`;
             }
         }

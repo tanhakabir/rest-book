@@ -8,6 +8,9 @@
             "include": "#keyword"
         },
         {
+            "include": "#variable"
+        },
+        {
             "include": "#headerkey"
         },
         {
@@ -29,6 +32,10 @@
         "keyword": {
             "name": "keyword.control",
             "match": "\\b(let)\\b"
+        },
+        "variable": {
+            "name": "variable",
+            "match": "\\$[A-Za-z0-9.-]*"
         },
         "json": {
             "begin": "\\{",

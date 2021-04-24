@@ -69,6 +69,9 @@ export class RequestParser {
         if (variableName.includes(' ')) {
             throw new Error('Invalid declaration of variable!');
         }
+        if (variableName === 'SECRETS') {
+            throw new Error('"SECRETS" variable name reserved for Secrets storage!');
+        }
         return variableName;
     }
     _stripVariableDeclaration() {
@@ -176,7 +179,7 @@ export class RequestParser {
         if (bodyStr.startsWith('$')) {
             let variableContents = cache.attemptToLoadVariable(bodyStr.substr(1));
             if (variableContents) {
-                if (bodyStr.startsWith('$secrets')) {
+                if (bodyStr.startsWith('$SECRETS')) {
                     this.valuesReplacedBySecrets.push(variableContents);
                 }
                 return variableContents;
@@ -213,7 +216,7 @@ export class RequestParser {
         let loadedFromVariable = cache.attemptToLoadVariable(text.substring(1));
         if (loadedFromVariable) {
             if (typeof loadedFromVariable === 'string') {
-                if (text.startsWith('$secrets')) {
+                if (text.startsWith('$SECRETS')) {
                     this.valuesReplacedBySecrets.push(loadedFromVariable);
                 }
                 return loadedFromVariable;
