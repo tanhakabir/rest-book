@@ -79,7 +79,7 @@ You can also assign the responses from calls to a variable and use the data from
 let foo = GET google.com
 ```
 
-And then in future cells you can reference `foo` in the body of your calls. Here's a short example:
+And then in future cells you can reference `foo` in your calls with a `$` sign. Here's a short example:
 ![Example of someone declaring foo to be the response of a GET call to google.com and then creating a new cell after and seeing the auto-complete suggestions for foo.](docs/images/cross-cell-variable.gif)
 
 To test these interactions, you can play around with this simple server: [SandboxServer](https://github.com/tanhakabir/SandboxServer)
