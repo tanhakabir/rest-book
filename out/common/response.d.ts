@@ -24,5 +24,5 @@ export declare class ResponseParser {
     };
     html(): any;
     renderer(): ResponseRendererElements;
-    cache(): void;
+    private _cleanForSecrets;
 }

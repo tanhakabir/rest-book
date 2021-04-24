@@ -3,7 +3,11 @@ var stringify = require('json-stringify-safe');
 
 const SECRETS_KEY = 'rest-book-secrets';
 var extContext: vscode.ExtensionContext;
-var secrets: { [key: string]: string} = {};
+export var secrets: { [key: string]: string} = {};
+
+export function hasNoSecrets(): boolean {
+    return Object.keys(secrets).length === 0;
+}
 
 export function initializeSecretsRegistry(context: vscode.ExtensionContext) {
     extContext = context;
@@ -37,4 +41,12 @@ export function deleteSecret(name: string) {
 
 function _saveSecrets() {
     extContext.secrets.store(SECRETS_KEY, stringify(secrets));
+}
+
+export function cleanForSecrets(text: string): string {
+    let ret = text;
+    for(let key of Object.keys(secrets)) {
+        ret = ret.replace(secrets[key], `SECRET:${key}`);
+    }
+    return ret;
 }
