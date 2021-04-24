@@ -1,5 +1,6 @@
 import { logDebug } from './common';
 import { ResponseHeaderField } from './httpConstants';
+import { cleanForSecrets } from './secrets';
 export class ResponseParser {
     constructor(response, request) {
         logDebug(response);
@@ -31,6 +32,7 @@ export class ResponseParser {
             };
             this.request = { ...this.request, ...request };
             this.data = res.data;
+            this._cleanForSecrets();
         }
         catch {
             throw new Error(response.message);
@@ -62,7 +64,21 @@ export class ResponseParser {
             data: this.data
         };
     }
-    cache() {
+    _cleanForSecrets() {
+        // only need to clean config and request
+        if (this.request.data) {
+            this.request.data = cleanForSecrets(this.request.data);
+        }
+        if (this.request.headers) {
+            for (let key of Object.keys(this.request.headers)) {
+                this.request.headers[key] = cleanForSecrets(this.request.headers[key]);
+            }
+        }
+        if (this.config.headers) {
+            for (let key of Object.keys(this.config.headers)) {
+                this.config.headers[key] = cleanForSecrets(this.config.headers[key]);
+            }
+        }
     }
 }
 //# sourceMappingURL=response.js.map

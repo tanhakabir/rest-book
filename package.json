@@ -17,11 +17,18 @@
   "icon": "rest-book.png",
   "activationEvents": [
     "onNotebook:rest-book",
-    "onLanguage:rest-book"
+    "onLanguage:rest-book",
+    "onCommand:rest-book.secrets"
   ],
   "main": "./dist/extension-node.js",
   "browser": "./dist/extension-web.js",
   "contributes": {
+    "commands": [
+      {
+        "title": "REST Book: Secrets",
+        "command": "rest-book.secrets"
+      }
+    ],
     "notebookOutputRenderer": [
       {
         "id": "rest-book",

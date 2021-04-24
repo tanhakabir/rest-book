@@ -4,6 +4,8 @@ import * as vscode from 'vscode';
 import { NotebookSerializer, NotebookKernel } from './notebookProvider';
 import { registerLanguageProvider } from './languageProvider';
 import { logDebug } from '../common/common';
+import { registerCommands } from './commands';
+import { initializeSecretsRegistry } from '../common/secrets';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,6 +26,9 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(registerLanguageProvider());
+	context.subscriptions.push(registerCommands());
+
+	initializeSecretsRegistry(context);
 }
 
 // this method is called when your extension is deactivated
