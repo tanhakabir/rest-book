@@ -122,7 +122,7 @@ export class RequestParser {
     }
 
     private _parseBaseUrl(): string {
-        const tokens: string[] = this._stripVariableDeclaration().split(/[\s,]+/);
+        const tokens: string[] = this._stripVariableDeclaration().split(/[\s]+/);
 
         if (tokens.length === 0) { throw new Error('Invalid request!'); }
 
