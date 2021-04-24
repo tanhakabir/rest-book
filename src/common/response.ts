@@ -98,6 +98,10 @@ export class ResponseParser {
 
     private _cleanForSecrets() {
         // only need to clean config and request
+        if(this.request.responseUrl) {
+            this.request.responseUrl = cleanForSecrets(this.request.responseUrl);
+        }
+
         if(this.request.data) {
             this.request.data = cleanForSecrets(this.request.data);
         }
