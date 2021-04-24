@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { getNamesOfSecrets, addSecret, deleteSecret } from '../common/secrets';
+import * as secrets from '../common/secrets';
 
 interface PickerResult {
     id: string,
@@ -16,22 +16,16 @@ class SecretItem implements vscode.QuickPickItem {
 	constructor(public label: string) { }
 }
 
-class ConfigureSecretsItem implements vscode.QuickPickItem {
-	public readonly label = 'View Saved Secrets...';
-	public readonly alwaysShow = true;
-	constructor() { }
-}
-
 class AddNewSecretItem implements vscode.QuickPickItem {
 	public readonly label = '$(plus) Add New Secret...';
 	public readonly alwaysShow = true;
 	constructor() { }
 }
 
-class EditSecretItem implements vscode.QuickPickItem {
+class ViewSecretItem implements vscode.QuickPickItem {
 	public secretName: string;
 	public get label(): string { 
-		return `Edit ${this.secretName}...`; 
+		return `View the secret for ${this.secretName}...`; 
 	}
 	public readonly alwaysShow = true;
 	constructor(secret: string) {
@@ -50,7 +44,7 @@ class DeleteSecretItem implements vscode.QuickPickItem {
 	}
 }
 
-type SecretPickerItem = SecretItem | ConfigureSecretsItem | AddNewSecretItem;
+type SecretPickerItem = SecretItem | AddNewSecretItem | ViewSecretItem | DeleteSecretItem;
 
 class SetSecretName {
 	public secretName = '';
@@ -80,7 +74,6 @@ type SecretInputItem = SetSecretName | SetSecretValueItem;
 
 enum InteractiveSecretPickerState {
 	selectAction,
-	viewSecretsToEdit,
 	editSecret
 }
 
@@ -139,19 +132,15 @@ function _getSecretPicker(state: InteractiveSecretPickerState, extra?: string[] 
 	let newQpItems: SecretPickerItem[] = [];
 	switch (+state) {
 		case InteractiveSecretPickerState.selectAction:
-			quickPick.title = 'View secrets to edit them or add a new secret';
-			newQpItems.push(new AddNewSecretItem());
-			newQpItems.push(new ConfigureSecretsItem());
-			break;
-		case InteractiveSecretPickerState.viewSecretsToEdit:
 			const secretListItems = (extra as string[]).map(b => new SecretItem(b));
-			quickPick.title = 'Choose a secret to edit';
-			newQpItems = [ ...secretListItems ];
+			quickPick.title = 'View an existing secret or add a new secret';
+			newQpItems = [ ... secretListItems];
+			newQpItems.splice(0, 0, new AddNewSecretItem());
 			break;
 		case InteractiveSecretPickerState.editSecret:
 			if(typeof extra === 'string') {
-				quickPick.title = `Edit or delete ${extra}`;
-				newQpItems.push(new EditSecretItem(extra));
+				quickPick.title = `View or delete ${extra}`;
+				newQpItems.push(new ViewSecretItem(extra));
 				newQpItems.push(new DeleteSecretItem(extra));
 				break;
 			}
@@ -178,18 +167,13 @@ async function _showSecretPicker(state: InteractiveSecretPickerState, extra?: st
 			quickPick.busy = true;
 
 			const selected = quickPick.selectedItems[0];
-			if (selected instanceof ConfigureSecretsItem) {
-				resolve({ type: 'command', id: 'view' });
-                return;
-			}
-
 			if (selected instanceof AddNewSecretItem) {
 				resolve({ type: 'command', id: 'new' });
                 return;
 			}
 
-			if (selected instanceof EditSecretItem) {
-				resolve({ type: 'command', id: 'edit', value: extra as string });
+			if (selected instanceof ViewSecretItem) {
+				resolve({ type: 'command', id: 'view', value: extra as string });
                 return;
 			}
 
@@ -227,25 +211,24 @@ async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, 
 
 	switch(+state) {
 		case InteractiveSecretPickerState.selectAction:
-			if (pickerResult.type === 'command' && pickerResult.id === 'view') {
-				_useInteractiveSecretPicker(InteractiveSecretPickerState.viewSecretsToEdit, getNamesOfSecrets());
+			if (pickerResult.type === 'secret') {
+				_useInteractiveSecretPicker(InteractiveSecretPickerState.editSecret, pickerResult.value);
+				return pickerResult.id;
 			}
 			if (pickerResult.type === 'command' && pickerResult.id === 'new') {
 				_useInteractiveSecretInput(InteractiveSecretInputState.addSecretName);
 			}
 			break;
-		case InteractiveSecretPickerState.viewSecretsToEdit:
-			if (pickerResult.type === 'secret') {
-				_useInteractiveSecretPicker(InteractiveSecretPickerState.editSecret, pickerResult.value);
-				return pickerResult.id;
-			}
-			break;
 		case InteractiveSecretPickerState.editSecret: {
-			if (pickerResult.type === 'command' && pickerResult.id === 'edit') {
-				_useInteractiveSecretPicker(InteractiveSecretPickerState.viewSecretsToEdit, pickerResult.value);
+			if (pickerResult.type === 'command' && pickerResult.id === 'view') {
+				if(pickerResult.value) {
+					_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue, secrets.getSecret(pickerResult.value));
+				} else {
+					_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue);
+				}
 			}
 			if (pickerResult.type === 'command' && pickerResult.id === 'delete') {
-				if(pickerResult.value) { deleteSecret(pickerResult.value); }
+				if(pickerResult.value) { secrets.deleteSecret(pickerResult.value); }
 				vscode.window.showInformationMessage(`Deleted secret ${pickerResult.value}.`);
 			}
 		}
@@ -258,8 +241,8 @@ export function registerCommands(): vscode.Disposable {
     const subscriptions: vscode.Disposable[] = [];
 
     subscriptions.push(vscode.commands.registerCommand('rest-book.secrets', () => {
-		addSecret('foo', 'bar');
-        _useInteractiveSecretPicker(InteractiveSecretPickerState.selectAction);
+		secrets.addSecret('foo', 'bar');
+        _useInteractiveSecretPicker(InteractiveSecretPickerState.selectAction, secrets.getNamesOfSecrets());
     }));
 
     return vscode.Disposable.from(...subscriptions);

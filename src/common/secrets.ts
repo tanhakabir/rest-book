@@ -21,6 +21,10 @@ export function getNamesOfSecrets(): string[] {
     return Object.keys(secrets);
 }
 
+export function getSecret(name: string): string | undefined {
+    return secrets[name];
+}
+
 export function addSecret(name: string, value: string) {
     secrets[name] = value;
     _saveSecrets();

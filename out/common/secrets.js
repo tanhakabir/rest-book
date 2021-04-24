@@ -16,6 +16,9 @@ export function initializeSecretsRegistry(context) {
 export function getNamesOfSecrets() {
     return Object.keys(secrets);
 }
+export function getSecret(name) {
+    return secrets[name];
+}
 export function addSecret(name, value) {
     secrets[name] = value;
     _saveSecrets();
