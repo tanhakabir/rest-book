@@ -186,8 +186,8 @@ async function _showSecretPicker(state: InteractiveSecretPickerState, extra?: st
 			}
 
 			if (selected instanceof DeleteSecretItem) {
-				closeQuickPick();
 				resolve({ type: 'command', id: 'delete', value: extra as string });
+				closeQuickPick();
                 return;
 			}
 
@@ -238,31 +238,29 @@ async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, 
 
 	if(!pickerResult) { return; }
 
-	switch(+state) {
-		case InteractiveSecretPickerState.selectAction:
-			if (pickerResult.type === 'secret') {
-				_useInteractiveSecretPicker(InteractiveSecretPickerState.editSecret, pickerResult.value);
-			}
-			if (pickerResult.type === 'command' && pickerResult.id === 'new') {
-				_useInteractiveSecretInput(InteractiveSecretInputState.addSecretName);
-			}
-			break;
-		case InteractiveSecretPickerState.editSecret: {
-			if (pickerResult.type === 'command' && pickerResult.id === 'view') {
-				if(pickerResult.value) {
-					_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue, pickerResult.value);
-				} else {
-					_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue);
-				}
-			}
-			if (pickerResult.type === 'command' && pickerResult.id === 'delete') {
-				if(pickerResult.value) { secrets.deleteSecret(pickerResult.value); }
-				vscode.window.showInformationMessage(`Deleted secret ${pickerResult.value}.`);
-			}
-		}
+	if (pickerResult.type === 'secret') {
+		_useInteractiveSecretPicker(InteractiveSecretPickerState.editSecret, pickerResult.value);
+		return;
+	}
+	if (pickerResult.type === 'command' && pickerResult.id === 'new') {
+		_useInteractiveSecretInput(InteractiveSecretInputState.addSecretName);
+		return;
 	}
 
-	return null;
+	if (pickerResult.type === 'command' && pickerResult.id === 'view') {
+		if(pickerResult.value) {
+			_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue, pickerResult.value);
+		} else {
+			_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue);
+		}
+		return;
+	}
+
+	if (pickerResult.type === 'command' && pickerResult.id === 'delete') {
+		if(pickerResult.value) { secrets.deleteSecret(pickerResult.value); }
+		vscode.window.showInformationMessage(`Deleted secret ${pickerResult.value}.`);
+		return;
+	}
 }
 
 export function registerCommands(): vscode.Disposable {
