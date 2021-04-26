@@ -9,6 +9,7 @@ import { ResponseParser, ResponseRendererElements } from '../common/response';
 import { updateCache } from '../common/cache';
 import { Url } from 'url';
 const axios = require('axios').default;
+var stringify = require('json-stringify-safe');
 
 interface RawNotebookCell {
 	language: string;
@@ -79,7 +80,7 @@ export class NotebookKernel {
                 execution.replaceOutput([new vscode.NotebookCellOutput([
                     new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
                         ename: d instanceof Error && d.name || 'error',
-                        evalue: d instanceof Error && d.message || JSON.stringify(d, undefined, 4),
+                        evalue: d instanceof Error && d.message || stringify(d, undefined, 4),
                         traceback: []
                     })
                 ])]);
@@ -97,7 +98,7 @@ export class NotebookKernel {
             execution.replaceOutput([new vscode.NotebookCellOutput([
                 new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
                     ename: err instanceof Error && err.name || 'error',
-                    evalue: err instanceof Error && err.message || JSON.stringify(err, undefined, 4),
+                    evalue: err instanceof Error && err.message || stringify(err, undefined, 4),
                     traceback: []
                 })
             ])]);
@@ -152,7 +153,7 @@ export class NotebookKernel {
         const location = await vscode.window.showSaveDialog({ defaultUri: defaultPath });
         if(!location) { return; }
     
-        fs.writeFile(location?.fsPath, JSON.stringify(data, null, 4), { flag: 'w' }, (e) => {
+        fs.writeFile(location?.fsPath, stringify(data, null, 4), { flag: 'w' }, (e) => {
             vscode.window.showInformationMessage(e?.message || `Saved response to ${location}`);
         });
     };
@@ -213,6 +214,6 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 		}
 
         // Give a string of all the data to save and VS Code will handle the rest 
-		return new TextEncoder().encode(JSON.stringify(contents));
+		return new TextEncoder().encode(stringify(contents));
     }    
 }

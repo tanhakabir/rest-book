@@ -2,6 +2,7 @@
 import { FunctionComponent, h } from 'preact';
 import { StateUpdater, useEffect, useState } from 'preact/hooks';
 import { v4 as uuidv4 } from 'uuid';
+var stringify = require('json-stringify-safe');
 import { ResponseRendererElements } from '../common/response';
 import * as Save from 'vscode-codicons/src/icons/save.svg';
 import * as Search from 'vscode-codicons/src/icons/search.svg';
@@ -107,7 +108,7 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean, searchKeyword: 
                         {Object.keys(dict[key]).map((subKey) => {
                             let value;
                             if(typeof dict[key][subKey] === 'object') {
-                                value = JSON.stringify(dict[key][subKey]);
+                                value = stringify(dict[key][subKey]);
                             } else {
                                 value = dict[key][subKey];
                             }
@@ -130,7 +131,7 @@ const TableTab: FunctionComponent<{ dict?: any, active: boolean, searchKeyword: 
 };
 
 const DataTab: FunctionComponent<{ data: any, active: boolean, searchKeyword: string}> = ({ data, active, searchKeyword }) => {
-    const dataStr = typeof data === 'string' ? data : JSON.stringify(data);
+    const dataStr = typeof data === 'string' ? data : stringify(data);
 
     return <div class='tab-content' id='data-container' hidden={!active}>
         {searchForTermInText(dataStr, searchKeyword)}
