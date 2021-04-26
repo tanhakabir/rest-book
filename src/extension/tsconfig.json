@@ -1,7 +1,6 @@
 {
 	"extends": "../tsconfig.base.json",
 	"compilerOptions": {
-		"target": "es2015",
         "composite": true,
 		"rootDir": ".",
 		"outDir": "../../out/extension",

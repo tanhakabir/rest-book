@@ -7,7 +7,6 @@ import { Method } from '../common/httpConstants';
 import { RequestParser } from '../common/request';
 import { ResponseParser, ResponseRendererElements } from '../common/response';
 import { updateCache } from '../common/cache';
-import { Url } from 'url';
 const axios = require('axios').default;
 var stringify = require('json-stringify-safe');
 
@@ -139,10 +138,10 @@ export class NotebookKernel {
         let name;
         const url = data.request?.responseUrl;
         if(url) {
-            let hostname = new Url(url).hostname ?? '';
-            hostname = hostname.replace(/^[A-Za-z0-9]+\./g, '');
-            hostname = hostname.replace(/\.[A-Za-z0-9]+$/g, '');
-            name = hostname.replace(/\./g, '-');
+            let name = url;
+            name = name.replace(/^[A-Za-z0-9]+\./g, '');
+            name = name.replace(/\.[A-Za-z0-9]+$/g, '');
+            name = name.replace(/\./g, '-');
         } else {
             name = 'unknown-url';
         }
