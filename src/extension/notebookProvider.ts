@@ -75,11 +75,11 @@ export class NotebookKernel {
                 ], metadata)]);
         
                 execution.end({ success: true });
-            } catch (_) {
+            } catch (e) {
                 execution.replaceOutput([new vscode.NotebookCellOutput([
                     new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
-                        ename: d instanceof Error && d.name || 'error',
-                        evalue: d instanceof Error && d.message || stringify(d, undefined, 4),
+                        ename: e instanceof Error && e.name || 'error',
+                        evalue: e instanceof Error && e.message || stringify(e, undefined, 4),
                         traceback: []
                     })
                 ])]);

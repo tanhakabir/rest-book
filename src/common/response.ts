@@ -87,7 +87,7 @@ export class ResponseParser {
     }
 
     renderer(): ResponseRendererElements {
-        if (!this.status || !this.statusText || !this.data) {
+        if (!this.status || !this.statusText || this.data === undefined) {
             throw new Error("Corrupt response received! Missing one or more of response status, status text, and/or data!");
         }
 
