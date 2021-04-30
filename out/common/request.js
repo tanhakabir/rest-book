@@ -22,7 +22,7 @@ export class RequestParser {
         this.requestOptions = {
             method: this._parseMethod(),
             baseURL: this._parseBaseUrl(),
-            timeout: 1000
+            timeout: 10000
         };
         this.requestOptions.params = this._parseQueryParams();
         // eslint-disable-next-line @typescript-eslint/naming-convention
