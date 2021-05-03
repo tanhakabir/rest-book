@@ -3027,43 +3027,20 @@ declare module 'vscode' {
 	 */
 	export interface WorkspaceTrustRequestOptions {
 		/**
-		 * When true, a modal dialog will be used to request workspace trust.
-		 * When false, a badge will be displayed on the settings gear activity bar item.
+		 * Custom message describing the user action that requires workspace
+		 * trust. If omitted, a generic message will be displayed in the workspace
+		 * trust request dialog.
 		 */
-		readonly modal: boolean;
+		readonly message?: string;
 	}
 
 	export namespace workspace {
 		/**
 		 * Prompt the user to chose whether to trust the current workspace
 		 * @param options Optional object describing the properties of the
-		 * workspace trust request. Defaults to { modal: false }
-		 * When using a non-modal request, the promise will return immediately.
-		 * Any time trust is not given, it is recommended to use the
-		* `onDidGrantWorkspaceTrust` event to listen for trust changes.
+		 * workspace trust request.
 		 */
 		export function requestWorkspaceTrust(options?: WorkspaceTrustRequestOptions): Thenable<boolean | undefined>;
-	}
-
-	//#endregion
-
-	//#region https://github.com/microsoft/vscode/issues/115807
-
-	export interface Webview {
-		/**
-		 * @param message A json serializable message to send to the webview.
-		 *
-		 *   For older versions of vscode, if an `ArrayBuffer` is included in `message`,
-		 *   it will not be serialized properly and will not be received by the webview.
-		 *   Similarly any TypedArrays, such as a `Uint8Array`, will be very inefficiently
-		 *   serialized and will also not be recreated as a typed array inside the webview.
-		 *
-		 *   However if your extension targets vscode 1.56+ in the `engines` field of its
-		 *   `package.json` any `ArrayBuffer` values that appear in `message` will be more
-		 *   efficiently transferred to the webview and will also be recreated inside of
-		 *   the webview.
-		 */
-		postMessage(message: any): Thenable<boolean>;
 	}
 
 	//#endregion
