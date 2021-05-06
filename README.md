@@ -30,7 +30,7 @@ Must be using the latest version of Visual Studio Code Insiders edition.
 ![Making a call to my Express Server](docs/images/make-call.gif)
 
 
-### More examples
+## More examples
 
 ```javascript
 google.com
@@ -42,6 +42,8 @@ is equivalent to:
 GET google.com
 ```
 
+### Parameters
+
 In subsequent lines immediately following the first line add any parameters or queries starting with `?` or `&` like this:
 
 ```javascript
@@ -49,6 +51,8 @@ GET https://www.google.com
     ?query="fun"
     &page=2
 ```
+
+### Headers
 
 In the lines following without an empty line will be considered as the Request Headers:
 
@@ -59,6 +63,8 @@ GET https://www.google.com
 User-Agent: rest-book
 Content-Type: application/json 
 ```
+
+### Bodies
 
 The last lines after a new line separator is the body of the call. Like the following:
 
@@ -72,6 +78,18 @@ Content-Type: application/json
     text: "Foo is the most bar of the Foos" 
 }
 ```
+
+Or you can load the body from another file like so:
+
+```javascript
+POST https://www.myapi.com
+User-Agent: rest-book
+Content-Type: application/json 
+
+./body.txt
+```
+
+## Variables
 
 You can also assign the responses from calls to a variable and use the data from that response in future calls. To do this you would just declare a variable with `let ` and the name of your variable and then a `=` like so:
 
