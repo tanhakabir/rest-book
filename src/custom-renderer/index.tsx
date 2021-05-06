@@ -8,7 +8,7 @@ link.rel = 'stylesheet';
 link.href = scriptUrl.split('/').slice(0, -1).concat('style.css').join('/');
 document.head.appendChild(link);
 
-const api = acquireNotebookRendererApi('rest-book');
+const api = acquireNotebookRendererApi();
 
 api.onDidCreateOutput(event => {
 	const data = event.value;
@@ -16,10 +16,10 @@ api.onDidCreateOutput(event => {
 });
 
 
-const saveDataToFile = async (data: any) => {
+const saveDataToFile = async (_data: any) => {
 	console.log("SAVE");
-	api.postMessage({
-		command: 'save-response',
-		data: data
-	});
+	// api.postMessage({
+	// 	command: 'save-response',
+	// 	data: data
+	// });
 };
