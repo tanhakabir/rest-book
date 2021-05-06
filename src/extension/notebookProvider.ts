@@ -59,11 +59,14 @@ export class NotebookKernel {
         execution.executionOrder = ++this._executionOrder;
 		execution.start({ startTime: Date.now() });
 
-        const metadata = {
-			startTime: Date.now()
-		};
+        const startTime = Date.now();
 
         const logger = (d: any, r: any, requestParser: RequestParser) => {
+            const metadata: vscode.NotebookCellExecutionSummary = {
+                startTime: startTime,
+                endTime: Date.now()
+            };
+
             try {
                 const response = new ResponseParser(d, r, requestParser);
                 updateCache(requestParser, response);
@@ -73,8 +76,8 @@ export class NotebookKernel {
                     new vscode.NotebookCellOutputItem('application/json', response.json()),
                     new vscode.NotebookCellOutputItem('text/html', response.html())
                 ], metadata)]);
-        
-                execution.end({ success: true });
+
+                execution.end({ success: true, endTime: Date.now() });
             } catch (e) {
                 execution.replaceOutput([new vscode.NotebookCellOutput([
                     new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
@@ -83,7 +86,7 @@ export class NotebookKernel {
                         traceback: []
                     })
                 ])]);
-                execution.end({ success: false });
+                execution.end({ success: false, endTime: Date.now() });
             }
         };
 
