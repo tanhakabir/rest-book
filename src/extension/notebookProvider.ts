@@ -209,8 +209,8 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 		for (const cell of data.cells) {
 			contents.push({
 				kind: cell.kind,
-				language: cell.language,
-				value: cell.source,
+				language: cell.languageId,
+				value: cell.value,
 				outputs: asRawOutput(cell)
 			});
 		}
