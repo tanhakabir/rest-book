@@ -39,7 +39,7 @@
         ]
       }
     ],
-    "notebookProvider": [
+    "notebooks": [
       {
         "viewType": "rest-book",
         "displayName": "REST Book",
