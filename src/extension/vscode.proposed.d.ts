@@ -393,6 +393,25 @@ declare module 'vscode' {
 	}
 
 	/**
+	 * A message regarding a completed search.
+	 */
+	export interface TextSearchCompleteMessage {
+		/**
+		 * Markdown text of the message.
+		 */
+		text: string,
+		/**
+		 * Whether the source of the message is trusted, command links are disabled for untrusted message sources.
+		 * Messaged are untrusted by default.
+		 */
+		trusted?: boolean,
+		/**
+		 * The message type, this affects how the message will be rendered.
+		 */
+		type: TextSearchCompleteMessageType,
+	}
+
+	/**
 	 * Information collected when text search is complete.
 	 */
 	export interface TextSearchComplete {
@@ -411,8 +430,10 @@ declare module 'vscode' {
 		 * Messages with "Information" tyle support links in markdown syntax:
 		 * - Click to [run a command](command:workbench.action.OpenQuickPick)
 		 * - Click to [open a website](https://aka.ms)
+		 *
+		 * Commands may optionally return { triggerSearch: true } to signal to VS Code that the original search should run be agian.
 		 */
-		message?: { text: string, type: TextSearchCompleteMessageType } | { text: string, type: TextSearchCompleteMessageType }[];
+		message?: TextSearchCompleteMessage | TextSearchCompleteMessage[];
 	}
 
 	/**
@@ -1071,8 +1092,10 @@ declare module 'vscode' {
 		 */
 		readonly outputs: ReadonlyArray<NotebookCellOutput>;
 
-		// todo@API maybe just executionSummary or lastExecutionSummary?
-		readonly latestExecutionSummary: NotebookCellExecutionSummary | undefined;
+		/**
+		 * The most recent {@link NotebookCellExecutionSummary excution summary} for this cell.
+		 */
+		readonly executionSummary?: NotebookCellExecutionSummary;
 	}
 
 	/**
@@ -1269,9 +1292,17 @@ declare module 'vscode' {
 		// static textplain(value:string): NotebookCellOutputItem;
 		// static errortrace(value:any): NotebookCellOutputItem;
 
+		/**
+		 * Creates `application/x.notebook.error`
+		 *
+		 * @param err An error for which an output item is wanted
+		 */
+		static error(err: Error): NotebookCellOutputItem;
+
 		mime: string;
 
 		//todo@API string or Unit8Array?
+		// value: string | Uint8Array | unknown;
 		value: unknown;
 
 		metadata?: { [key: string]: any };
@@ -1320,8 +1351,10 @@ declare module 'vscode' {
 		 */
 		metadata?: NotebookCellMetadata;
 
-		// todo@API just executionSummary or lastExecutionSummary
-		latestExecutionSummary?: NotebookCellExecutionSummary;
+		/**
+		 * The execution summary of this cell data.
+		 */
+		executionSummary?: NotebookCellExecutionSummary;
 
 		/**
 		 * Create new cell data. Minimal cell data specifies its kind, its source value, and the
@@ -1332,9 +1365,9 @@ declare module 'vscode' {
 		 * @param languageId The language identifier of the source value.
 		 * @param outputs //TODO@API remove ctor?
 		 * @param metadata //TODO@API remove ctor?
-		 * @param latestExecutionSummary //TODO@API remove ctor?
+		 * @param executionSummary //TODO@API remove ctor?
 		 */
-		constructor(kind: NotebookCellKind, value: string, languageId: string, outputs?: NotebookCellOutput[], metadata?: NotebookCellMetadata, latestExecutionSummary?: NotebookCellExecutionSummary);
+		constructor(kind: NotebookCellKind, value: string, languageId: string, outputs?: NotebookCellOutput[], metadata?: NotebookCellMetadata, executionSummary?: NotebookCellExecutionSummary);
 	}
 
 	/**
@@ -3267,6 +3300,11 @@ declare module 'vscode' {
 	export enum FilePermission {
 		/**
 		 * The file is readonly.
+		 *
+		 * *Note:* All `FileStat` from a `FileSystemProvider` that is registered  with
+		 * the option `isReadonly: true` will be implicitly handled as if `FilePermission.Readonly`
+		 * is set. As a consequence, it is not possible to have a readonly file system provider
+		 * registered where some `FileStat` are not readonly.
 		 */
 		Readonly = 1
 	}
