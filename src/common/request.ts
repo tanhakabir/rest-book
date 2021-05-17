@@ -269,22 +269,42 @@ export class RequestParser {
     }
 
     private _attemptToLoadVariable(text: string): string {
-        if(!text.startsWith('$')) {
+        let indexOfDollarSign = text.indexOf('$');
+        if(indexOfDollarSign === -1) {
             return text;
         }
 
-        let loadedFromVariable = cache.attemptToLoadVariable(text.substring(1));
+        let beforeVariable = text.substr(0, indexOfDollarSign);
+
+        let indexOfEndOfPossibleVariable = this._getEndOfWordIndex(text, indexOfDollarSign);
+        let possibleVariable = text.substr(indexOfDollarSign + 1, indexOfEndOfPossibleVariable);
+        let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
         if(loadedFromVariable) {
             if(typeof loadedFromVariable === 'string') {
-                if(text.startsWith('$SECRETS')) {
+                if(possibleVariable.startsWith('SECRETS')) {
                     this.valuesReplacedBySecrets.push(loadedFromVariable);
                 }
-                return loadedFromVariable;
+                return beforeVariable + loadedFromVariable;
             } else {
-                return stringify(loadedFromVariable);
+                return beforeVariable + stringify(loadedFromVariable);
             }
         }
 
         return text;
+    }
+
+    private _getEndOfWordIndex(text: string, startingIndex?: number): number {
+        let indexOfSpace = text.indexOf(' ', startingIndex ?? 0);
+        let indexOfComma = text.indexOf(',', startingIndex ?? 0);
+        let indexOfSemicolon = text.indexOf(';', startingIndex ?? 0);
+        let indexOfEnd = text.length - 1;
+
+        let values: number[] = [];
+
+        if(indexOfSpace !== -1) { values.push(indexOfSpace); }
+        if(indexOfComma !== -1) { values.push(indexOfComma); }
+        if(indexOfSemicolon !== -1) { values.push(indexOfSemicolon); }
+
+        return Math.min(... values, indexOfEnd);
     }
 }
