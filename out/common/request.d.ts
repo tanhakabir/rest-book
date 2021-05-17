@@ -39,4 +39,5 @@ export declare class RequestParser {
     private _parseBody;
     private _attemptToLoadFile;
     private _attemptToLoadVariable;
+    private _getEndOfWordIndex;
 }

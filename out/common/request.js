@@ -210,22 +210,43 @@ export class RequestParser {
         return;
     }
     _attemptToLoadVariable(text) {
-        if (!text.startsWith('$')) {
+        let indexOfDollarSign = text.indexOf('$');
+        if (indexOfDollarSign === -1) {
             return text;
         }
-        let loadedFromVariable = cache.attemptToLoadVariable(text.substring(1));
+        let beforeVariable = text.substr(0, indexOfDollarSign);
+        let indexOfEndOfPossibleVariable = this._getEndOfWordIndex(text, indexOfDollarSign);
+        let possibleVariable = text.substr(indexOfDollarSign + 1, indexOfEndOfPossibleVariable);
+        let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
         if (loadedFromVariable) {
             if (typeof loadedFromVariable === 'string') {
                 if (text.startsWith('$SECRETS')) {
                     this.valuesReplacedBySecrets.push(loadedFromVariable);
                 }
-                return loadedFromVariable;
+                return beforeVariable + loadedFromVariable;
             }
             else {
-                return stringify(loadedFromVariable);
+                return beforeVariable + stringify(loadedFromVariable);
             }
         }
         return text;
+    }
+    _getEndOfWordIndex(text, startingIndex) {
+        let indexOfSpace = text.indexOf(' ', startingIndex !== null && startingIndex !== void 0 ? startingIndex : 0);
+        let indexOfComma = text.indexOf(',', startingIndex !== null && startingIndex !== void 0 ? startingIndex : 0);
+        let indexOfSemicolon = text.indexOf(';', startingIndex !== null && startingIndex !== void 0 ? startingIndex : 0);
+        let indexOfEnd = text.length - 1;
+        let values = [];
+        if (indexOfSpace !== -1) {
+            values.push(indexOfSpace);
+        }
+        if (indexOfComma !== -1) {
+            values.push(indexOfComma);
+        }
+        if (indexOfSemicolon !== -1) {
+            values.push(indexOfSemicolon);
+        }
+        return Math.min(...values, indexOfEnd);
     }
 }
 //# sourceMappingURL=request.js.map
