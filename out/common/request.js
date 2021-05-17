@@ -220,7 +220,7 @@ export class RequestParser {
         let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
         if (loadedFromVariable) {
             if (typeof loadedFromVariable === 'string') {
-                if (text.startsWith('$SECRETS')) {
+                if (possibleVariable.startsWith('SECRETS')) {
                     this.valuesReplacedBySecrets.push(loadedFromVariable);
                 }
                 return beforeVariable + loadedFromVariable;
