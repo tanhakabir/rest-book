@@ -142,6 +142,9 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Make VSIX's hidden
+*.vsix
+
 ### react ###
 .DS_*
 **/*.backup.*
