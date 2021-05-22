@@ -29,6 +29,7 @@ export class NotebookKernel {
     readonly supportedLanguages = ['rest-book'];
 
     private readonly _controller: vscode.NotebookController;
+    private readonly _renderMessaging: vscode.NotebookRendererMessaging;
 	private _executionOrder = 0;
 
 	constructor() {
@@ -41,7 +42,8 @@ export class NotebookKernel {
 		this._controller.description = 'A notebook for making REST calls.';
 		this._controller.executeHandler = this._executeAll.bind(this);
 
-        this._controller.onDidReceiveMessage(this._handleMessage.bind(this));
+        this._renderMessaging = vscode.notebook.createRendererMessaging('rest-book');
+        this._renderMessaging.onDidReceiveMessage(this._handleMessage.bind(this));
 	}
 
 	dispose(): void {
@@ -125,7 +127,7 @@ export class NotebookKernel {
         
     }
     
-    private async _handleMessage(event: any): Promise<any> {
+    private async _handleMessage(event: vscode.NotebookRendererMessage<any>) {
         switch(event.message.command) {
             case 'save-response': 
                 this._saveDataToFile(event.message.data);

@@ -4,6 +4,7 @@ export declare class NotebookKernel {
     readonly label = "REST Book Kernel";
     readonly supportedLanguages: string[];
     private readonly _controller;
+    private readonly _renderMessaging;
     private _executionOrder;
     constructor();
     dispose(): void;
