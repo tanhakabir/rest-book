@@ -18,7 +18,8 @@
   "activationEvents": [
     "onNotebook:rest-book",
     "onLanguage:rest-book",
-    "onCommand:rest-book.secrets"
+    "onCommand:rest-book.secrets",
+    "onCommand:rest-book.newNotebook"
   ],
   "main": "./dist/extension-node.js",
   "browser": "./dist/extension-web.js",
@@ -27,6 +28,10 @@
       {
         "title": "REST Book: Secrets",
         "command": "rest-book.secrets"
+      },
+      {
+        "title": "REST Book: Create a new blank REST Notebook",
+        "command": "rest-book.newNotebook"
       }
     ],
     "notebookOutputRenderer": [
