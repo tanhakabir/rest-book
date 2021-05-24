@@ -30,7 +30,7 @@
         "command": "rest-book.secrets"
       },
       {
-        "title": "REST Book: Create new Untitled Notebook",
+        "title": "REST Book: Create a new blank REST Notebook",
         "command": "rest-book.newNotebook"
       }
     ],
