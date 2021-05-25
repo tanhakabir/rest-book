@@ -98,7 +98,7 @@ Content-Type: application/json
 
 ## Variables
 
-You can also assign the responses from calls to a variable and use the data from that response in future calls. To do this you would just declare a variable with `let ` and the name of your variable and then a `=` like so:
+You can also assign the responses from calls to a variable and use the data from that response in future calls. To do this you would just declare a variable with `let` and the name of your variable and then a `=` like so:
 
 ```javascript
 let foo = GET google.com
@@ -106,6 +106,20 @@ let foo = GET google.com
 
 And then in future cells you can reference `foo` in your calls with a `$` sign. Here's a short example:
 ![Example of someone declaring foo to be the response of a GET call to google.com and then creating a new cell after and seeing the auto-complete suggestions for foo.](docs/images/cross-cell-variable.gif)
+
+## Using API keys and other secrets
+
+If you'd like to use secret information in your calls like API keys but you don't want to use and save the raw text of these keys in the REST Notebooks, you can use secrets to save and access API keys.
+
+To save secrets, look for the command `REST Book: Secrets` in the command palette with Cmd+Shift+P (MacOS) or Ctrl+Shift+P (Windows). Add a new secret and a name for that secret.
+
+Then when use your secrets in your calls using the `$SECRETS` variable. In this example I'm saving a secret with the name `mySecret` and then accessing this secret to send to my Express server with `$SECRETS.mySecret`. You can see my server received my secret value of "hooray" correctly but the secret text is not visible anywhere in the Notebook.
+
+![Example of saving and using secrets in calls](docs/images/secrets.gif)
+
+And you can see that the actual secret is not saved in the results of the call. Every place that used a secret will be replaced by `[Secret <secret name>]`; this is for all parameters, headers, and bodies sent. Here you can see that my secret text "hooray" was replaced by `[Secret mySecret]` in the view of the request I sent.
+
+![Example of mySecret hidden](docs/images/secret-hidden.gif)
 
 To test these interactions, you can play around with this simple server: [SandboxServer](https://github.com/tanhakabir/SandboxServer)
 
