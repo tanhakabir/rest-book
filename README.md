@@ -16,6 +16,7 @@ REST Book is a Visual Studio Code extension that allows you to perform REST call
 - View rich HTML and image responses directly inside the Notebook.
 - Basic Authentication
 - Use data from one call in the next
+- Save API keys and other sensitive information outside of the Notebook to use securely in calls.
 
 ## Requirements
 
@@ -25,10 +26,16 @@ Must be using the latest version of Visual Studio Code Insiders edition.
 
 1. Create a new file to store your REST Calls with a `.restbook` ending.
 ![New file creation](docs/images/new-file.gif)
-1. Add an code cell by hovering over the middle of the Notebook and clicking the `+ Code`
+You can also use the command: `REST Book: Create a new blank REST Notebook`.
+![New file command](docs/images/new-file-command.gif)
+1. Add a code cell by hovering over the middle of the Notebook and clicking the `+ Code`
 1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
 ![Making a call to my Express Server](docs/images/make-call.gif)
 
+### Changing output view to rich rendered HTML or rich JSON view
+
+To toggle between the different views for the results of calls you can change mimetype like so:
+![Using mimetype picker to change mimetype for a different output view](docs/images/change-mimetype.gif)
 
 ## More examples
 
