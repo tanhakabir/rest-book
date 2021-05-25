@@ -28,14 +28,14 @@ table .column {
 }
 
 input {
-    border: 1px solid var(--vscode-input-focus-border-color);
-    background-color: var(--vscode-input-background);
-    color: var(--vscode-input-placeholder-foreground);
+    border: 1px solid var(--theme-input-focus-border-color);
+    background-color: var(--theme-input-background);
+    color: var(--theme-input-placeholder-foreground);
     padding: 10px;
 }
 
 input:active {
-    color: var(--vscode-input-foreground);
+    color: var(--theme-input-foreground);
 }
 
 svg {
@@ -46,12 +46,12 @@ svg {
 
 .save-button {
     margin-left: 20px;
-    background-color: var(--vscode-input-background);
+    background-color: var(--theme-input-background);
     border: none;
     padding: 2px 10px 10px 10px;
     opacity: 0.6;
-    color: var(--vscode-editor-foreground);
-    border: 0.2px solid var(--vscode-editor-foreground);
+    color: var(--theme-editor-foreground);
+    border: 0.2px solid var(--theme-editor-foreground);
 }
 
 .save-button:hover {
@@ -63,7 +63,7 @@ svg {
     border: none;
     padding: 0px 10px 10px 10px;
     opacity: 0.6;
-    color: var(--vscode-editor-foreground);
+    color: var(--theme-editor-foreground);
 }
 
 .search-button:hover {
@@ -72,21 +72,21 @@ svg {
 
 button.tab {
     border: none;
-    color: var(--vscode-editor-foreground);
-    background-color: var(--vscode-input-background);
+    color: var(--theme-editor-foreground);
+    background-color: var(--theme-input-background);
     padding: 10px 30px 10px 30px;
-    border: 0.2px solid var(--vscode-input-border);
+    border: 0.2px solid var(--theme-input-border);
 }
 
 button:hover { 
-    color: var(--vscode-editor-foreground);
+    color: var(--theme-editor-foreground);
     cursor: pointer;
 }
 
 button.tab[active] {
-    color: var(--vscode-editor-foreground);
-    background-color: var(--vscode-input-border);
-    border-bottom: 2px solid var(--vscode-editor-foreground);
+    color: var(--theme-editor-foreground);
+    background-color: var(--theme-input-border);
+    border-bottom: 2px solid var(--theme-editor-foreground);
 }
 
 #data-container {
