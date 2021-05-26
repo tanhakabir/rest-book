@@ -4,8 +4,15 @@ import { Response } from './renderer';
 import './style.css';
 
 export const activate: ActivationFunction = () => ({
-	renderCell(_id, { value, element }) {
-		render(<Response response={value as any} saveResponse={saveDataToFile}/>, element);
+	renderCell(_id, info) {
+		try {
+			// console.log(data.json());
+			// let data = JSON.parse(value as string);
+			//@ts-ignore
+			render(<Response response={info.json()} saveResponse={saveDataToFile}/>, info.element);
+		} catch {
+			render(<p>Error!</p>, info.element);
+		}
 	}
 });
 

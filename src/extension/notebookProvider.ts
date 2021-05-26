@@ -74,20 +74,20 @@ export class NotebookKernel {
                 updateCache(requestParser, response);
 
                 execution.replaceOutput([new vscode.NotebookCellOutput([
-                    new vscode.NotebookCellOutputItem(MIME_TYPE, response.renderer()),
-                    new vscode.NotebookCellOutputItem('application/json', response.json()),
-                    new vscode.NotebookCellOutputItem('text/html', response.html())
+                    vscode.NotebookCellOutputItem.json(response.renderer(), MIME_TYPE),
+                    vscode.NotebookCellOutputItem.json(response.json()),
+                    vscode.NotebookCellOutputItem.text(response.html(), 'text/html')
                 ], metadata)]);
 
                 execution.end({ success: true, endTime: Date.now() });
             } catch (e) {
-                execution.replaceOutput([new vscode.NotebookCellOutput([
-                    new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
-                        ename: e instanceof Error && e.name || 'error',
-                        evalue: e instanceof Error && e.message || stringify(e, undefined, 4),
-                        traceback: []
-                    })
-                ])]);
+                execution.replaceOutput([
+                    new vscode.NotebookCellOutput([
+                        vscode.NotebookCellOutputItem.error({ 
+                            name: e instanceof Error && e.name || 'error', 
+                            message: e instanceof Error && e.message || stringify(e, undefined, 4)})
+                    ])
+                ]);
                 execution.end({ success: false, endTime: Date.now() });
             }
         };
@@ -99,13 +99,13 @@ export class NotebookKernel {
             parser = new RequestParser(cell.document.getText());
             req = parser.getRequest();
         } catch (err) {
-            execution.replaceOutput([new vscode.NotebookCellOutput([
-                new vscode.NotebookCellOutputItem('application/x.notebook.error-traceback', {
-                    ename: err instanceof Error && err.name || 'error',
-                    evalue: err instanceof Error && err.message || stringify(err, undefined, 4),
-                    traceback: []
-                })
-            ])]);
+            execution.replaceOutput([
+                new vscode.NotebookCellOutput([
+                    vscode.NotebookCellOutputItem.error({ 
+                        name: err instanceof Error && err.name || 'error', 
+                        message: err instanceof Error && err.message || stringify(err, undefined, 4)})
+                ])
+            ]);
             execution.end({ success: false });
             return;
         }
@@ -181,8 +181,7 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 			item.kind,
 			item.value,
 			item.language,
-			item.outputs ? [new vscode.NotebookCellOutput(item.outputs.map(raw => new vscode.NotebookCellOutputItem(raw.mime, raw.value)))] : [],
-			new vscode.NotebookCellMetadata()
+			// item.outputs ? [new vscode.NotebookCellOutput(item.outputs.map(raw => new vscode.NotebookCellOutputItem(raw.value, raw.mime)))] : [],
 		));
 
         // Pass read and formatted Notebook Data to VS Code to display Notebook with saved cells
@@ -196,11 +195,11 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
         // function to take output renderer data to a format to save to the file
 		function asRawOutput(cell: vscode.NotebookCellData): RawCellOutput[] {
 			let result: RawCellOutput[] = [];
-			for (let output of cell.outputs ?? []) {
-				for (let item of output.outputs) {
-					result.push({ mime: item.mime, value: item.value });
-				}
-			}
+			// for (let output of cell.outputs ?? []) {
+			// 	for (let item of output.outputs) {
+			// 		result.push({ mime: item.mime, value: item.data });
+			// 	}
+			// }
 			return result;
 		}
 
