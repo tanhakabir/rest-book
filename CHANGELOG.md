@@ -1,9 +1,7 @@
 # Change Log
 
-All notable changes to the "PostBox" extension will be documented in this file.
+All notable changes to the REST Book extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## May 27, 2021
 
-## [Unreleased]
-
-- Initial release
+- Add variable resolving to url paths. The only place where variables don't work currently is variables embedded within objects in bodies; stand alone variable references in bodies do work.
