@@ -1238,6 +1238,9 @@ declare module 'vscode' {
 		with(change: { start?: number, end?: number }): NotebookRange;
 	}
 
+	/**
+	 * One representation of a {@link NotebookCellOutput notebook output}, defined by MIME type and data.
+	 */
 	// todo@API document which mime types are supported out of the box and
 	// which are considered secure
 	export class NotebookCellOutputItem {
@@ -1331,12 +1334,41 @@ declare module 'vscode' {
 		constructor(data: Uint8Array, mime: string, metadata?: { [key: string]: any });
 	}
 
-	// @jrieken transient
+	/**
+	 * Notebook cell output represents a result of executing a cell. It is a container type for multiple
+	 * {@link NotebookCellOutputItem output items} where contained items represent the same result but
+	 * use different MIME types.
+	 */
+	//todo@API - add sugar function to add more outputs
 	export class NotebookCellOutput {
+
+		/**
+		 * Identifier for this output. Using the identifier allows a subsequent execution to modify
+		 * existing output. Defaults to a fresh UUID.
+		 */
 		id: string;
+
+		/**
+		 * The output items of this output. Each item must represent the same result. _Note_ that repeated
+		 * MIME types per output is invalid and that the editor will just pick one of them.
+		 *
+		 * ```ts
+		 * new vscode.NotebookCellOutput([
+		 * 	vscode.NotebookCellOutputItem.text('Hello', 'text/plain'),
+		 * 	vscode.NotebookCellOutputItem.text('<i>Hello</i>', 'text/html'),
+		 * 	vscode.NotebookCellOutputItem.text('_Hello_', 'text/markdown'),
+		 * 	vscode.NotebookCellOutputItem.text('Hey', 'text/plain'), // INVALID: repeated type, editor will pick just one
+		 * ])
+		 * ```
+		 */
+		//todo@API rename to items
 		outputs: NotebookCellOutputItem[];
+
+		//todo@API
 		metadata?: { [key: string]: any };
+
 		constructor(outputs: NotebookCellOutputItem[], metadata?: { [key: string]: any });
+
 		constructor(outputs: NotebookCellOutputItem[], id: string, metadata?: { [key: string]: any });
 	}
 
@@ -3033,27 +3065,19 @@ declare module 'vscode' {
 
 	//#region https://github.com/microsoft/vscode/issues/124024 @hediet @alexdima
 
-	export class InlineCompletionItem {
-		/**
-		 * The text to insert.
-		 * If the text contains a line break, the range must end at the end of a line.
-		 * If existing text should be replaced, the existing text must be a prefix of the text to insert.
-		*/
-		text: string;
-
-		/**
-		 * The range to replace.
-		 * Must begin and end on the same line.
-		*/
-		range?: Range;
-
-		constructor(text: string);
+	export namespace languages {
+		export function registerInlineCompletionItemProvider(selector: DocumentSelector, provider: InlineCompletionItemProvider): Disposable;
 	}
 
-	export class InlineCompletionList {
-		items: InlineCompletionItem[];
+	export interface InlineCompletionItemProvider<T extends InlineCompletionItem = InlineCompletionItem> {
+		provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionList<T>>;
+	}
 
-		constructor(items: InlineCompletionItem[]);
+	export interface InlineCompletionContext {
+		/**
+		 * How the completion was triggered.
+		 */
+		readonly triggerKind: InlineCompletionTriggerKind;
 	}
 
 	/**
@@ -3072,19 +3096,56 @@ declare module 'vscode' {
 		 */
 		Explicit = 1,
 	}
-	export interface InlineCompletionContext {
+
+	export class InlineCompletionList<T extends InlineCompletionItem = InlineCompletionItem> {
+		items: T[];
+
+		constructor(items: T[]);
+	}
+
+	export class InlineCompletionItem {
 		/**
-		 * How the completion was triggered.
+		 * The text to insert.
+		 * If the text contains a line break, the range must end at the end of a line.
+		 * If existing text should be replaced, the existing text must be a prefix of the text to insert.
+		*/
+		text: string;
+
+		/**
+		 * The range to replace.
+		 * Must begin and end on the same line.
+		*/
+		range?: Range;
+
+		/**
+		 * An optional {@link Command} that is executed *after* inserting this completion.
 		 */
-		readonly triggerKind: InlineCompletionTriggerKind;
+		command?: Command;
+
+		constructor(text: string, range?: Range, command?: Command);
 	}
 
-	export interface InlineCompletionItemProvider {
-		provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionList>;
+
+	/**
+	 * Be aware that this API will not ever be finalized.
+	 */
+	export namespace window {
+		export function getInlineCompletionItemController<T extends InlineCompletionItem>(provider: InlineCompletionItemProvider<T>): InlineCompletionController<T>;
 	}
 
-	export namespace languages {
-		export function registerInlineCompletionItemProvider(selector: DocumentSelector, provider: InlineCompletionItemProvider): Disposable;
+	/**
+	 * Be aware that this API will not ever be finalized.
+	 */
+	export interface InlineCompletionController<T extends InlineCompletionItem> {
+		// eslint-disable-next-line vscode-dts-event-naming
+		readonly onDidShowCompletionItem: Event<InlineCompletionItemDidShowEvent<T>>;
+	}
+
+	/**
+	 * Be aware that this API will not ever be finalized.
+	 */
+	export interface InlineCompletionItemDidShowEvent<T extends InlineCompletionItem> {
+		completionItem: T;
 	}
 
 	//#endregion
