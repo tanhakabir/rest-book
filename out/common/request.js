@@ -100,13 +100,23 @@ export class RequestParser {
         if (tokens.length === 0) {
             throw new Error('Invalid request!');
         }
+        const findAndReplaceVarsInUrl = (url) => {
+            let tokens = url.split('/');
+            for (let i = 1; i < tokens.length; i++) {
+                if (!tokens[i].startsWith('$')) {
+                    continue;
+                }
+                tokens[i] = this._attemptToLoadVariable(tokens[i]);
+            }
+            return tokens.join('/');
+        };
         if (tokens.length === 1) {
-            let url = tokens[0].split('?')[0];
+            let url = findAndReplaceVarsInUrl(tokens[0].split('?')[0]);
             this.baseUrl = url;
             return formatURL(url);
         }
         else if (tokens.length === 2) {
-            let url = tokens[1].split('?')[0];
+            let url = findAndReplaceVarsInUrl(tokens[1].split('?')[0]);
             this.baseUrl = url;
             return formatURL(url);
         }

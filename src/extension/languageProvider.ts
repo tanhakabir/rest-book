@@ -54,8 +54,10 @@ export class KeywordCompletionItemProvider implements vscode.CompletionItemProvi
 export class HeaderCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = [':'];
 
-    provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
+    provideCompletionItems(_document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>> {
         const result: vscode.CompletionItem[] = [];
+
+        if(position.line === 0) { return result; }
 
         for(const field of Object.values(MIMEType)) {
             result.push({
@@ -93,7 +95,7 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
         const result: vscode.CompletionItem[] = [];
 
         let text = document.lineAt(position.line).text.substring(0, position.character);
-        let startingIndex =  Math.max(text.lastIndexOf(' '), text.lastIndexOf('=')) + 1;
+        let startingIndex =  Math.max(text.lastIndexOf(' '), text.lastIndexOf('='), text.lastIndexOf('/')) + 1;
         let varName = text.substring(startingIndex).trim();
 
         const tokens: string[] = varName.split('.').filter(Boolean).map(s => s.replace('.', ''));

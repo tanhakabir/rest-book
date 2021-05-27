@@ -5,7 +5,7 @@ export declare class KeywordCompletionItemProvider implements vscode.CompletionI
 }
 export declare class HeaderCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters: string[];
-    provideCompletionItems(_document: vscode.TextDocument, _position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>>;
+    provideCompletionItems(_document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): vscode.ProviderResult<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem>>;
 }
 export declare class CacheVariableCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters: string[];
