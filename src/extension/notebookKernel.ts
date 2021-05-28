@@ -43,7 +43,7 @@ export class NotebookKernel {
 	}
 
     private async _doExecution(cell: vscode.NotebookCell): Promise<void> {
-        const execution = this._controller.createNotebookCellExecutionTask(cell);
+        const execution = this._controller.createNotebookCellExecution(cell);
         execution.executionOrder = ++this._executionOrder;
 		execution.start({ startTime: Date.now() });
 
