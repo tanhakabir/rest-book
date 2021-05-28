@@ -24,18 +24,6 @@ export function findMatchingDataInVariableCache(varName: string, cache: any): an
     return undefined;
 }
 
-export function findMatchingVariable(name: string): any | undefined {
-    if(name === 'SECRETS' && !hasNoSecrets()) {
-        return SECRETS;
-    }
-
-    for(let key of Object.keys(variableCache)) {
-        if(key === name) { return variableCache[name]; }
-    }
-
-    return undefined;
-}
-
 export function getBaseUrls(): string[] {
     return [...baseUrlCache];
 }

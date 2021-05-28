@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { DEBUG_MODE, NAME } from '../common/common';
-import { getVariableNames, getBaseUrls, findMatchingVariable, variableCache } from '../common/cache';
+import { getVariableNames, getBaseUrls, attemptToLoadVariable } from '../common/cache';
 import { Method, MIMEType, RequestHeaderField } from '../common/httpConstants';
 
 const selector: vscode.DocumentSelector = { language: NAME };
@@ -98,15 +98,11 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
         let startingIndex =  Math.max(text.lastIndexOf(' '), text.lastIndexOf('='), text.lastIndexOf('/')) + 1;
         let varName = text.substring(startingIndex).trim();
 
-        const tokens: string[] = varName.split('.').filter(Boolean).map(s => s.replace('.', ''));
+        if(!varName.startsWith('$')) { return result }
 
-        if(tokens.length < 1) { return result; }
+        varName = varName.substr(1, varName.length - 2);
 
-        let matchingData = findMatchingVariable(tokens[0].substring(1));
-
-        for(let i = 1; i < tokens.length; i++) {
-            matchingData = matchingData[tokens[i]];
-        }
+        let matchingData = attemptToLoadVariable(varName);
 
         if(matchingData && typeof matchingData === 'object') {
             for(let key of Object.keys(matchingData)) {
