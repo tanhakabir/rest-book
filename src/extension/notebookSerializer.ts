@@ -59,7 +59,7 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 		function asRawOutput(cell: vscode.NotebookCellData): RawCellOutput[] {
 			let result: RawCellOutput[] = [];
 			for (let output of cell.outputs ?? []) {
-				for (let item of output.outputs) {
+				for (let item of output.items) {
                     let outputContents = '';
                     try {
                         outputContents = new TextDecoder().decode(item.data);

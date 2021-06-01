@@ -19,7 +19,7 @@ export class NotebookKernel {
 	private _executionOrder = 0;
 
 	constructor() {
-        this._controller = vscode.notebook.createNotebookController('rest-book-kernel', 
+        this._controller = vscode.notebooks.createNotebookController('rest-book-kernel', 
                                                                     'rest-book', 
                                                                     'REST Book');
 
@@ -28,7 +28,7 @@ export class NotebookKernel {
 		this._controller.description = 'A notebook for making REST calls.';
 		this._controller.executeHandler = this._executeAll.bind(this);
 
-        this._renderMessaging = vscode.notebook.createRendererMessaging('rest-book');
+        this._renderMessaging = vscode.notebooks.createRendererMessaging('rest-book');
         this._renderMessaging.onDidReceiveMessage(this._handleMessage.bind(this));
 	}
 
