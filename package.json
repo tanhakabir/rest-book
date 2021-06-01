@@ -2,13 +2,13 @@
   "name": "rest-book",
   "displayName": "REST Book",
   "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "publisher": "tanhakabir",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
   },
   "engines": {
-    "vscode": "^1.54.0"
+    "vscode": "^1.56.0"
   },
   "enableProposedApi": true,
   "categories": [
