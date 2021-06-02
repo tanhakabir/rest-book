@@ -271,7 +271,8 @@ export function registerCommands(): vscode.Disposable {
     }));
 
 	subscriptions.push(vscode.commands.registerCommand('rest-book.newNotebook', async () => {
-		const newNotebook = await vscode.workspace.openNotebookDocument('rest-book', 
+		//@ts-ignore
+		const newNotebook = await vscode.notebooks.openNotebookDocument('rest-book', 
 			new vscode.NotebookData([
 				new vscode.NotebookCellData(vscode.NotebookCellKind.Code, '', 'rest-book')
 			]));
