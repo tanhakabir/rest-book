@@ -904,14 +904,14 @@ declare module 'vscode' {
 		/**
 		 * The icon path or {@link ThemeIcon} for the terminal.
 		 */
-		readonly iconPath?: Uri | { light: Uri; dark: Uri } | { id: string, color?: { id: string } };
+		readonly iconPath?: Uri | { light: Uri; dark: Uri } | ThemeIcon;
 	}
 
 	export interface ExtensionTerminalOptions {
 		/**
 		 * A themeIcon, Uri, or light and dark Uris to use as the terminal tab icon
 		 */
-		readonly iconPath?: Uri | { light: Uri; dark: Uri } | { id: string, color?: { id: string } };
+		readonly iconPath?: Uri | { light: Uri; dark: Uri } | ThemeIcon;
 	}
 
 	//#endregion
@@ -1059,12 +1059,11 @@ declare module 'vscode' {
 
 	//#endregion
 
-	//#region https://github.com/microsoft/vscode/issues/106744, Notebook, deprecated
+	//#region https://github.com/microsoft/vscode/issues/106744, Notebook, deprecated & misc
 
-	/**
-	 * @deprecated use notebooks instead
-	 */
-	export const notebook: typeof notebooks;
+	export interface NotebookCellOutput {
+		id: string;
+	}
 
 	//#endregion
 
@@ -1253,15 +1252,15 @@ declare module 'vscode' {
 
 	export interface WorkspaceEdit {
 		// todo@API add NotebookEdit-type which handles all these cases?
-		replaceNotebookMetadata(uri: Uri, value: NotebookDocumentMetadata): void;
+		replaceNotebookMetadata(uri: Uri, value: { [key: string]: any }): void;
 		replaceNotebookCells(uri: Uri, range: NotebookRange, cells: NotebookCellData[], metadata?: WorkspaceEditEntryMetadata): void;
-		replaceNotebookCellMetadata(uri: Uri, index: number, cellMetadata: NotebookCellMetadata, metadata?: WorkspaceEditEntryMetadata): void;
+		replaceNotebookCellMetadata(uri: Uri, index: number, cellMetadata: { [key: string]: any }, metadata?: WorkspaceEditEntryMetadata): void;
 	}
 
 	export interface NotebookEditorEdit {
-		replaceMetadata(value: NotebookDocumentMetadata): void;
+		replaceMetadata(value: { [key: string]: any }): void;
 		replaceCells(start: number, end: number, cells: NotebookCellData[]): void;
-		replaceCellMetadata(index: number, metadata: NotebookCellMetadata): void;
+		replaceCellMetadata(index: number, metadata: { [key: string]: any }): void;
 	}
 
 	export interface NotebookEditor {
@@ -1391,7 +1390,7 @@ declare module 'vscode' {
 		backupNotebook(document: NotebookDocument, context: NotebookDocumentBackupContext, token: CancellationToken): Thenable<NotebookDocumentBackup>;
 	}
 
-	export namespace notebooks {
+	export namespace workspace {
 
 		// TODO@api use NotebookDocumentFilter instead of just notebookType:string?
 		// TODO@API options duplicates the more powerful variant on NotebookContentProvider
@@ -1408,7 +1407,7 @@ declare module 'vscode' {
 		exclusive?: boolean;
 	}
 
-	export namespace notebooks {
+	export namespace workspace {
 		// SPECIAL overload with NotebookRegistrationData
 		export function registerNotebookContentProvider(notebookType: string, provider: NotebookContentProvider, options?: NotebookDocumentContentOptions, registrationData?: NotebookRegistrationData): Disposable;
 		// SPECIAL overload with NotebookRegistrationData
@@ -1466,7 +1465,7 @@ declare module 'vscode' {
 
 	/**
 	 * Renderer messaging is used to communicate with a single renderer. It's
-	 * returned from {@link notebook.createRendererMessaging}.
+	 * returned from {@link notebooks.createRendererMessaging}.
 	 */
 	export interface NotebookRendererMessaging<TSend = any, TReceive = TSend> {
 		/**
@@ -1541,14 +1540,13 @@ declare module 'vscode' {
 		/**
 		 * Creates a new messaging instance used to communicate with a specific
 		 * renderer. The renderer only has access to messaging if `requiresMessaging`
-		 * is set in its contribution.
+		 * is set to `always` or `optional` in its `notebookRenderer ` contribution.
 		 *
 		 * @see https://github.com/microsoft/vscode/issues/123601
 		 * @param rendererId The renderer ID to communicate with
 		*/
 		// todo@API can ANY extension talk to renderer or is there a check that the calling extension
 		// declared the renderer in its package.json?
-		// todo@API align with vscode.Webview -> remove generics
 		export function createRendererMessaging<TSend = any, TReceive = TSend>(rendererId: string): NotebookRendererMessaging<TSend, TReceive>;
 	}
 
@@ -2760,11 +2758,20 @@ declare module 'vscode' {
 	//#region https://github.com/microsoft/vscode/issues/124024 @hediet @alexdima
 
 	export namespace languages {
+		/**
+		 * Registers an inline completion provider.
+		 */
 		export function registerInlineCompletionItemProvider(selector: DocumentSelector, provider: InlineCompletionItemProvider): Disposable;
 	}
 
 	export interface InlineCompletionItemProvider<T extends InlineCompletionItem = InlineCompletionItem> {
-		provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionList<T>>;
+		/**
+		 * Provides inline completion items for the given position and document.
+		 * If inline completions are enabled, this method will be called whenever the user stopped typing.
+		 * It will also be called when the user explicitly triggers inline completions or asks for the next or previous inline completion.
+		 * Use `context.triggerKind` to distinguish between these scenarios.
+		*/
+		provideInlineCompletionItems(document: TextDocument, position: Position, context: InlineCompletionContext, token: CancellationToken): ProviderResult<InlineCompletionList<T> | T[]>;
 	}
 
 	export interface InlineCompletionContext {
@@ -2808,6 +2815,10 @@ declare module 'vscode' {
 		/**
 		 * The range to replace.
 		 * Must begin and end on the same line.
+		 *
+		 * Prefer replacements over insertions to avoid cache invalidation.
+		 * Instead of reporting a completion that extends a word,
+		 * the whole word should be replaced with the extended word.
 		*/
 		range?: Range;
 
@@ -2831,6 +2842,9 @@ declare module 'vscode' {
 	 * Be aware that this API will not ever be finalized.
 	 */
 	export interface InlineCompletionController<T extends InlineCompletionItem> {
+		/**
+		 * Is fired when an inline completion item is shown to the user.
+		 */
 		// eslint-disable-next-line vscode-dts-event-naming
 		readonly onDidShowCompletionItem: Event<InlineCompletionItemDidShowEvent<T>>;
 	}

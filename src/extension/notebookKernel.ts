@@ -24,7 +24,7 @@ export class NotebookKernel {
                                                                     'REST Book');
 
 		this._controller.supportedLanguages = ['rest-book'];
-		this._controller.hasExecutionOrder = true;
+		this._controller.supportsExecutionOrder = true;
 		this._controller.description = 'A notebook for making REST calls.';
 		this._controller.executeHandler = this._executeAll.bind(this);
 
@@ -45,16 +45,13 @@ export class NotebookKernel {
     private async _doExecution(cell: vscode.NotebookCell): Promise<void> {
         const execution = this._controller.createNotebookCellExecution(cell);
         execution.executionOrder = ++this._executionOrder;
-		execution.start({ startTime: Date.now() });
+		execution.start(Date.now());
+
+        cell.document.languageId;
 
         const startTime = Date.now();
 
         const logger = (d: any, r: any, requestParser: RequestParser) => {
-            const metadata: vscode.NotebookCellExecutionSummary = {
-                startTime: startTime,
-                endTime: Date.now()
-            };
-
             try {
                 const response = new ResponseParser(d, r, requestParser);
                 updateCache(requestParser, response);
@@ -63,9 +60,9 @@ export class NotebookKernel {
                     vscode.NotebookCellOutputItem.json(response.renderer(), MIME_TYPE),
                     vscode.NotebookCellOutputItem.json(response.json()),
                     vscode.NotebookCellOutputItem.text(response.html(), 'text/html')
-                ], metadata)]);
+                ])]);
 
-                execution.end({ success: true, endTime: Date.now() });
+                execution.end(true, Date.now());
             } catch (e) {
                 execution.replaceOutput([
                     new vscode.NotebookCellOutput([
@@ -74,7 +71,7 @@ export class NotebookKernel {
                             message: e instanceof Error && e.message || stringify(e, undefined, 4)})
                     ])
                 ]);
-                execution.end({ success: false, endTime: Date.now() });
+                execution.end(false, Date.now());
             }
         };
 
@@ -92,7 +89,7 @@ export class NotebookKernel {
                         message: err instanceof Error && err.message || stringify(err, undefined, 4)})
                 ])
             ]);
-            execution.end({ success: false });
+            execution.end(false, Date.now());
             return;
         }
 

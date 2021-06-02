@@ -39,7 +39,6 @@
         "id": "rest-book",
         "displayName": "REST Book Renderer",
         "entrypoint": "./dist/renderer.js",
-        "requiresMessaging": true,
         "mimeTypes": [
           "x-application/rest-book"
         ]
@@ -47,7 +46,8 @@
     ],
     "notebooks": [
       {
-        "viewType": "rest-book",
+        "id": "rest-book",
+        "type": "rest-book",
         "displayName": "REST Book",
         "selector": [
           {

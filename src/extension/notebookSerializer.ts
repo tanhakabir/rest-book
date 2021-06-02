@@ -43,14 +43,17 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 		const cells = raw.map(item => new vscode.NotebookCellData(
 			item.kind,
 			item.value,
-			item.language,
-			item.outputs ? [new vscode.NotebookCellOutput(convertRawOutputToBytes(item))] : [],
+			item.language
 		));
+
+		for(let i = 0; i < cells.length; i++) {
+			let cell = cells[i];
+			cell.outputs = raw[i].outputs ? [new vscode.NotebookCellOutput(convertRawOutputToBytes(raw[i]))] : [];
+		}
 
         // Pass read and formatted Notebook Data to VS Code to display Notebook with saved cells
 		return new vscode.NotebookData(
-			cells,
-			new vscode.NotebookDocumentMetadata()
+			cells
 		);
     }
 
