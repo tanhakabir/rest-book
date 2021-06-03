@@ -17,8 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
 	console.log('rest-book is now active!');
 	
 	context.subscriptions.push(new NotebookKernel());
-	//@ts-ignore
-	context.subscriptions.push(vscode.notebooks.registerNotebookSerializer('rest-book', new NotebookSerializer(), {
+	context.subscriptions.push(vscode.workspace.registerNotebookSerializer('rest-book', new NotebookSerializer(), {
 		transientOutputs: false,
 		transientCellMetadata: {
 			inputCollapsed: true,
