@@ -28,7 +28,7 @@ table .column {
 }
 
 input {
-    border: 1px solid var(--theme-input-focus-border-color);
+    border: 1px solid var(--notebook-inactive-focused-cell-border-color);
     background-color: var(--theme-input-background);
     color: var(--theme-input-placeholder-foreground);
     padding: 10px;
@@ -36,6 +36,7 @@ input {
 
 input:active {
     color: var(--theme-input-foreground);
+    border: 1px solid var(--theme-input-focus-border-color);
 }
 
 svg {
