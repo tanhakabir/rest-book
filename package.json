@@ -7,8 +7,9 @@
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
   },
+  "enableProposedApi": true,
   "engines": {
-    "vscode": "^1.56.0"
+    "vscode": "^1.57.0"
   },
   "categories": [
     "Notebooks"
