@@ -1,7 +1,7 @@
 {
   "name": "rest-book",
   "displayName": "REST Book",
-  "description": "A Postman-like REST API Notebook for sending to and receiving from REST endpoints.",
+  "description": "Notebook for running REST queries.",
   "version": "2.0.2",
   "publisher": "tanhakabir",
   "repository": {
@@ -31,6 +31,13 @@
       },
       {
         "title": "REST Book: Create a new blank REST Notebook",
+        "command": "rest-book.newNotebook"
+      }
+    ],
+    "startEntries": [
+      {
+        "title": "REST Book",
+        "description": "Notebook for running REST queries",
         "command": "rest-book.newNotebook"
       }
     ],
