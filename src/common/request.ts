@@ -55,7 +55,7 @@ export class RequestParser {
 
         this.originalRequest = this._parseOutVariableDeclarations();
 
-        if(this.originalRequest.length == 0) { return }
+        if(this.originalRequest.length == 0) { return; }
 
         this.variableName = this._parseVariableName();
 
@@ -127,7 +127,7 @@ export class RequestParser {
             i++;
         }
 
-        while(!this.originalText[i] || this.originalText[i].length === 0) {
+        while(i < this.originalText.length && (!this.originalText[i] || this.originalText[i].length === 0)) {
             i++;
         }
 

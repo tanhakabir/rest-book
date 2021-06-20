@@ -86,10 +86,11 @@ export class NotebookKernel {
         } catch (err) {
             execution.replaceOutput([
                 new vscode.NotebookCellOutput([
-                    // vscode.NotebookCellOutputItem.error({ 
-                    //     name: err instanceof Error && err.name || 'error', 
-                    //     message: err instanceof Error && err.message || stringify(err, undefined, 4)})
-                    vscode.NotebookCellOutputItem.error(err)
+                    DEBUG_MODE ?
+                    vscode.NotebookCellOutputItem.error(err) :
+                    vscode.NotebookCellOutputItem.error({ 
+                            name: err instanceof Error && err.name || 'error', 
+                            message: err instanceof Error && err.message || stringify(err, undefined, 4)})
                 ])
             ]);
             execution.end(false, Date.now());

@@ -82,7 +82,7 @@ export class RequestParser {
             }
             i++;
         }
-        while (!this.originalText[i] || this.originalText[i].length === 0) {
+        while (i < this.originalText.length && (!this.originalText[i] || this.originalText[i].length === 0)) {
             i++;
         }
         for (i; i < this.originalText.length; i++) {
