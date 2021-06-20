@@ -15,6 +15,6 @@ jobs:
           node-version: ^12
       - run: npm i
       - run: npm i -g vsce
-      - run: vsce publish -p $VSCE_TOKEN
+      - run: vsce publish -p $VSCE_TOKEN --no-verify
         env:
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
