@@ -31,7 +31,7 @@
         },
         "keyword": {
             "name": "keyword.control",
-            "match": "\\b(let)\\b"
+            "match": "\\b(let|const)\\b"
         },
         "variable": {
             "name": "variable",

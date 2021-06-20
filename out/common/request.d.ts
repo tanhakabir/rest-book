@@ -20,16 +20,18 @@ export interface Request {
     decompress?: boolean | true;
 }
 export declare class RequestParser {
+    private originalText;
     private originalRequest;
     private requestOptions;
     private baseUrl?;
     private variableName;
     private valuesReplacedBySecrets;
     constructor(query: string);
-    getRequest(): any;
+    getRequest(): any | undefined;
     getBaseUrl(): string | undefined;
     getVariableName(): string | undefined;
     wasReplacedBySecret(text: string): boolean;
+    private _parseOutVariableDeclarations;
     private _parseVariableName;
     private _stripVariableDeclaration;
     private _parseMethod;

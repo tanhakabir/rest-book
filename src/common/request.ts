@@ -34,23 +34,28 @@ export interface Request {
 }
 
 export class RequestParser {
+    private originalText: string[];
     private originalRequest: string[];
-    private requestOptions: Request;
+    private requestOptions: Request | undefined;
     private baseUrl?: string;
     private variableName: string | undefined;
     private valuesReplacedBySecrets: string[] = [];
 
     constructor(query: string) {
 
-        let linesOfRequest = query.split(EOL);
+        let linesOfText = query.split(EOL);
 
-        if (linesOfRequest.filter(s => { return s; }).length === 0) {
+        if (linesOfText.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
         }
 
-        logDebug(linesOfRequest);
+        logDebug(linesOfText);
 
-        this.originalRequest = linesOfRequest;
+        this.originalText = linesOfText;
+
+        this.originalRequest = this._parseOutVariableDeclarations();
+
+        if(this.originalRequest.length == 0) { return; }
 
         this.variableName = this._parseVariableName();
 
@@ -69,7 +74,8 @@ export class RequestParser {
         this.requestOptions.data = this._parseBody();
     }
 
-    getRequest(): any {
+    getRequest(): any | undefined {
+        if(this.requestOptions === undefined) { return undefined; }
         return pickBy(this.requestOptions, identity);
     }
 
@@ -97,6 +103,39 @@ export class RequestParser {
         }
 
         return false;
+    }
+
+    private _parseOutVariableDeclarations(): string[] {
+        const keyword = 'const ';
+        let ret: string[] = [];
+
+        let i = 0; 
+        while(i < this.originalText.length && this.originalText[i].trim().match(/const\s([A-Za-z0-9]+)(\s)?=/)) {
+            let line = this.originalText[i];
+            let startIndex = (line.indexOf(keyword) + keyword.length);
+            let nameLength = line.indexOf('=') - startIndex;
+            let varName = line.substr(startIndex, nameLength).trim();
+            let varValueStr = line.substr(line.indexOf('=') + 1).trim();
+
+            try {
+                let varValue = JSON.parse(varValueStr);
+                cache.addToCache(varName, varValue);
+            } catch (e) {
+                cache.addToCache(varName, varValueStr);
+            }
+
+            i++;
+        }
+
+        while(i < this.originalText.length && (!this.originalText[i] || this.originalText[i].length === 0)) {
+            i++;
+        }
+
+        for(i; i < this.originalText.length; i++) {
+            ret.push(this.originalText[i]);
+        }
+
+        return ret;
     }
 
     private _parseVariableName(): string | undefined {

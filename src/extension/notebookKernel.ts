@@ -47,10 +47,6 @@ export class NotebookKernel {
         execution.executionOrder = ++this._executionOrder;
 		execution.start(Date.now());
 
-        cell.document.languageId;
-
-        const startTime = Date.now();
-
         const logger = (d: any, r: any, requestParser: RequestParser) => {
             try {
                 const response = new ResponseParser(d, r, requestParser);
@@ -81,12 +77,20 @@ export class NotebookKernel {
         try {
             parser = new RequestParser(cell.document.getText());
             req = parser.getRequest();
+
+            if(req === undefined) { 
+                execution.end(true, Date.now()); 
+                return; 
+            }
+            
         } catch (err) {
             execution.replaceOutput([
                 new vscode.NotebookCellOutput([
+                    DEBUG_MODE ?
+                    vscode.NotebookCellOutputItem.error(err) :
                     vscode.NotebookCellOutputItem.error({ 
-                        name: err instanceof Error && err.name || 'error', 
-                        message: err instanceof Error && err.message || stringify(err, undefined, 4)})
+                            name: err instanceof Error && err.name || 'error', 
+                            message: err instanceof Error && err.message || stringify(err, undefined, 4)})
                 ])
             ]);
             execution.end(false, Date.now());
