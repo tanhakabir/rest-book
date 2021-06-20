@@ -1,3 +1,4 @@
+import { ResponseParser } from './response';
 import { SECRETS, hasNoSecrets } from './secrets';
 var stringify = require('json-stringify-safe');
 export var variableCache = {};
@@ -33,6 +34,9 @@ export function updateCache(request, response) {
         return;
     }
     variableCache[varName] = response;
+}
+export function addToCache(name, value) {
+    variableCache[name] = value;
 }
 export function attemptToLoadVariable(text) {
     let declaration = _createVariableDeclarationsFromCache();
@@ -70,7 +74,12 @@ function _attemptToLoadVariableInObjectHelper(obj) {
 function _createVariableDeclarationsFromCache() {
     let ret = '';
     for (let varName of Object.keys(variableCache)) {
-        ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
+        if (variableCache[varName] instanceof ResponseParser) {
+            ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
+        }
+        else {
+            ret += `let ${varName} = ${stringify(variableCache[varName])}; `;
+        }
     }
     if (!hasNoSecrets()) {
         ret += `let SECRETS = ${stringify(SECRETS)}; `;

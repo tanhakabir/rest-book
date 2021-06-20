@@ -12,12 +12,16 @@ export class RequestParser {
     constructor(query) {
         var _a;
         this.valuesReplacedBySecrets = [];
-        let linesOfRequest = query.split(EOL);
-        if (linesOfRequest.filter(s => { return s; }).length === 0) {
+        let linesOfText = query.split(EOL);
+        if (linesOfText.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
         }
-        logDebug(linesOfRequest);
-        this.originalRequest = linesOfRequest;
+        logDebug(linesOfText);
+        this.originalText = linesOfText;
+        this.originalRequest = this._parseOutVariableDeclarations();
+        if (this.originalRequest.length == 0) {
+            return;
+        }
         this.variableName = this._parseVariableName();
         this.requestOptions = {
             method: this._parseMethod(),
@@ -31,6 +35,9 @@ export class RequestParser {
         this.requestOptions.data = this._parseBody();
     }
     getRequest() {
+        if (this.requestOptions === undefined) {
+            return undefined;
+        }
         return pickBy(this.requestOptions, identity);
     }
     getBaseUrl() {
@@ -55,6 +62,33 @@ export class RequestParser {
             }
         }
         return false;
+    }
+    _parseOutVariableDeclarations() {
+        const keyword = 'const ';
+        let ret = [];
+        let i = 0;
+        while (i < this.originalText.length && this.originalText[i].trim().match(/const\s([A-Za-z0-9]+)(\s)?=/)) {
+            let line = this.originalText[i];
+            let startIndex = (line.indexOf(keyword) + keyword.length);
+            let nameLength = line.indexOf('=') - startIndex;
+            let varName = line.substr(startIndex, nameLength).trim();
+            let varValueStr = line.substr(line.indexOf('=') + 1).trim();
+            try {
+                let varValue = JSON.parse(varValueStr);
+                cache.addToCache(varName, varValue);
+            }
+            catch (e) {
+                cache.addToCache(varName, varValueStr);
+            }
+            i++;
+        }
+        while (!this.originalText[i] || this.originalText[i].length === 0) {
+            i++;
+        }
+        for (i; i < this.originalText.length; i++) {
+            ret.push(this.originalText[i]);
+        }
+        return ret;
     }
     _parseVariableName() {
         let firstLine = this.originalRequest[0].trimLeft();

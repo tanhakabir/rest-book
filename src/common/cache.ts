@@ -3,7 +3,7 @@ import { RequestParser } from './request';
 import { SECRETS, hasNoSecrets } from './secrets';
 var stringify = require('json-stringify-safe');
 
-export var variableCache: { [key: string]: ResponseParser } = {};
+export var variableCache: { [key: string]: ResponseParser | any } = {};
 export var baseUrlCache: Set<string> = new Set();
 
 export function getVariableNames(): string[] {
@@ -38,6 +38,10 @@ export function updateCache(request: RequestParser, response: ResponseParser ){
     if(!varName) { return; }
 
     variableCache[varName] = response;
+}
+
+export function addToCache(name: string, value: any) {
+    variableCache[name] = value;
 }
 
 export function attemptToLoadVariable(text: string): any | undefined {
@@ -79,7 +83,12 @@ function _createVariableDeclarationsFromCache(): string {
     let ret = '';
 
     for(let varName of Object.keys(variableCache)) {
-        ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
+        if(variableCache[varName] instanceof ResponseParser) {
+            ret += `let ${varName} = ${stringify(variableCache[varName].renderer())}; `;
+        } else {
+            ret += `let ${varName} = ${stringify(variableCache[varName])}; `;
+        }
+        
     }
 
     if(!hasNoSecrets()) { ret += `let SECRETS = ${stringify(SECRETS)}; `; }
