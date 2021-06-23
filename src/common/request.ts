@@ -190,7 +190,7 @@ export class RequestParser {
         const findAndReplaceVarsInUrl = (url: string) => {
             let tokens = url.split('/');
 
-            for(let i = 1; i < tokens.length; i++) {
+            for(let i = 0; i < tokens.length; i++) {
                 if(!tokens[i].startsWith('$')) { continue; }
 
                 tokens[i] = this._attemptToLoadVariable(tokens[i]);

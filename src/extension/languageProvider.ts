@@ -46,6 +46,14 @@ export class KeywordCompletionItemProvider implements vscode.CompletionItemProvi
                 kind: vscode.CompletionItemKind.Keyword
             });
         }
+
+        ["const", "let"].forEach(str => {
+            result.push({
+                label: str,
+                insertText: `${str} `,
+                kind: vscode.CompletionItemKind.Keyword
+            });
+        })
         
         return result;
     }
