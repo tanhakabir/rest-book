@@ -3,8 +3,19 @@ import { ActivationFunction } from 'vscode-notebook-renderer';
 import { Response } from './renderer';
 import './style.css';
 
-export const activate: ActivationFunction = () => ({
+export const activate: ActivationFunction = (context) => ({
 	renderOutputItem(data, element) {
+		let saveDataToFile;
+		if(context.postMessage) {
+			saveDataToFile = async (response: any) => {
+				console.log("meesage!");
+				context.postMessage!({
+					command: 'save-response',
+					data: response
+				});
+			};
+		}
+
 		try {
 			render(<Response response={data.json()} saveResponse={saveDataToFile}/>, element);
 		} catch {
@@ -12,11 +23,3 @@ export const activate: ActivationFunction = () => ({
 		}
 	}
 });
-
-const saveDataToFile = async (_data: any) => {
-	console.log("SAVE");
-	// api.postMessage({
-	// 	command: 'save-response',
-	// 	data: data
-	// });
-};

@@ -7,12 +7,13 @@ import { ResponseRendererElements } from '../common/response';
 import * as Save from 'vscode-codicons/src/icons/save.svg';
 import * as Search from 'vscode-codicons/src/icons/search.svg';
 
-export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse: (d: any) => void }> = ({ response }) => {
+export const Response: FunctionComponent<{ response: Readonly<ResponseRendererElements>, saveResponse?: (d: any) => void }> = ({ response, saveResponse }) => {
     const [activeIndex, setActive] = useState(0);
     const [searchKeyword, setSearchKeyword] = useState('');
     const uuid = uuidv4();
     const searchBarId = `search-bar-${uuid}`;
     const searchButtonId = `search-button-${uuid}`;
+    const showSaveButton = saveResponse !== undefined;
 
     let darkMode = document.body.getAttribute('data-vscode-theme-kind')?.includes('dark') ?? false;
 
@@ -32,7 +33,7 @@ export const Response: FunctionComponent<{ response: Readonly<ResponseRendererEl
             <span class='tab-bar-tools'>
                 <input id={searchBarId} placeholder='Search for keyword'></input>
                 <button id={searchButtonId} class='search-button' title='Search for keyword' onClick={() => handleSearchForKeywordClick(setSearchKeyword, searchBarId)}><Icon name={Search}/></button>
-                {/* <button class='save-button' title='Save response' onClick={() => saveResponse(response) }><Icon name={Save}/>Save Response</button> */}
+                {showSaveButton && <button class='save-button' title='Save response' onClick={() => saveResponse!(response) }><Icon name={Save}/>Save Response</button>}
             </span>
         </div>
         <br />

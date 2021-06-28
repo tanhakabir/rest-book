@@ -134,6 +134,5 @@ export function registerLanguageProvider(): vscode.Disposable {
     disposables.push(vscode.languages.registerCompletionItemProvider(selector, new HeaderCompletionItemProvider(), ...HeaderCompletionItemProvider.triggerCharacters));
     disposables.push(vscode.languages.registerCompletionItemProvider(selector, new CacheVariableCompletionItemProvider(), ...CacheVariableCompletionItemProvider.triggerCharacters));
     disposables.push(vscode.languages.registerCompletionItemProvider(selector, new VariableCompletionItemProvider(), ...VariableCompletionItemProvider.triggerCharacters));
-
     return vscode.Disposable.from(...disposables);
 }

@@ -46,6 +46,7 @@
         "id": "rest-book",
         "displayName": "REST Book Renderer",
         "entrypoint": "./dist/renderer.js",
+        "requiresMessaging": "optional",
         "mimeTypes": [
           "x-application/rest-book"
         ]
