@@ -132,10 +132,10 @@ export class NotebookKernel {
         let name;
         const url = data.request?.responseUrl;
         if(url) {
-            let name = url;
+            name = url;
             name = name.replace(/^[A-Za-z0-9]+\./g, '');
             name = name.replace(/\.[A-Za-z0-9]+$/g, '');
-            name = name.replace(/\./g, '-');
+            name = name.replace(/\.\:\//g, '-');
         } else {
             name = 'unknown-url';
         }
