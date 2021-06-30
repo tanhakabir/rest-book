@@ -38,7 +38,8 @@
       {
         "title": "REST Book",
         "description": "Notebook for running REST queries",
-        "command": "rest-book.newNotebook"
+        "command": "rest-book.newNotebook",
+        "category": "notebook"
       }
     ],
     "notebookRenderer": [
