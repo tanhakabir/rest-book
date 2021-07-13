@@ -16,48 +16,6 @@
 
 declare module 'vscode' {
 
-	//#region auth provider: https://github.com/microsoft/vscode/issues/88309
-
-	/**
-	 * An {@link Event} which fires when an {@link AuthenticationProvider} is added or removed.
-	 */
-	export interface AuthenticationProvidersChangeEvent {
-		/**
-		 * The ids of the {@link AuthenticationProvider}s that have been added.
-		 */
-		readonly added: ReadonlyArray<AuthenticationProviderInformation>;
-
-		/**
-		 * The ids of the {@link AuthenticationProvider}s that have been removed.
-		 */
-		readonly removed: ReadonlyArray<AuthenticationProviderInformation>;
-	}
-
-	export namespace authentication {
-		/**
-		 * @deprecated - getSession should now trigger extension activation.
-		 * Fires with the provider id that was registered or unregistered.
-		 */
-		export const onDidChangeAuthenticationProviders: Event<AuthenticationProvidersChangeEvent>;
-
-		/**
-		 * @deprecated
-		 * An array of the information of authentication providers that are currently registered.
-		 */
-		export const providers: ReadonlyArray<AuthenticationProviderInformation>;
-
-		/**
-		 * @deprecated
-		 * Logout of a specific session.
-		 * @param providerId The id of the provider to use
-		 * @param sessionId The session id to remove
-		 * provider
-		 */
-		export function logout(providerId: string, sessionId: string): Thenable<void>;
-	}
-
-	//#endregion
-
 	// eslint-disable-next-line vscode-dts-region-comments
 	//#region @alexdima - resolvers
 
@@ -721,6 +679,24 @@ declare module 'vscode' {
 		 * @return Disposable which unregisters this command on disposal.
 		 */
 		export function registerDiffInformationCommand(command: string, callback: (diff: LineChange[], ...args: any[]) => any, thisArg?: any): Disposable;
+	}
+
+	//#endregion
+
+	// eslint-disable-next-line vscode-dts-region-comments
+	//#region @weinand: new debug session option 'managedByParent' (see https://github.com/microsoft/vscode/issues/128058)
+
+	/**
+	 * Options for {@link debug.startDebugging starting a debug session}.
+	 */
+	export interface DebugSessionOptions {
+
+		/**
+		 * Controls whether lifecycle requests like 'restart' are sent to the newly created session or its parent session.
+		 * By default (if the property is false or missing), lifecycle requests are sent to the new session.
+		 * This property is ignored if the session has no parent session.
+		 */
+		lifecycleManagedByParent?: boolean;
 	}
 
 	//#endregion
@@ -2479,69 +2455,6 @@ declare module 'vscode' {
 
 	//#endregion
 
-	//#region @joaomoreno https://github.com/microsoft/vscode/issues/124263
-	// This API change only affects behavior and documentation, not API surface.
-
-	namespace env {
-
-		/**
-		 * Resolves a uri to form that is accessible externally.
-		 *
-		 * #### `http:` or `https:` scheme
-		 *
-		 * Resolves an *external* uri, such as a `http:` or `https:` link, from where the extension is running to a
-		 * uri to the same resource on the client machine.
-		 *
-		 * This is a no-op if the extension is running on the client machine.
-		 *
-		 * If the extension is running remotely, this function automatically establishes a port forwarding tunnel
-		 * from the local machine to `target` on the remote and returns a local uri to the tunnel. The lifetime of
-		 * the port forwarding tunnel is managed by the editor and the tunnel can be closed by the user.
-		 *
-		 * *Note* that uris passed through `openExternal` are automatically resolved and you should not call `asExternalUri` on them.
-		 *
-		 * #### `vscode.env.uriScheme`
-		 *
-		 * Creates a uri that - if opened in a browser (e.g. via `openExternal`) - will result in a registered {@link UriHandler}
-		 * to trigger.
-		 *
-		 * Extensions should not make any assumptions about the resulting uri and should not alter it in anyway.
-		 * Rather, extensions can e.g. use this uri in an authentication flow, by adding the uri as callback query
-		 * argument to the server to authenticate to.
-		 *
-		 * *Note* that if the server decides to add additional query parameters to the uri (e.g. a token or secret), it
-		 * will appear in the uri that is passed to the {@link UriHandler}.
-		 *
-		 * **Example** of an authentication flow:
-		 * ```typescript
-		 * vscode.window.registerUriHandler({
-		 *   handleUri(uri: vscode.Uri): vscode.ProviderResult<void> {
-		 *     if (uri.path === '/did-authenticate') {
-		 *       console.log(uri.toString());
-		 *     }
-		 *   }
-		 * });
-		 *
-		 * const callableUri = await vscode.env.asExternalUri(vscode.Uri.parse(`${vscode.env.uriScheme}://my.extension/did-authenticate`));
-		 * await vscode.env.openExternal(callableUri);
-		 * ```
-		 *
-		 * *Note* that extensions should not cache the result of `asExternalUri` as the resolved uri may become invalid due to
-		 * a system or user action — for example, in remote cases, a user may close a port forwarding tunnel that was opened by
-		 * `asExternalUri`.
-		 *
-		 * #### Any other scheme
-		 *
-		 * Any other scheme will be handled as if the provided URI is a workspace URI. In that case, the method will return
-		 * a URI which, when handled, will make the editor open the workspace.
-		 *
-		 * @return A uri that can be used on the client machine.
-		 */
-		export function asExternalUri(target: Uri): Thenable<Uri>;
-	}
-
-	//#endregion
-
 	//#region https://github.com/Microsoft/vscode/issues/15178
 
 	// TODO@API must be a class
@@ -2779,31 +2692,6 @@ declare module 'vscode' {
 		 * *Note:* This value might be a bitmask, e.g. `FilePermission.Readonly | FilePermission.Other`.
 		 */
 		permissions?: FilePermission;
-	}
-
-	//#endregion
-
-	//#region https://github.com/microsoft/vscode/issues/87110 @eamodio
-
-	export interface Memento {
-
-		/**
-		 * The stored keys.
-		 */
-		readonly keys: readonly string[];
-	}
-
-	//#endregion
-
-	//#region https://github.com/microsoft/vscode/issues/126258 @aeschli
-
-	export interface StatusBarItem {
-
-		/**
-		 * Will be merged into StatusBarItem#tooltip
-		 */
-		tooltip2: string | MarkdownString | undefined;
-
 	}
 
 	//#endregion
