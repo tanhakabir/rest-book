@@ -238,6 +238,7 @@ export class RequestParser {
             if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`); }
 
             params[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
+            params[parts[0]] = params[parts[0]].replace(/%20/g, '+');
         }
 
         return params;
