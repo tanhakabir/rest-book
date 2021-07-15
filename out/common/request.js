@@ -130,7 +130,7 @@ export class RequestParser {
         return Method[tokens[0].toLowerCase()];
     }
     _parseBaseUrl() {
-        const tokens = this._stripVariableDeclaration().split(/[\s]+/);
+        const tokens = this._stripVariableDeclaration().split(/(?<=^\S+)\s/);
         if (tokens.length === 0) {
             throw new Error('Invalid request!');
         }
@@ -178,6 +178,7 @@ export class RequestParser {
                 throw new Error(`Invalid query paramter for ${p}`);
             }
             params[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
+            params[parts[0]] = params[parts[0]].replace(/%20/g, '+');
         }
         return params;
     }
