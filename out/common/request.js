@@ -29,8 +29,11 @@ export class RequestParser {
             timeout: 10000
         };
         this.requestOptions.params = this._parseQueryParams();
+        let defaultHeaders = {};
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let defaultHeaders = { "User-Agent": NAME };
+        if (process.env.NODE_ENV) {
+            defaultHeaders = { "User-Agent": NAME };
+        }
         this.requestOptions.headers = (_a = this._parseHeaders()) !== null && _a !== void 0 ? _a : defaultHeaders;
         this.requestOptions.data = this._parseBody();
     }
@@ -201,6 +204,9 @@ export class RequestParser {
             let parts = h.split(/(:\s+)/).filter(s => { return !s.match(/(:\s+)/); });
             if (parts.length !== 2) {
                 throw new Error(`Invalid header ${h}`);
+            }
+            if (parts[0] === 'User-Agent' && !process.env.NODE_ENV) {
+                continue;
             }
             headers[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
             i++;

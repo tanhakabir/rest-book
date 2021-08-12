@@ -24,6 +24,12 @@ const config = {
 					"path": require.resolve("path-browserify"),
 					"fs": false }
 	},
+	plugins: [
+		new webpack.DefinePlugin({
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+		})
+	],
 	module: {
 		rules: [
 			{
@@ -69,7 +75,7 @@ const webConfig = {
 	plugins: [
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
-		}),
+		})
 	],
 };
 
