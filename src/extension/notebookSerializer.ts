@@ -1,4 +1,3 @@
-import { TextDecoder, TextEncoder } from "util";
 import * as vscode from 'vscode';
 const stringify = require('json-stringify-safe');
 
@@ -97,4 +96,14 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
         // Give a string of all the data to save and VS Code will handle the rest 
 		return new TextEncoder().encode(stringify(contents));
     }    
+}
+
+
+// NEEDED Declaration to silence errors
+declare class TextDecoder {
+	decode(data: Uint8Array): string;
+}
+
+declare class TextEncoder {
+	encode(data: string): Uint8Array;
 }

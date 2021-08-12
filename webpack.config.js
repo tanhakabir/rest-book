@@ -8,6 +8,7 @@
 'use strict';
 
 const path = require('path');
+const webpack = require('webpack');
 
 /**@type {import('webpack').Configuration}*/
 const config = {
@@ -21,7 +22,6 @@ const config = {
         fallback: { "url": require.resolve("url/"),
                     "os": require.resolve("os-browserify/browser"),
 					"path": require.resolve("path-browserify"),
-					"util": require.resolve("util/"),
 					"fs": false }
 	},
 	module: {
@@ -65,7 +65,12 @@ const webConfig = {
 		filename: 'extension-web.js',
 		libraryTarget: "commonjs2",
 		devtoolModuleFilenameTemplate: "../[resource-path]",
-	}
+	},
+	plugins: [
+		new webpack.ProvidePlugin({
+			process: 'process/browser',
+		}),
+	],
 };
 
 const rendererConfig = {
