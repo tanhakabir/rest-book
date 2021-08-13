@@ -2,7 +2,7 @@
   "name": "rest-book",
   "displayName": "REST Book",
   "description": "Notebook for running REST queries.",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "publisher": "tanhakabir",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
