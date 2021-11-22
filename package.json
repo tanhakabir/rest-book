@@ -2,12 +2,14 @@
   "name": "rest-book",
   "displayName": "REST Book",
   "description": "Notebook for running REST queries.",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "publisher": "tanhakabir",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
   },
-  "enableProposedApi": true,
+  "enabledApiProposals": [
+    "notebookEditor"
+  ],
   "engines": {
     "vscode": "^1.59.0"
   },
@@ -131,7 +133,7 @@
     "url": "^0.11.0",
     "util": "^0.12.3",
     "vscode-codicons": "0.0.14",
-    "vscode-dts": "^0.3.1",
+    "vscode-dts": "^0.3.2",
     "vscode-test": "^1.5.1",
     "webpack": "^5.26.3",
     "webpack-cli": "^4.5.0"
