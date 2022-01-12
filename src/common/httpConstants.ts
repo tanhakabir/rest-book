@@ -1,4 +1,4 @@
-// following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
+// following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html and https://datatracker.ietf.org/doc/html/rfc5789#section-2
 export enum Method {
     options = "OPTIONS",
     get = "GET",
@@ -7,7 +7,8 @@ export enum Method {
     put = "PUT",
     delete = "DELETE",
     trace = "TRACE",
-    connect = "CONNECT"
+    connect = "CONNECT",
+    patch = "PATCH"
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers

@@ -23,7 +23,7 @@
     "repository": {
         "constant": {
             "name": "support.function",
-            "match": "\\b(OPTIONS|GET|HEAD|POST|PUT|DELETE|TRACE|CONNECT)\\b"
+            "match": "\\b(OPTIONS|GET|HEAD|POST|PUT|DELETE|TRACE|CONNECT|PATCH)\\b"
         },
         "headerkey": {
             "name": "keyword.other",
