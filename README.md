@@ -10,13 +10,27 @@ REST Book is a Visual Studio Code extension that allows you to perform REST call
 - Organize multiple REST Calls within one file.
 - Intermingle markdown for documenting your calls.
 - View rich HTML and image responses directly inside the Notebook.
-- Basic Authentication
-- Use data from one call in the next
+- Optionally use the Interactive Window interface.
+- Basic Authentication.
+- Use data from one call in the next.
 - Save API keys and other sensitive information outside of the Notebook to use securely in calls.
 
 ## Requirements
 
-Must be using the latest version of Visual Studio Code Insiders edition.
+This extension uses [proposed API](https://code.visualstudio.com/api/advanced-topics/using-proposed-api#sharing-extensions-using-the-proposed-api) so you must be using the latest version of Visual Studio Code Insiders edition.
+
+Either launch it from the command line:
+```
+code-insiders . --enable-proposed-api=tanhakabir.rest-book
+```
+
+or use the `Preferences: Configure Runtime Arguments` to add this extension's ID to the `enable-proposed-api` array, then relaunch:
+```json
+{
+    ...
+    "enable-proposed-api": ["tanhakabir.rest-book"]
+}
+```
 
 ## Usage
 
@@ -27,6 +41,12 @@ You can also use the command: `REST Book: Create a new blank REST Notebook`.
 1. Add a code cell by hovering over the middle of the Notebook and clicking the `+ Code`
 1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
 ![Making a call to my Express Server](docs/images/make-call.gif)
+
+To use the Interactive Window interface:
+1. Run the command: `REST Book: Create an Interactive Window`
+1. Enter your line(s) into the input feild at the bottom of the window.
+1. Click the adjacent button to run them.
+1. Repeat.
 
 ### Changing output view to rich rendered HTML or rich JSON view
 

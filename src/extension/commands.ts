@@ -263,7 +263,7 @@ async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, 
 	}
 }
 
-export function registerCommands(): vscode.Disposable {
+export function registerCommands(extensionId: string): vscode.Disposable {
     const subscriptions: vscode.Disposable[] = [];
 
     subscriptions.push(vscode.commands.registerCommand('rest-book.secrets', () => {
@@ -276,6 +276,15 @@ export function registerCommands(): vscode.Disposable {
 				new vscode.NotebookCellData(vscode.NotebookCellKind.Code, '', 'rest-book')
 			]));
 		vscode.window.showNotebookDocument(newNotebook);
+	}));
+
+	subscriptions.push(vscode.commands.registerCommand('rest-book.newInteractive', async () => {
+		const result: { inputUri: vscode.Uri, notebookUri?: vscode.Uri, notebookEditor?: vscode.NotebookEditor } | undefined = await vscode.commands.executeCommand('interactive.open',
+			undefined,
+			undefined,
+			`${extensionId}/rest-book-interactive-kernel`,
+			undefined
+		);
 	}));
 
     return vscode.Disposable.from(...subscriptions);

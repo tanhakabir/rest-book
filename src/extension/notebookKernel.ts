@@ -10,15 +10,19 @@ const axios = require('axios').default;
 var stringify = require('json-stringify-safe');
 
 export class NotebookKernel {
-    readonly id = 'rest-book-kernel';
-    readonly notebookType = 'rest-book';
-    readonly label = 'REST Book';
+    readonly id: string = 'rest-book-kernel';
+    readonly notebookType: string = 'rest-book';
+    readonly label: string = 'REST Book';
     readonly supportedLanguages = ['rest-book'];
 
     private readonly _controller: vscode.NotebookController;
 	private _executionOrder = 0;
 
-	constructor() {
+	constructor(isInteractive?: boolean) {
+        if (isInteractive) {
+            this.id = 'rest-book-interactive-kernel';
+            this.notebookType = 'interactive';
+        }
         this._controller = vscode.notebooks.createNotebookController(this.id, 
                                                                     this.notebookType, 
                                                                     this.label);

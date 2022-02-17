@@ -1,11 +1,11 @@
 export declare class NotebookKernel {
-    readonly id = "rest-book-kernel";
-    readonly notebookType = "rest-book";
-    readonly label = "REST Book";
+    readonly id: string;
+    readonly notebookType: string;
+    readonly label: string;
     readonly supportedLanguages: string[];
     private readonly _controller;
     private _executionOrder;
-    constructor();
+    constructor(isInteractive?: boolean);
     dispose(): void;
     private _executeAll;
     private _doExecution;
