@@ -6,7 +6,8 @@ export declare enum Method {
     put = "PUT",
     delete = "DELETE",
     trace = "TRACE",
-    connect = "CONNECT"
+    connect = "CONNECT",
+    patch = "PATCH"
 }
 export declare enum RequestHeaderField {
     wwwAuthentication = "WWW-Authenticate",
