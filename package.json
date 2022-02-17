@@ -36,11 +36,13 @@
       {
         "command": "rest-book.newInteractive",
         "title": "Create an Interactive Window",
+        "shortTitle": "Interactive REST Window",
         "category": "REST Book"
       },
       {
         "command": "rest-book.newNotebook",
         "title": "Create a new blank REST Notebook",
+        "shortTitle": "REST Notebook",
         "category": "REST Book"
       }
     ],
