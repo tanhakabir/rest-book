@@ -44,7 +44,7 @@ You can also use the command: `REST Book: Create a new blank REST Notebook`.
 
 To use the Interactive Window interface:
 1. Run the command: `REST Book: Create an Interactive Window`
-1. Enter your line(s) into the input feild at the bottom of the window.
+1. Enter your line(s) into the input field at the bottom of the window.
 1. Click the adjacent button to run them.
 1. Repeat.
 
