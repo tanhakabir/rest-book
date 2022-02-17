@@ -17,20 +17,7 @@ REST Book is a Visual Studio Code extension that allows you to perform REST call
 
 ## Requirements
 
-This extension uses [proposed API](https://code.visualstudio.com/api/advanced-topics/using-proposed-api#sharing-extensions-using-the-proposed-api) so you must be using the latest version of Visual Studio Code Insiders edition.
-
-Either launch it from the command line:
-```
-code-insiders . --enable-proposed-api=tanhakabir.rest-book
-```
-
-or use the `Preferences: Configure Runtime Arguments` to add this extension's ID to the `enable-proposed-api` array, then relaunch:
-```json
-{
-    ...
-    "enable-proposed-api": ["tanhakabir.rest-book"]
-}
-```
+Must be using the latest version of Visual Studio Code Insiders edition.
 
 ## Usage
 
