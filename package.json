@@ -2,7 +2,7 @@
   "name": "rest-book",
   "displayName": "REST Book",
   "description": "Notebook for running REST queries.",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "publisher": "tanhakabir",
   "repository": {
     "url": "https://github.com/tanhakabir/rest-book"
@@ -11,7 +11,7 @@
     "notebookEditor"
   ],
   "engines": {
-    "vscode": "^1.59.0"
+    "vscode": "^1.63.0"
   },
   "categories": [
     "Notebooks"
