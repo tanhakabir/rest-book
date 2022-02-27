@@ -4,8 +4,8 @@ All notable changes to the REST Book extension will be documented in this file.
 
 ## Feb 26, 2022
 
-- Add Interactive Window support
-- Add option to create Interactive Window and Notebook editors from "New File..." in the Welcome page
+- Add Interactive Window support. Thanks @gjsjohnmurray!
+- Add option to create Interactive Window and Notebook editors from "New File..." in the Welcome page. Thanks @gjsjohnmurray!
 - Updated to latest Notebook API
 
 ## May 27, 2021
