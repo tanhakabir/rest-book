@@ -1,4 +1,4 @@
-// following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html
+// following guidance from https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html and https://datatracker.ietf.org/doc/html/rfc5789#section-2
 export var Method;
 (function (Method) {
     Method["options"] = "OPTIONS";
@@ -9,6 +9,7 @@ export var Method;
     Method["delete"] = "DELETE";
     Method["trace"] = "TRACE";
     Method["connect"] = "CONNECT";
+    Method["patch"] = "PATCH";
 })(Method || (Method = {}));
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers
 export var RequestHeaderField;
