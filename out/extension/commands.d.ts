@@ -1,2 +1,2 @@
 import * as vscode from 'vscode';
-export declare function registerCommands(): vscode.Disposable;
+export declare function registerCommands(extensionId: string): vscode.Disposable;

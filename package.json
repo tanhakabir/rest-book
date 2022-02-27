@@ -19,30 +19,45 @@
   "icon": "rest-book.png",
   "activationEvents": [
     "onNotebook:rest-book",
+    "onNotebook:interactive",
     "onLanguage:rest-book",
     "onCommand:rest-book.secrets",
+    "onCommand:rest-book.newInteractive",
     "onCommand:rest-book.newNotebook"
   ],
   "main": "./dist/extension-node.js",
   "contributes": {
     "commands": [
       {
-        "title": "REST Book: Secrets",
-        "command": "rest-book.secrets"
+        "command": "rest-book.secrets",
+        "title": "Secrets",
+        "category": "REST Book"
       },
       {
-        "title": "REST Book: Create a new blank REST Notebook",
-        "command": "rest-book.newNotebook"
-      }
-    ],
-    "startEntries": [
+        "command": "rest-book.newInteractive",
+        "title": "Create an Interactive Window",
+        "shortTitle": "Interactive REST Window",
+        "category": "REST Book"
+      },
       {
-        "title": "REST Book",
-        "description": "Notebook for running REST queries",
         "command": "rest-book.newNotebook",
-        "category": "notebook"
+        "title": "Create a new blank REST Notebook",
+        "shortTitle": "REST Notebook",
+        "category": "REST Book"
       }
     ],
+    "menus": {
+      "file/newFile": [
+        {
+          "command": "rest-book.newInteractive",
+          "group": "notebook"
+        },
+        {
+          "command": "rest-book.newNotebook",
+          "group": "notebook"
+        }
+      ]
+    },
     "notebookRenderer": [
       {
         "id": "rest-book",

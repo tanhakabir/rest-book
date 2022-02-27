@@ -16,7 +16,11 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('rest-book is now active!');
 	
+	// Regular kernel
 	context.subscriptions.push(new NotebookKernel());
+	// Kernel for interactive window
+	context.subscriptions.push(new NotebookKernel(true));
+
 	context.subscriptions.push(vscode.workspace.registerNotebookSerializer('rest-book', new NotebookSerializer(), {
 		transientOutputs: false,
 		transientCellMetadata: {
@@ -26,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
 	}));
 
 	context.subscriptions.push(registerLanguageProvider());
-	context.subscriptions.push(registerCommands());
+	context.subscriptions.push(registerCommands(context.extension.id));
 
 	initializeSecretsRegistry(context);
 }
