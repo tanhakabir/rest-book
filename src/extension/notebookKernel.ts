@@ -51,7 +51,7 @@ export class NotebookKernel {
 
                 execution.replaceOutput([new vscode.NotebookCellOutput([
                     vscode.NotebookCellOutputItem.json(response.renderer(), MIME_TYPE),
-                    vscode.NotebookCellOutputItem.json(response.json()),
+                    vscode.NotebookCellOutputItem.json(response.json(), 'text/x-json'),
                     vscode.NotebookCellOutputItem.text(response.html(), 'text/html')
                 ])]);
 
