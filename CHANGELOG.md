@@ -1,6 +1,6 @@
 # Change Log
 
-All notable changes to the REST Book extension will be documented in this file.
+All notable changes to the ML feed extension will be documented in this file.
 
 ## Feb 26, 2022
 

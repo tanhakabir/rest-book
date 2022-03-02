@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 var stringify = require('json-stringify-safe');
 
-const SECRETS_KEY = 'rest-book-secrets';
+const SECRETS_KEY = 'ml-feed-secrets';
 var extContext: vscode.ExtensionContext;
 export var SECRETS: { [key: string]: string} = {};
 

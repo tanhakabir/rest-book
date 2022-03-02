@@ -1,7 +1,7 @@
 export const DEBUG_MODE = false;
 
-export const NAME = 'rest-book';
-export const MIME_TYPE = 'x-application/rest-book';
+export const NAME = 'ml-feed';
+export const MIME_TYPE = 'x-application/ml-feed';
 
 
 export function formatURL(url: string): string {

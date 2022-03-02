@@ -1,11 +1,11 @@
 {
-  "name": "rest-book",
-  "displayName": "REST Book",
+  "name": "ml-feed",
+  "displayName": "ML feed",
   "description": "Notebook for running REST queries.",
   "version": "6.0.1",
-  "publisher": "tanhakabir",
+  "publisher": "sajedjalil",
   "repository": {
-    "url": "https://github.com/tanhakabir/rest-book"
+    "url": "https://github.com/sajedjalil/ml-feed"
   },
   "enabledApiProposals": [
     "notebookEditor"
@@ -16,87 +16,87 @@
   "categories": [
     "Notebooks"
   ],
-  "icon": "rest-book.png",
+  "icon": "ml-feed.png",
   "activationEvents": [
-    "onNotebook:rest-book",
+    "onNotebook:ml-feed",
     "onNotebook:interactive",
-    "onLanguage:rest-book",
-    "onCommand:rest-book.secrets",
-    "onCommand:rest-book.newInteractive",
-    "onCommand:rest-book.newNotebook"
+    "onLanguage:ml-feed",
+    "onCommand:ml-feed.secrets",
+    "onCommand:ml-feed.newInteractive",
+    "onCommand:ml-feed.newNotebook"
   ],
   "main": "./dist/extension-node.js",
   "contributes": {
     "commands": [
       {
-        "command": "rest-book.secrets",
+        "command": "ml-feed.secrets",
         "title": "Secrets",
-        "category": "REST Book"
+        "category": "ML feed"
       },
       {
-        "command": "rest-book.newInteractive",
+        "command": "ml-feed.newInteractive",
         "title": "Create an Interactive Window",
         "shortTitle": "Interactive REST Window",
-        "category": "REST Book"
+        "category": "ML feed"
       },
       {
-        "command": "rest-book.newNotebook",
+        "command": "ml-feed.newNotebook",
         "title": "Create a new blank REST Notebook",
         "shortTitle": "REST Notebook",
-        "category": "REST Book"
+        "category": "ML feed"
       }
     ],
     "menus": {
       "file/newFile": [
         {
-          "command": "rest-book.newInteractive",
+          "command": "ml-feed.newInteractive",
           "group": "notebook"
         },
         {
-          "command": "rest-book.newNotebook",
+          "command": "ml-feed.newNotebook",
           "group": "notebook"
         }
       ]
     },
     "notebookRenderer": [
       {
-        "id": "rest-book",
-        "displayName": "REST Book Renderer",
+        "id": "ml-feed",
+        "displayName": "ML feed Renderer",
         "entrypoint": "./dist/renderer.js",
         "requiresMessaging": "optional",
         "mimeTypes": [
-          "x-application/rest-book"
+          "x-application/ml-feed"
         ]
       }
     ],
     "notebooks": [
       {
-        "id": "rest-book",
-        "type": "rest-book",
-        "displayName": "REST Book",
+        "id": "ml-feed",
+        "type": "ml-feed",
+        "displayName": "ML feed",
         "selector": [
           {
-            "filenamePattern": "*.restbook"
+            "filenamePattern": "*.mlfeed"
           }
         ]
       }
     ],
     "languages": [
       {
-        "id": "rest-book",
+        "id": "ml-feed",
         "aliases": [
-          "REST Book"
+          "ML feed"
         ],
         "filenamePatterns": [
-          "*.rest-book.txt"
+          "*.ml-feed.txt"
         ]
       }
     ],
     "grammars": [
       {
-        "language": "rest-book",
-        "scopeName": "source.rest-book",
-        "path": "./syntaxes/rest-book.tmGrammar.json",
+        "language": "ml-feed",
+        "scopeName": "source.ml-feed",
+        "path": "./syntaxes/ml-feed.tmGrammar.json",
         "embeddedLanguages": {
           "meta.embedded.block.javascript": "javascript",
           "meta.embedded.block.json": "json",
@@ -150,7 +150,7 @@
     "vscode-codicons": "0.0.14",
     "vscode-dts": "^0.3.2",
     "vscode-test": "^1.5.1",
-    "webpack": "^5.26.3",
+    "webpack": "^5.69.1",
     "webpack-cli": "^4.5.0"
   },
   "dependencies": {

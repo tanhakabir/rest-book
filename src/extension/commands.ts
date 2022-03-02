@@ -266,23 +266,23 @@ async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, 
 export function registerCommands(extensionId: string): vscode.Disposable {
     const subscriptions: vscode.Disposable[] = [];
 
-    subscriptions.push(vscode.commands.registerCommand('rest-book.secrets', () => {
+    subscriptions.push(vscode.commands.registerCommand('ml-feed.secrets', () => {
         _useInteractiveSecretPicker(InteractiveSecretPickerState.selectAction, secrets.getNamesOfSecrets());
     }));
 
-	subscriptions.push(vscode.commands.registerCommand('rest-book.newNotebook', async () => {
-		const newNotebook = await vscode.workspace.openNotebookDocument('rest-book', 
+	subscriptions.push(vscode.commands.registerCommand('ml-feed.newNotebook', async () => {
+		const newNotebook = await vscode.workspace.openNotebookDocument('ml-feed', 
 			new vscode.NotebookData([
-				new vscode.NotebookCellData(vscode.NotebookCellKind.Code, '', 'rest-book')
+				new vscode.NotebookCellData(vscode.NotebookCellKind.Code, '', 'ml-feed')
 			]));
 		vscode.window.showNotebookDocument(newNotebook);
 	}));
 
-	subscriptions.push(vscode.commands.registerCommand('rest-book.newInteractive', async () => {
+	subscriptions.push(vscode.commands.registerCommand('ml-feed.newInteractive', async () => {
 		const result: { inputUri: vscode.Uri, notebookUri?: vscode.Uri, notebookEditor?: vscode.NotebookEditor } | undefined = await vscode.commands.executeCommand('interactive.open',
 			undefined,
 			undefined,
-			`${extensionId}/rest-book-interactive-kernel`,
+			`${extensionId}/ml-feed-interactive-kernel`,
 			undefined
 		);
 	}));

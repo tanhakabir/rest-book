@@ -10,24 +10,24 @@ const axios = require('axios').default;
 var stringify = require('json-stringify-safe');
 
 export class NotebookKernel {
-    readonly id: string = 'rest-book-kernel';
-    readonly notebookType: string = 'rest-book';
-    readonly label: string = 'REST Book';
-    readonly supportedLanguages = ['rest-book'];
+    readonly id: string = 'ml-feed-kernel';
+    readonly notebookType: string = 'ml-feed';
+    readonly label: string = 'ML feed';
+    readonly supportedLanguages = ['ml-feed'];
 
     private readonly _controller: vscode.NotebookController;
 	private _executionOrder = 0;
 
 	constructor(isInteractive?: boolean) {
         if (isInteractive) {
-            this.id = 'rest-book-interactive-kernel';
+            this.id = 'ml-feed-interactive-kernel';
             this.notebookType = 'interactive';
         }
         this._controller = vscode.notebooks.createNotebookController(this.id, 
                                                                     this.notebookType, 
                                                                     this.label);
 
-		this._controller.supportedLanguages = ['rest-book'];
+		this._controller.supportedLanguages = ['ml-feed'];
 		this._controller.supportsExecutionOrder = true;
 		this._controller.description = 'A notebook for making REST calls.';
 		this._controller.executeHandler = this._executeAll.bind(this);

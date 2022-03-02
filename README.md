@@ -1,8 +1,8 @@
-# REST Book
+# ML feed
 
-REST Book is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
+ML feed is a Visual Studio Code extension that allows you to perform REST calls in a Notebook interface.
 
-![Example of REST Book notebook that REST calls made to an Express App](docs/images/express-app.png)
+![Example of ML feed notebook that REST calls made to an Express App](docs/images/express-app.png)
 
 ## Features
 
@@ -21,16 +21,16 @@ Must be using the latest version of Visual Studio Code Insiders edition.
 
 ## Usage
 
-1. Create a new file to store your REST Calls with a `.restbook` ending.
+1. Create a new file to store your REST Calls with a `.mlfeed` ending.
 ![New file creation](docs/images/new-file.gif)
-You can also use the command: `REST Book: Create a new blank REST Notebook`.
+You can also use the command: `ML feed: Create a new blank REST Notebook`.
 ![New file command](docs/images/new-file-command.gif)
 1. Add a code cell by hovering over the middle of the Notebook and clicking the `+ Code`
 1. Add your intended URL as the first line of the cell. By default without specifying a method, it will be a GET call.
 ![Making a call to my Express Server](docs/images/make-call.gif)
 
 To use the Interactive Window interface:
-1. Run the command: `REST Book: Create an Interactive Window`
+1. Run the command: `ML feed: Create an Interactive Window`
 1. Enter your line(s) into the input field at the bottom of the window.
 1. Click the adjacent button to run them.
 1. Repeat.
@@ -70,7 +70,7 @@ In the lines following without an empty line will be considered as the Request H
 GET https://www.google.com
     ?query="fun"
     &page=2
-User-Agent: rest-book
+User-Agent: ml-feed
 Content-Type: application/json 
 ```
 
@@ -80,7 +80,7 @@ The last lines after a new line separator is the body of the call. Like the foll
 
 ```javascript
 POST https://www.myapi.com
-User-Agent: rest-book
+User-Agent: ml-feed
 Content-Type: application/json 
 
 {
@@ -93,7 +93,7 @@ Or you can load the body from another file like so:
 
 ```javascript
 POST https://www.myapi.com
-User-Agent: rest-book
+User-Agent: ml-feed
 Content-Type: application/json 
 
 ./body.txt
@@ -114,7 +114,7 @@ And then in future cells you can reference `foo` in your calls with a `$` sign. 
 
 If you'd like to use secret information in your calls like API keys but you don't want to use and save the raw text of these keys in the REST Notebooks, you can use secrets to save and access API keys.
 
-To save secrets, look for the command `REST Book: Secrets` in the command palette with Cmd+Shift+P (MacOS) or Ctrl+Shift+P (Windows). Add a new secret and a name for that secret.
+To save secrets, look for the command `ML feed: Secrets` in the command palette with Cmd+Shift+P (MacOS) or Ctrl+Shift+P (Windows). Add a new secret and a name for that secret.
 
 Then when use your secrets in your calls using the `$SECRETS` variable. In this example I'm saving a secret with the name `mySecret` and then accessing this secret to send to my Express server with `$SECRETS.mySecret`. You can see my server received my secret value of "hooray" correctly but the secret text is not visible anywhere in the Notebook.
 
@@ -132,4 +132,4 @@ Unable to save responses. This should be fixed soon in the next few versions of 
 
 ## Any Other issues
 
-Please submit your issue on the [tanhakabir/rest-book](https://github.com/tanhakabir/rest-book) repository with exact reproduction steps.
+Please submit your issue on the [tanhakabir/ml-feed](https://github.com/tanhakabir/ml-feed) repository with exact reproduction steps.

@@ -1,5 +1,5 @@
 {
-    "scopeName": "source.rest-book",
+    "scopeName": "source.ml-feed",
     "patterns":[
         {
             "include": "#constant"
