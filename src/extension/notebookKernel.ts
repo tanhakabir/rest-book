@@ -30,88 +30,38 @@ export class NotebookKernel {
 		this._controller.supportedLanguages = ['ml-feed'];
 		this._controller.supportsExecutionOrder = true;
 		this._controller.description = 'A notebook for making REST calls.';
-		this._controller.executeHandler = this._executeAll.bind(this);
+		this._controller.executeHandler = this._execute.bind(this);
 	}
 
 	dispose(): void {
 		this._controller.dispose();
 	}
 
-    private _executeAll(cells: vscode.NotebookCell[], _notebook: vscode.NotebookDocument, _controller: vscode.NotebookController): void {
+    private _execute(
+        cells: vscode.NotebookCell[],
+        _notebook: vscode.NotebookDocument,
+        _controller: vscode.NotebookController
+      ): void {
         for (let cell of cells) {
-			this._doExecution(cell);
-		}
-	}
-
-    private async _doExecution(cell: vscode.NotebookCell): Promise<void> {
+          this._doExecution(cell);
+        }
+      }
+    
+      private async _doExecution(cell: vscode.NotebookCell): Promise<void> {
         const execution = this._controller.createNotebookCellExecution(cell);
         execution.executionOrder = ++this._executionOrder;
-		execution.start(Date.now());
-
-        const logger = (d: any, r: any, requestParser: RequestParser) => {
-            try {
-                const response = new ResponseParser(d, r, requestParser);
-                updateCache(requestParser, response);
-
-                execution.replaceOutput([new vscode.NotebookCellOutput([
-                    vscode.NotebookCellOutputItem.json(response.renderer(), MIME_TYPE),
-                    vscode.NotebookCellOutputItem.json(response.json(), 'text/x-json'),
-                    vscode.NotebookCellOutputItem.text(response.html(), 'text/html')
-                ])]);
-
-                execution.end(true, Date.now());
-            } catch (e) {
-                execution.replaceOutput([
-                    new vscode.NotebookCellOutput([
-                        vscode.NotebookCellOutputItem.error({ 
-                            name: e instanceof Error && e.name || 'error', 
-                            message: e instanceof Error && e.message || stringify(e, undefined, 4)})
-                    ])
-                ]);
-                execution.end(false, Date.now());
-            }
-        };
-
-        let req;
-        let parser;
-        
-        try {
-            parser = new RequestParser(cell.document.getText());
-            req = parser.getRequest();
-
-            if(req === undefined) { 
-                execution.end(true, Date.now()); 
-                return; 
-            }
-            
-        } catch (err) {
-            execution.replaceOutput([
-                new vscode.NotebookCellOutput([
-                    vscode.NotebookCellOutputItem.error({ 
-                            name: err instanceof Error && err.name || 'error', 
-                            message: err instanceof Error && err.message || stringify(err, undefined, 4)})
-                ])
-            ]);
-            execution.end(false, Date.now());
-            return;
-        }
-
-        try {
-            const cancelTokenAxios = axios.CancelToken.source();
-
-            let options = {...req};
-            options['cancelToken'] = cancelTokenAxios.token;
-
-            execution.token.onCancellationRequested(_ => cancelTokenAxios.cancel());
-
-            let response = await axios(options);
-
-            logger(response, req, parser);
-        } catch (exception) {
-            logger(exception, req, parser);
-        }
-        
-    }
+        execution.start(Date.now()); // Keep track of elapsed time to execute cell.
+    
+        /* Do some execution here; not implemented */
+    
+        execution.replaceOutput([
+          new vscode.NotebookCellOutput([
+            vscode.NotebookCellOutputItem.text( 'abc')
+          ])
+        ]);
+        await this.comby();
+        execution.end(true, Date.now());
+      }
 
     private async _saveDataToFile(data: ResponseRendererElements) {
         const workSpaceDir = path.dirname(vscode.window.activeTextEditor?.document.uri.fsPath ?? '');
@@ -138,4 +88,23 @@ export class NotebookKernel {
             vscode.window.showInformationMessage(e?.message || `Saved response to ${location}`);
         });
     };
+
+
+    private async comby() {
+      var exec = require('child_process').exec;
+      var child;
+      // var command: string = "echo 'these are words 123' | comby -stdin ':[[x]]' ':[[x]].Capitalize' -lang .txt";
+      var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py";
+      child = exec(command,
+         function (error: string | null, stdout: string, stderr: string) {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            if (error !== null) {
+                console.log('exec error: ' + error);
+            }
+        });
+      
+        // console.log(child);
+      //return child;
+    }
 }

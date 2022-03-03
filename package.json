@@ -2,7 +2,7 @@
   "name": "ml-feed",
   "displayName": "ML feed",
   "description": "Notebook for running REST queries.",
-  "version": "6.0.1",
+  "version": "1.0.0",
   "publisher": "sajedjalil",
   "repository": {
     "url": "https://github.com/sajedjalil/ml-feed"
@@ -21,18 +21,12 @@
     "onNotebook:ml-feed",
     "onNotebook:interactive",
     "onLanguage:ml-feed",
-    "onCommand:ml-feed.secrets",
     "onCommand:ml-feed.newInteractive",
     "onCommand:ml-feed.newNotebook"
   ],
   "main": "./dist/extension-node.js",
   "contributes": {
     "commands": [
-      {
-        "command": "ml-feed.secrets",
-        "title": "Secrets",
-        "category": "ML feed"
-      },
       {
         "command": "ml-feed.newInteractive",
         "title": "Create an Interactive Window",
@@ -76,7 +70,7 @@
         "displayName": "ML feed",
         "selector": [
           {
-            "filenamePattern": "*.mlfeed"
+            "filenamePattern": "*.notebook"
           }
         ]
       }

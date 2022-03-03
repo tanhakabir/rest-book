@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 const stringify = require('json-stringify-safe');
+import { TextDecoder, TextEncoder } from 'util';
 
 interface RawNotebookCell {
 	language: string;
@@ -99,11 +100,3 @@ export class NotebookSerializer implements vscode.NotebookSerializer {
 }
 
 
-// NEEDED Declaration to silence errors
-declare class TextDecoder {
-	decode(data: Uint8Array): string;
-}
-
-declare class TextEncoder {
-	encode(data: string): Uint8Array;
-}

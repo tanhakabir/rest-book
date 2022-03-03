@@ -7,7 +7,8 @@ export declare class NotebookKernel {
     private _executionOrder;
     constructor(isInteractive?: boolean);
     dispose(): void;
-    private _executeAll;
+    private _execute;
     private _doExecution;
     private _saveDataToFile;
+    private comby;
 }
