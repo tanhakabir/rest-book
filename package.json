@@ -20,7 +20,11 @@
   "activationEvents": [
     "onNotebook:ml-feed",
     "onNotebook:interactive",
+    "onNotebook:jupyter-notebook",
+    "onNotebook:interactive",
     "onLanguage:ml-feed",
+    "onLanguage:python",
+    "onLanguage:jupyter",
     "onCommand:ml-feed.newInteractive",
     "onCommand:ml-feed.newNotebook"
   ],
@@ -92,12 +96,19 @@
         "scopeName": "source.ml-feed",
         "path": "./syntaxes/ml-feed.tmGrammar.json",
         "embeddedLanguages": {
+          "meta.embedded.block.python": "python",
           "meta.embedded.block.javascript": "javascript",
           "meta.embedded.block.json": "json",
           "meta.embedded.block.html": "html",
           "meta.embedded.block.xml": "xml",
           "meta.embedded.block.css": "css"
         }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "ml-feed",
+        "path": "./snippets/snippets.code-snippets"
       }
     ]
   },
@@ -119,6 +130,7 @@
     "@types/lodash": "^4.14.168",
     "@types/mocha": "^8.2.1",
     "@types/node": "^12.20.10",
+    "@types/shelljs": "^0.8.11",
     "@types/user-home": "^2.0.0",
     "@types/uuid": "^8.3.0",
     "@types/vscode": "^1.59.0",
@@ -135,6 +147,7 @@
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
+    "shelljs": "^0.8.5",
     "style-loader": "^2.0.0",
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^8.0.18",
@@ -145,7 +158,7 @@
     "vscode-dts": "^0.3.2",
     "vscode-test": "^1.5.1",
     "webpack": "^5.69.1",
-    "webpack-cli": "^4.5.0"
+    "webpack-cli": "^4.9.2"
   },
   "dependencies": {
     "-": "0.0.1",

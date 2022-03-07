@@ -7,6 +7,7 @@ import { registerLanguageProvider } from './languageProvider';
 import { logDebug } from '../common/common';
 import { registerCommands } from './commands';
 import { initializeSecretsRegistry } from '../common/secrets';
+import { SelectionRange } from 'vscode';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -28,11 +29,31 @@ export function activate(context: vscode.ExtensionContext) {
 			outputCollapsed: true,
 		}
 	}));
-
-	context.subscriptions.push(registerLanguageProvider());
+	context.subscriptions.push( registerLanguageProvider());
 	context.subscriptions.push(registerCommands(context.extension.id));
 
-	initializeSecretsRegistry(context);
+	// vscode.languages.registerHoverProvider('ml-feed', {
+	// 	provideHover(document, position, token) {
+			
+	// 		console.log(document.lineAt(0));
+	// 		console.log(position);
+	// 	  return {
+	// 		contents: ['Hover Content']
+	// 	  };
+	// 	}
+	//   });
+
+	// initializeSecretsRegistry(context);
+
+	// vscode.languages.registerSelectionRangeProvider('ml-feed', {
+	// 	provideSelectionRanges( document, positions): Promise<SelectionRange[]>  {
+			
+	// 		var v = new SelectionRange( new vscode.Range(positions[0], positions[0]));
+	// 		return v;
+	// 	}
+	// }
+	// );
+	
 }
 
 // this method is called when your extension is deactivated

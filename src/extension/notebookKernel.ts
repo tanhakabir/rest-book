@@ -59,7 +59,7 @@ export class NotebookKernel {
             vscode.NotebookCellOutputItem.text( 'abc')
           ])
         ]);
-        await this.comby();
+        //await this.comby();
         execution.end(true, Date.now());
       }
 
@@ -90,21 +90,5 @@ export class NotebookKernel {
     };
 
 
-    private async comby() {
-      var exec = require('child_process').exec;
-      var child;
-      // var command: string = "echo 'these are words 123' | comby -stdin ':[[x]]' ':[[x]].Capitalize' -lang .txt";
-      var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py";
-      child = exec(command,
-         function (error: string | null, stdout: string, stderr: string) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-                console.log('exec error: ' + error);
-            }
-        });
-      
-        // console.log(child);
-      //return child;
-    }
+    
 }

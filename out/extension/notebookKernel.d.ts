@@ -10,5 +10,4 @@ export declare class NotebookKernel {
     private _execute;
     private _doExecution;
     private _saveDataToFile;
-    private comby;
 }
