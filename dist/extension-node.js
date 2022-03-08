@@ -4453,7 +4453,8 @@ class VariableCompletionItemProvider {
     //     //return result;
     // }
     async provideCompletionItems(document, position, _token, _context) {
-        const val = await this.readFile('abc.txt');
+        //const val = await this.readFile('abc.txt');
+        const val = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
         //console.log(val);
         if (!val) {
             return undefined;
@@ -4472,7 +4473,7 @@ class VariableCompletionItemProvider {
     //     // var exec = require('child_process').exec;
     //     // var child;
     //     // // var command: string = "echo 'these are words 123' | comby -stdin ':[[x]]' ':[[x]].Capitalize' -lang .txt";
-    //     // // var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py";
+    //     var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'";
     //     // child = exec(command,
     //     //    function (error: string | null, stdout: string, stderr: string) {
     //     //     //   console.log('stdout: ' + stdout.substring(0));
@@ -4489,13 +4490,23 @@ class VariableCompletionItemProvider {
     //     //     //console.log(output);
     //     //     //fs.writeFileSync("abc.txt", output);
     //     // });
-    //     fs.readFile('abc.txt', function(err, data) {
-    //         if(err) {throw err;}
-    //         const arr: string[] = data.toString().replace(/\r\n/g,'\n').split('\n');
-    //         console.log(arr);
-    //         return await Promise.resolve(arr);
-    //     });
     // }
+    /**
+     * Executes a shell command and return it as a Promise.
+     * @param cmd {string}
+     * @return {Promise<string>}
+     */
+    async execShellCommand(cmd) {
+        const exec = (__webpack_require__(57).exec);
+        return new Promise((resolve, reject) => {
+            exec(cmd, (error, stdout, stderr) => {
+                if (error) {
+                    console.warn(error);
+                }
+                resolve(stdout ? stdout.toString().replace(/\r\n/g, '\n').split('\n') : stderr);
+            });
+        });
+    }
     async readFile(path) {
         try {
             const data = fs__WEBPACK_IMPORTED_MODULE_1__.readFileSync(path, 'utf-8');
@@ -4546,6 +4557,13 @@ function logDebug(item) {
 
 /***/ }),
 /* 57 */
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
+
+/***/ }),
+/* 58 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4555,7 +4573,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vscode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
 /* harmony import */ var vscode__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vscode__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _common_secrets__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(58);
+/* harmony import */ var _common_secrets__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(59);
 
 
 class SecretItem {
@@ -4795,7 +4813,7 @@ function registerCommands(extensionId) {
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -4947,7 +4965,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _notebookKernel__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2);
 /* harmony import */ var _notebookSerializer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(54);
 /* harmony import */ var _languageProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(55);
-/* harmony import */ var _commands__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(57);
+/* harmony import */ var _commands__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(58);
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 

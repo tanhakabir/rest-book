@@ -152,7 +152,9 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
     // }
 
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem> | null | undefined>{
-        const val = await this.readFile('abc.txt');
+        //const val = await this.readFile('abc.txt');
+
+        const val = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
         //console.log(val);
         if(!val) {return undefined;}
 
@@ -171,7 +173,7 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
     //     // var exec = require('child_process').exec;
     //     // var child;
     //     // // var command: string = "echo 'these are words 123' | comby -stdin ':[[x]]' ':[[x]].Capitalize' -lang .txt";
-    //     // // var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py";
+    //     var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'";
     //     // child = exec(command,
     //     //    function (error: string | null, stdout: string, stderr: string) {
     //     //     //   console.log('stdout: ' + stdout.substring(0));
@@ -190,18 +192,26 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
     //     //     //console.log(output);
     //     //     //fs.writeFileSync("abc.txt", output);
     //     // });
-
-
-    //     fs.readFile('abc.txt', function(err, data) {
-    //         if(err) {throw err;}
-                
-    //         const arr: string[] = data.toString().replace(/\r\n/g,'\n').split('\n');
-    //         console.log(arr);
-    //         return await Promise.resolve(arr);
-    //     });
         
         
     // }
+
+    /**
+     * Executes a shell command and return it as a Promise.
+     * @param cmd {string}
+     * @return {Promise<string>}
+     */
+    private async execShellCommand(cmd: string) {
+        const exec = require('child_process').exec;
+        return new Promise((resolve, reject) => {
+            exec(cmd, (error: any, stdout: string, stderr: unknown) => {
+            if (error) {
+                console.warn(error);
+            }
+                resolve(stdout? stdout.toString().replace(/\r\n/g,'\n').split('\n') : stderr);
+            });
+        });
+   }
 
 
     private async readFile(path: string){
