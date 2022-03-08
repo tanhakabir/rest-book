@@ -10,4 +10,8 @@ export declare class VariableCompletionItemProvider implements vscode.Completion
     private execShellCommand;
     private readFile;
 }
+export declare class VariableHoverItemProvider implements vscode.HoverProvider {
+    provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | null | undefined>;
+    private execShellCommand;
+}
 export declare function registerLanguageProvider(): vscode.Disposable;

@@ -100,56 +100,10 @@ const selector: vscode.DocumentSelector = { language: NAME };
 // }
 
 
+
 export class VariableCompletionItemProvider implements vscode.CompletionItemProvider {
     static readonly triggerCharacters = ['.'];
 
-    // provideCompletionItems(document: vscode.TextDocument, position: vscode.TextDocument, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[]> {
-    //     const result: vscode.CompletionItem[] = [];
-
-    //     let text = document.lineAt(position.line).text.substring(0, position.character);
-    //     let startingIndex =  Math.max(text.lastIndexOf(' '), text.lastIndexOf('='), text.lastIndexOf('/')) + 1;
-    //     let varName = text.substring(startingIndex).trim();
-    //     //await this.comby("echo 'swap(x, y)\nswap(x,y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'" );
-        
-    //     fs.readFile('abc.txt', function(err, data) {
-    //         if(err) {throw err;}
-        
-    //         const arr: string[] = data.toString().replace(/\r\n/g,'\n').split('\n');
-        
-    //         for(let i of arr) {
-    //             console.log(i);
-    //             result.push({
-    //                 label: i,
-    //                 kind: vscode.CompletionItemKind.Variable
-    //             });
-    //         }
-
-    //         return result;
-    //     });
-
-    //     result.push({
-    //         label: "ol",
-    //         kind: vscode.CompletionItemKind.Variable
-    //     });
-        
-    //     // if(matchingData && typeof matchingData === 'object') {
-    //     //     for(let key of Object.keys(matchingData)) {
-    //     //         result.push({
-    //     //             label: key,
-    //     //             kind: vscode.CompletionItemKind.Variable
-    //     //         });
-    //     //     }
-    //     // }
-        
-
-        
-
-    //     // return new Promise(() => {
-    //     //     setTimeout(() => { result; }, 10);
-    //     //   });
-
-    //     //return result;
-    // }
 
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem> | null | undefined>{
         //const val = await this.readFile('abc.txt');
@@ -166,36 +120,20 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
             });
         }
         console.log(val);
+
+
+        result.push({
+            label: "Text: "+document.getText(),
+            kind: vscode.CompletionItemKind.Variable
+        });
+
+        result.push({
+            label: 'Line: '+position.line.toString(),
+            kind: vscode.CompletionItemKind.Variable
+        });
+
         return result;
       }
-
-    // private async comby(command: string): Promise<string[]>{
-    //     // var exec = require('child_process').exec;
-    //     // var child;
-    //     // // var command: string = "echo 'these are words 123' | comby -stdin ':[[x]]' ':[[x]].Capitalize' -lang .txt";
-    //     var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'";
-    //     // child = exec(command,
-    //     //    function (error: string | null, stdout: string, stderr: string) {
-    //     //     //   console.log('stdout: ' + stdout.substring(0));
-    //     //     //   console.log('stdout: ' + stdout);
-    //     //       //console.log('stderr: ' + stderr);
-    //     //       if (error !== null) {
-    //     //           console.log('exec error: ' + error);
-    //     //       }
-
-    //     //       return stdout.substring(0);
-    //     //   });
-        
-    //     // //console.log(child);
-    //     // return Promise.resolve('');
-    //     // var data = await shell.exec(command, {silent:true}, (code: any, output: any) => {
-    //     //     //console.log(output);
-    //     //     //fs.writeFileSync("abc.txt", output);
-    //     // });
-        
-        
-    // }
-
     /**
      * Executes a shell command and return it as a Promise.
      * @param cmd {string}
@@ -203,7 +141,7 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
      */
     private async execShellCommand(cmd: string) {
         const exec = require('child_process').exec;
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             exec(cmd, (error: any, stdout: string, stderr: unknown) => {
             if (error) {
                 console.warn(error);
@@ -227,13 +165,36 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
 }
 
 
+export class VariableHoverItemProvider implements vscode.HoverProvider {
+    async provideHover(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Promise<vscode.Hover | null | undefined> {
+        const val: string[] = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
 
+        console.log(val.toString);
+        return new vscode.Hover({
+            language: "ML Feed",
+            value: val.join('\n')
+        }); 
+    }
+
+    private async execShellCommand(cmd: string): Promise<string[]> {
+        const exec = require('child_process').exec;
+        return new Promise((resolve) => {
+            exec(cmd, (error: any, stdout: string, stderr: string) => {
+            if (error) {
+                console.warn(error);
+            }
+                resolve(stdout? stdout.toString().replace(/\r\n/g,'\n').split('\n') : stderr.toString().replace(/\r\n/g,'\n').split('\n'));
+            });
+        });
+   }
+}
 
   
 export function registerLanguageProvider(): vscode.Disposable {
     const disposables: vscode.Disposable[] = [];
 
     disposables.push(vscode.languages.registerCompletionItemProvider(selector, new VariableCompletionItemProvider(), ...VariableCompletionItemProvider.triggerCharacters));
+    disposables.push(vscode.languages.registerHoverProvider(selector, new VariableHoverItemProvider()));
     return vscode.Disposable.from(...disposables);
 }
 

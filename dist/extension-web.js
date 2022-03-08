@@ -4891,6 +4891,7 @@ if (typeof Object.create === 'function') {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "VariableCompletionItemProvider": () => (/* binding */ VariableCompletionItemProvider),
+/* harmony export */   "VariableHoverItemProvider": () => (/* binding */ VariableHoverItemProvider),
 /* harmony export */   "registerLanguageProvider": () => (/* binding */ registerLanguageProvider)
 /* harmony export */ });
 /* harmony import */ var vscode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1);
@@ -4977,41 +4978,6 @@ const selector = { language: _common_common__WEBPACK_IMPORTED_MODULE_2__.NAME };
 //     }
 // }
 class VariableCompletionItemProvider {
-    // provideCompletionItems(document: vscode.TextDocument, position: vscode.TextDocument, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[]> {
-    //     const result: vscode.CompletionItem[] = [];
-    //     let text = document.lineAt(position.line).text.substring(0, position.character);
-    //     let startingIndex =  Math.max(text.lastIndexOf(' '), text.lastIndexOf('='), text.lastIndexOf('/')) + 1;
-    //     let varName = text.substring(startingIndex).trim();
-    //     //await this.comby("echo 'swap(x, y)\nswap(x,y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'" );
-    //     fs.readFile('abc.txt', function(err, data) {
-    //         if(err) {throw err;}
-    //         const arr: string[] = data.toString().replace(/\r\n/g,'\n').split('\n');
-    //         for(let i of arr) {
-    //             console.log(i);
-    //             result.push({
-    //                 label: i,
-    //                 kind: vscode.CompletionItemKind.Variable
-    //             });
-    //         }
-    //         return result;
-    //     });
-    //     result.push({
-    //         label: "ol",
-    //         kind: vscode.CompletionItemKind.Variable
-    //     });
-    //     // if(matchingData && typeof matchingData === 'object') {
-    //     //     for(let key of Object.keys(matchingData)) {
-    //     //         result.push({
-    //     //             label: key,
-    //     //             kind: vscode.CompletionItemKind.Variable
-    //     //         });
-    //     //     }
-    //     // }
-    //     // return new Promise(() => {
-    //     //     setTimeout(() => { result; }, 10);
-    //     //   });
-    //     //return result;
-    // }
     async provideCompletionItems(document, position, _token, _context) {
         //const val = await this.readFile('abc.txt');
         const val = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
@@ -5027,30 +4993,16 @@ class VariableCompletionItemProvider {
             });
         }
         console.log(val);
+        result.push({
+            label: "Text: " + document.getText(),
+            kind: vscode__WEBPACK_IMPORTED_MODULE_0__.CompletionItemKind.Variable
+        });
+        result.push({
+            label: 'Line: ' + position.line.toString(),
+            kind: vscode__WEBPACK_IMPORTED_MODULE_0__.CompletionItemKind.Variable
+        });
         return result;
     }
-    // private async comby(command: string): Promise<string[]>{
-    //     // var exec = require('child_process').exec;
-    //     // var child;
-    //     // // var command: string = "echo 'these are words 123' | comby -stdin ':[[x]]' ':[[x]].Capitalize' -lang .txt";
-    //     var command = "echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'";
-    //     // child = exec(command,
-    //     //    function (error: string | null, stdout: string, stderr: string) {
-    //     //     //   console.log('stdout: ' + stdout.substring(0));
-    //     //     //   console.log('stdout: ' + stdout);
-    //     //       //console.log('stderr: ' + stderr);
-    //     //       if (error !== null) {
-    //     //           console.log('exec error: ' + error);
-    //     //       }
-    //     //       return stdout.substring(0);
-    //     //   });
-    //     // //console.log(child);
-    //     // return Promise.resolve('');
-    //     // var data = await shell.exec(command, {silent:true}, (code: any, output: any) => {
-    //     //     //console.log(output);
-    //     //     //fs.writeFileSync("abc.txt", output);
-    //     // });
-    // }
     /**
      * Executes a shell command and return it as a Promise.
      * @param cmd {string}
@@ -5058,7 +5010,7 @@ class VariableCompletionItemProvider {
      */
     async execShellCommand(cmd) {
         const exec = Object(function webpackMissingModule() { var e = new Error("Cannot find module 'child_process'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             exec(cmd, (error, stdout, stderr) => {
                 if (error) {
                     console.warn(error);
@@ -5079,9 +5031,31 @@ class VariableCompletionItemProvider {
     }
 }
 VariableCompletionItemProvider.triggerCharacters = ['.'];
+class VariableHoverItemProvider {
+    async provideHover(document, position, token) {
+        const val = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
+        console.log(val.toString);
+        return new vscode__WEBPACK_IMPORTED_MODULE_0__.Hover({
+            language: "ML Feed",
+            value: val.join('\n')
+        });
+    }
+    async execShellCommand(cmd) {
+        const exec = Object(function webpackMissingModule() { var e = new Error("Cannot find module 'child_process'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
+        return new Promise((resolve) => {
+            exec(cmd, (error, stdout, stderr) => {
+                if (error) {
+                    console.warn(error);
+                }
+                resolve(stdout ? stdout.toString().replace(/\r\n/g, '\n').split('\n') : stderr.toString().replace(/\r\n/g, '\n').split('\n'));
+            });
+        });
+    }
+}
 function registerLanguageProvider() {
     const disposables = [];
     disposables.push(vscode__WEBPACK_IMPORTED_MODULE_0__.languages.registerCompletionItemProvider(selector, new VariableCompletionItemProvider(), ...VariableCompletionItemProvider.triggerCharacters));
+    disposables.push(vscode__WEBPACK_IMPORTED_MODULE_0__.languages.registerHoverProvider(selector, new VariableHoverItemProvider()));
     return vscode__WEBPACK_IMPORTED_MODULE_0__.Disposable.from(...disposables);
 }
 
