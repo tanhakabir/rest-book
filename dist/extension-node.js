@@ -4455,7 +4455,7 @@ class VariableCompletionItemProvider {
                 if (error) {
                     console.warn(error);
                 }
-                resolve(stdout ? stdout.toString().replace(/\r\n/g, '\n').split('\n') : stderr);
+                resolve(stdout ? stdout.toString().replace(/\r\n/g, '\n').split('\n') : stderr.toString().replace(/\r\n/g, '\n').split('\n'));
             });
         });
     }

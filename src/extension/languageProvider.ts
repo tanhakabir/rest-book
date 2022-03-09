@@ -108,7 +108,7 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
     async provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, _token: vscode.CancellationToken, _context: vscode.CompletionContext): Promise<vscode.CompletionItem[] | vscode.CompletionList<vscode.CompletionItem> | null | undefined>{
         //const val = await this.readFile('abc.txt');
 
-        const val = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
+        const val: string[] = await this.execShellCommand("echo 'swap(x, y)' | comby -stdin 'swap(:[1], :[2])' 'swap(:[2], :[1])'  .py | sed 's/\x1b\[[0-9;]*m//g'");
         //console.log(val);
         if(!val) {return undefined;}
 
@@ -139,14 +139,14 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
      * @param cmd {string}
      * @return {Promise<string>}
      */
-    private async execShellCommand(cmd: string) {
+    private async execShellCommand(cmd: string): Promise<string[]> {
         const exec = require('child_process').exec;
         return new Promise((resolve) => {
-            exec(cmd, (error: any, stdout: string, stderr: unknown) => {
+            exec(cmd, (error: any, stdout: string, stderr: string) => {
             if (error) {
                 console.warn(error);
             }
-                resolve(stdout? stdout.toString().replace(/\r\n/g,'\n').split('\n') : stderr);
+                resolve(stdout? stdout.toString().replace(/\r\n/g,'\n').split('\n') : stderr.toString().replace(/\r\n/g,'\n').split('\n'));
             });
         });
    }
