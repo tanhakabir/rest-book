@@ -1,5 +1,3 @@
-import * as os from 'os';
-const { EOL } = os;
 import * as fs from 'fs';
 import * as path from 'path';
 var stringify = require('json-stringify-safe');
@@ -9,10 +7,10 @@ import * as vscode from 'vscode';
 import { Method } from './httpConstants';
 import * as cache from './cache';
 export class RequestParser {
-    constructor(query) {
+    constructor(query, eol) {
         var _a;
         this.valuesReplacedBySecrets = [];
-        let linesOfText = query.split(EOL);
+        let linesOfText = query.split((eol == vscode.EndOfLine.LF ? '\n' : '\r\n'));
         if (linesOfText.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
         }

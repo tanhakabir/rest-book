@@ -76,7 +76,7 @@ export class NotebookKernel {
         let parser;
         
         try {
-            parser = new RequestParser(cell.document.getText());
+            parser = new RequestParser(cell.document.getText(), cell.document.eol);
             req = parser.getRequest();
 
             if(req === undefined) { 
