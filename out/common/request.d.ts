@@ -1,3 +1,4 @@
+import * as vscode from 'vscode';
 export interface Request {
     url?: string | undefined;
     method: string;
@@ -26,7 +27,7 @@ export declare class RequestParser {
     private baseUrl?;
     private variableName;
     private valuesReplacedBySecrets;
-    constructor(query: string);
+    constructor(query: string, eol: vscode.EndOfLine);
     getRequest(): any | undefined;
     getBaseUrl(): string | undefined;
     getVariableName(): string | undefined;
