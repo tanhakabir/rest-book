@@ -201,3 +201,5 @@ $RECYCLE.BIN/
 
 vscode.*.d.ts
 vscode.d.ts
+
+out/
