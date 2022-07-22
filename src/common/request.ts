@@ -39,6 +39,8 @@ export class RequestParser {
     private variableName: string | undefined;
     private valuesReplacedBySecrets: string[] = [];
 
+    private readonly _variableMatchExp = /(?:\{\{)(SECRETS:)?([A-Za-z0-9._\-\[\]]*)(?:\}\})/ig;
+
     constructor(query: string, eol: vscode.EndOfLine) {
 
         let linesOfText = query.split((eol == vscode.EndOfLine.LF ? '\n' : '\r\n'));
@@ -192,16 +194,17 @@ export class RequestParser {
         const findAndReplaceVarsInUrl = (url: string) => {
             let tokens = url.split('/');
 
-            for(let i = 0; i < tokens.length; i++) {
-                if(!tokens[i].startsWith('$')) { continue; }
+            for (let i = 0; i < tokens.length; i++) {
+                let currentToken = tokens[i];
 
-                tokens[i] = this._attemptToLoadVariable(tokens[i]);
+                tokens[i] = this._attemptToLoadVariable(currentToken);
             }
 
-            return tokens.join('/');
+            let returnValue = tokens.join('/');
+            return returnValue;
         };
 
-        if(tokens.length === 1) {
+        if (tokens.length === 1) {
             let url = findAndReplaceVarsInUrl(tokens[0].split('?')[0]);
             this.baseUrl = url;
             return formatURL(url);
@@ -327,42 +330,35 @@ export class RequestParser {
     }
 
     private _attemptToLoadVariable(text: string): string {
-        let indexOfDollarSign = text.indexOf('$');
-        if(indexOfDollarSign === -1) {
-            return text;
-        }
+        let groups = text.matchAll(this._variableMatchExp);
 
-        let beforeVariable = text.substr(0, indexOfDollarSign);
+        for (let group of groups) {
 
-        let indexOfEndOfPossibleVariable = this._getEndOfWordIndex(text, indexOfDollarSign);
-        let possibleVariable = text.substr(indexOfDollarSign + 1, indexOfEndOfPossibleVariable);
-        let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
-        if(loadedFromVariable) {
-            if(typeof loadedFromVariable === 'string') {
-                if(possibleVariable.startsWith('SECRETS')) {
-                    this.valuesReplacedBySecrets.push(loadedFromVariable);
+            if (group.length !== 3) {
+                console.log("Unable to process the extracted possible variable: ", group);
+                continue;
+            }
+
+            let possibleVariable = group[2];
+            let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
+
+            if (loadedFromVariable) {
+                try {
+                    if (typeof loadedFromVariable === 'string') {
+                        if (group[1]?.toUpperCase() === 'SECRETS:') {
+                            this.valuesReplacedBySecrets.push(loadedFromVariable);
+                        }
+                        return text.replace(group[0], loadedFromVariable);
+                    } else {
+                        return text.replace(group[0], stringify(loadedFromVariable));
+                    }
                 }
-                return beforeVariable + loadedFromVariable;
-            } else {
-                return beforeVariable + stringify(loadedFromVariable);
+                catch (e) {
+                    console.error(e);
+                }
             }
         }
 
         return text;
-    }
-
-    private _getEndOfWordIndex(text: string, startingIndex?: number): number {
-        let indexOfSpace = text.indexOf(' ', startingIndex ?? 0);
-        let indexOfComma = text.indexOf(',', startingIndex ?? 0);
-        let indexOfSemicolon = text.indexOf(';', startingIndex ?? 0);
-        let indexOfEnd = text.length - 1;
-
-        let values: number[] = [];
-
-        if(indexOfSpace !== -1) { values.push(indexOfSpace); }
-        if(indexOfComma !== -1) { values.push(indexOfComma); }
-        if(indexOfSemicolon !== -1) { values.push(indexOfSemicolon); }
-
-        return Math.min(... values, indexOfEnd);
     }
 }
