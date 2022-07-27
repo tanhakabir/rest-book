@@ -3,6 +3,9 @@
 	"compilerOptions": {
 		"composite": true,
 		"rootDir": ".",
-		"outDir": "../../out/common"
+		"outDir": "../../out/common",
+		"lib": [
+			"es2020.string"
+		]
 	}
 }

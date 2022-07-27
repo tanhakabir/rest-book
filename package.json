@@ -152,6 +152,7 @@
   "dependencies": {
     "-": "0.0.1",
     "@types/react": "^17.0.3",
+    "jsonpath-plus": "^7.0.0",
     "lodash": "^4.17.21",
     "preact": "^10.5.13",
     "save-dev": "0.0.1-security",

@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-var stringify = require('json-stringify-safe');
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method, RequestHeaderField } from './httpConstants';
 import * as cache from './cache';
+import { VariableParser } from './variableParser';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined
@@ -39,11 +39,10 @@ export class RequestParser {
     private variableName: string | undefined;
     private valuesReplacedBySecrets: string[] = [];
 
-    private readonly _variableMatchExp = /(?:\{\{)(SECRETS:)?([A-Za-z0-9._\-\[\]]*)(?:\}\})/ig;
 
     constructor(query: string, eol: vscode.EndOfLine) {
 
-        let linesOfText = query.split((eol == vscode.EndOfLine.LF ? '\n' : '\r\n'));
+        let linesOfText = query.split((eol === vscode.EndOfLine.LF ? '\n' : '\r\n'));
 
         if (linesOfText.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
@@ -55,7 +54,7 @@ export class RequestParser {
 
         this.originalRequest = this._parseOutVariableDeclarations();
 
-        if(this.originalRequest.length == 0) { return; }
+        if(this.originalRequest.length === 0) { return; }
 
         this.variableName = this._parseVariableName();
 
@@ -197,24 +196,26 @@ export class RequestParser {
             for (let i = 0; i < tokens.length; i++) {
                 let currentToken = tokens[i];
 
-                tokens[i] = this._attemptToLoadVariable(currentToken);
+                tokens[i] = VariableParser.instance.attemptToLoadVariable(currentToken, this.valuesReplacedBySecrets).value;
             }
 
             let returnValue = tokens.join('/');
             return returnValue;
         };
 
+        let urlToken = '';
+
         if (tokens.length === 1) {
-            let url = findAndReplaceVarsInUrl(tokens[0].split('?')[0]);
-            this.baseUrl = url;
-            return formatURL(url);
+            urlToken = tokens[0].split('?')[0];
         } else if (tokens.length === 2) {
-            let url = findAndReplaceVarsInUrl(tokens[1].split('?')[0]);
-            this.baseUrl = url;
-            return formatURL(url);
+            urlToken = tokens[1].split('?')[0];
+        } else {
+            throw new Error('Invalid URL given!');
         }
-            
-        throw new Error('Invalid URL given!');
+
+        let url = findAndReplaceVarsInUrl(urlToken);
+        this.baseUrl = url;
+        return formatURL(url);
     }
 
     private _parseQueryParams(): {[key: string] : string} | undefined {
@@ -242,7 +243,7 @@ export class RequestParser {
             let parts = p.split('=');
             if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`); }
 
-            params[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
+            params[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim(), this.valuesReplacedBySecrets).value;
             params[parts[0]] = params[parts[0]].replace(/%20/g, '+');
         }
 
@@ -274,7 +275,7 @@ export class RequestParser {
                 continue;
             }
 
-            headers[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
+            headers[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim(), this.valuesReplacedBySecrets).value;
             i++;
         }
 
@@ -327,38 +328,5 @@ export class RequestParser {
             // File doesn't exist
         }
         return;
-    }
-
-    private _attemptToLoadVariable(text: string): string {
-        let groups = text.matchAll(this._variableMatchExp);
-
-        for (let group of groups) {
-
-            if (group.length !== 3) {
-                console.log("Unable to process the extracted possible variable: ", group);
-                continue;
-            }
-
-            let possibleVariable = group[2];
-            let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
-
-            if (loadedFromVariable) {
-                try {
-                    if (typeof loadedFromVariable === 'string') {
-                        if (group[1]?.toUpperCase() === 'SECRETS:') {
-                            this.valuesReplacedBySecrets.push(loadedFromVariable);
-                        }
-                        return text.replace(group[0], loadedFromVariable);
-                    } else {
-                        return text.replace(group[0], stringify(loadedFromVariable));
-                    }
-                }
-                catch (e) {
-                    console.error(e);
-                }
-            }
-        }
-
-        return text;
     }
 }
