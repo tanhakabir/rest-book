@@ -116,15 +116,14 @@ export class VariableHoverProvider implements vscode.HoverProvider {
 
         const word = document.getText(range);
 
-        // FIXME: pass a valid secrets array
-        const variableResolveResult = VariableParser.instance.attemptToLoadVariable(word, []);
+        const variableResolveResult = VariableParser.instance.attemptToLoadVariable(word);
 
         let hoverContent = null;
         if (!variableResolveResult.hasResolved) {
-            hoverContent = new vscode.Hover(
-                new vscode.MarkdownString(
-                    `*Couldn't find a variable named* ${word}. Ensure the request declaring it has been sent or that the path is valid.`),
-                range);
+            let msgString = new vscode.MarkdownString(
+                `Couldn't find a variable named ${word}.<br/>Ensure the request declaring it has been sent or that the path is valid.`);
+            msgString.supportHtml = true;
+            hoverContent = new vscode.Hover(msgString, range);
         } else {
             hoverContent = new vscode.Hover(
                 new vscode.MarkdownString(`*Variable* ${word}: ${variableResolveResult.value}`),
@@ -156,8 +155,7 @@ export class VariableCompletionItemProvider implements vscode.CompletionItemProv
 
         varName = varName.substr(1, varName.length - 2);
 
-        // FIXME: pass a valid secrets array
-        let matchingData = VariableParser.instance.attemptToLoadVariable(varName, []);
+        let matchingData = VariableParser.instance.attemptToLoadVariable(varName);
 
         if (matchingData && typeof matchingData === 'object') {
             for (let key of Object.keys(matchingData)) {

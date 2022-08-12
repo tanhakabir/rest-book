@@ -37,8 +37,6 @@ export class RequestParser {
     private requestOptions: Request | undefined;
     private baseUrl?: string;
     private variableName: string | undefined;
-    private valuesReplacedBySecrets: string[] = [];
-
 
     constructor(query: string, eol: vscode.EndOfLine) {
 
@@ -88,24 +86,6 @@ export class RequestParser {
 
     getVariableName(): string | undefined {
         return this.variableName;
-    }
-
-    wasReplacedBySecret(text: string): boolean {
-        if(typeof text === 'string') {
-            for(let replaced of this.valuesReplacedBySecrets) {
-                if(text.includes(replaced)) {
-                    return true;
-                }
-            }
-        } else if(typeof text === 'number') {
-            for(let replaced of this.valuesReplacedBySecrets) {
-                if(`${text}`.includes(replaced)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     private _parseOutVariableDeclarations(): string[] {
@@ -196,7 +176,7 @@ export class RequestParser {
             for (let i = 0; i < tokens.length; i++) {
                 let currentToken = tokens[i];
 
-                tokens[i] = VariableParser.instance.attemptToLoadVariable(currentToken, this.valuesReplacedBySecrets).value;
+                tokens[i] = VariableParser.instance.attemptToLoadVariable(currentToken).value;
             }
 
             let returnValue = tokens.join('/');
@@ -243,7 +223,7 @@ export class RequestParser {
             let parts = p.split('=');
             if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`); }
 
-            params[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim(), this.valuesReplacedBySecrets).value;
+            params[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim()).value;
             params[parts[0]] = params[parts[0]].replace(/%20/g, '+');
         }
 
@@ -275,7 +255,7 @@ export class RequestParser {
                 continue;
             }
 
-            headers[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim(), this.valuesReplacedBySecrets).value;
+            headers[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim()).value;
             i++;
         }
 
@@ -298,14 +278,12 @@ export class RequestParser {
         let fileContents = this._attemptToLoadFile(bodyStr);
         if( fileContents ) { return fileContents; }
 
-        if(bodyStr.startsWith('$')) {
-            let variableContents = cache.attemptToLoadVariable(bodyStr.substr(1));
-            if( variableContents ) { 
-                if(bodyStr.startsWith('$SECRETS')) {
-                    this.valuesReplacedBySecrets.push(variableContents);
-                }
-                return variableContents;
-            }
+        let variableContents = VariableParser.instance.attemptToLoadVariable(
+            bodyStr
+        );
+
+        if (variableContents.hasResolved) {
+            return variableContents.value;
         }
 
         try {

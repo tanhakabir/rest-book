@@ -1,7 +1,8 @@
 var stringify = require('json-stringify-safe');
 import * as cache from './cache';
+import { getSecret } from './secrets';
 
-export interface IVariableResolveResult {
+export interface IVariableResult {
     value: any;
     hasResolved: boolean;
 }
@@ -11,6 +12,8 @@ export class VariableParser {
 
     public readonly dollarSignVarMatchExp = /\$[A-Za-z0-9.-\[\]]*/gi;
 
+    private _valuesReplacedBySecrets: string[] = [];
+
     private static _instance: VariableParser;
 
     public static get instance(): VariableParser {
@@ -19,21 +22,39 @@ export class VariableParser {
 
     constructor() { }
 
-    public attemptToLoadVariable(text: string, valuesReplacedBySecrets: string[]): IVariableResolveResult {
+    public attemptToLoadVariable(text: string): IVariableResult {
 
         const groups = Array.from(text.matchAll(this.curlyBracketsVarMatchExp));
 
         let resolvedVariableValue = null;
         if (groups.length > 0) {
-            resolvedVariableValue = this._attemptToLoadVariableFromRegex(text, groups, valuesReplacedBySecrets);
+            resolvedVariableValue = this._attemptToLoadVariableFromRegex(text, groups, this._valuesReplacedBySecrets);
         } else {
-            resolvedVariableValue = this._attemptToLoadVariableFromDollarToken(text, valuesReplacedBySecrets);
+            resolvedVariableValue = this._attemptToLoadVariableFromDollarToken(text, this._valuesReplacedBySecrets);
         }
 
         return {
             value: resolvedVariableValue,
             hasResolved: resolvedVariableValue !== text
         };
+    }
+
+    public wasReplacedBySecret(text: string): boolean {
+        if (typeof text === 'string') {
+            for (let replaced of this._valuesReplacedBySecrets) {
+                if (text.includes(replaced)) {
+                    return true;
+                }
+            }
+        } else if (typeof text === 'number') {
+            for (let replaced of this._valuesReplacedBySecrets) {
+                if (`${text}`.includes(replaced)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private _attemptToLoadVariableFromRegex(text: string, groups: RegExpMatchArray[], valuesReplacedBySecrets: string[]): string {
@@ -43,8 +64,11 @@ export class VariableParser {
                 continue;
             }
 
+            const isSecretLookup = group[1]?.toUpperCase() === 'SECRETS:';
             const possibleVariable = group[2];
-            const loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
+            const loadedFromVariable = isSecretLookup ?
+                getSecret(possibleVariable) :
+                cache.attemptToLoadVariable(possibleVariable);
 
             if (loadedFromVariable) {
                 try {
@@ -52,7 +76,9 @@ export class VariableParser {
                         return text.replace(group[0], stringify(loadedFromVariable));
                     }
 
-                    if (group[1]?.toUpperCase() === 'SECRETS:') {
+                    // Add the value into the list of values that won't be displayed in the sent request.
+                    // TODO: Possibly use an expression to forbid displaying the value of a secret by testing the key instead of the value
+                    if (isSecretLookup && valuesReplacedBySecrets.indexOf(loadedFromVariable) === -1) {
                         valuesReplacedBySecrets.push(loadedFromVariable);
                     }
                     return text.replace(group[0], loadedFromVariable);
@@ -67,6 +93,7 @@ export class VariableParser {
     }
 
     private _attemptToLoadVariableFromDollarToken(text: string, valuesReplacedBySecrets: string[]): string {
+        // TODO: Support multiple $ placeholders using the same replacement logic
         const indexOfDollarSign = text.indexOf('$');
         if (indexOfDollarSign === -1) {
             return text;
@@ -74,35 +101,44 @@ export class VariableParser {
 
         const beforeVariable = text.substring(0, indexOfDollarSign);
 
-        const indexOfEndOfPossibleVariable = this._getEndOfWordIndex(text, indexOfDollarSign) + 1;
+        const indexOfEndOfPossibleVariable = this._getEndOfWordIndex(text, indexOfDollarSign);
         const possibleVariable = text.substring(indexOfDollarSign + 1, indexOfEndOfPossibleVariable);
-        const loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
+
+        const isSecretLookup = possibleVariable.toUpperCase().startsWith('SECRETS:');
+        const loadedFromVariable = isSecretLookup ?
+            getSecret(possibleVariable.substring(8)) :
+            cache.attemptToLoadVariable(possibleVariable);
+
         if (loadedFromVariable) {
             if (typeof loadedFromVariable !== 'string') {
-                return beforeVariable + stringify(loadedFromVariable);
+                text = text.replace("$" + possibleVariable, stringify(loadedFromVariable));
+            } else {
+                text = text.replace("$" + possibleVariable, loadedFromVariable);
             }
 
-            if (possibleVariable.startsWith('SECRETS')) {
+            // Add the value into the list of values that won't be displayed in the sent request.
+            // TODO: Possibly use an expression to forbid displaying the value of a secret by testing the key instead of the value
+            if (isSecretLookup && valuesReplacedBySecrets.indexOf(loadedFromVariable) === -1) {
                 valuesReplacedBySecrets.push(loadedFromVariable);
             }
-            return beforeVariable + loadedFromVariable;
         }
 
         return text;
     }
 
     private _getEndOfWordIndex(text: string, startingIndex?: number): number {
-        let indexOfSpace = text.indexOf(' ', startingIndex ?? 0);
-        let indexOfComma = text.indexOf(',', startingIndex ?? 0);
-        let indexOfSemicolon = text.indexOf(';', startingIndex ?? 0);
-        let indexOfEnd = text.length - 1;
+        const indexOfEnd = text.length - 1;
 
-        let values: number[] = [];
+        let indexOfAcceptedDelimiters: number[] = [
+            text.indexOf(' ', startingIndex ?? 0),
+            text.indexOf(',', startingIndex ?? 0),
+            text.indexOf(';', startingIndex ?? 0),
+            text.indexOf('\n', startingIndex ?? 0),
+            text.indexOf('&', startingIndex ?? 0)
+        ];
 
-        if (indexOfSpace !== -1) { values.push(indexOfSpace); }
-        if (indexOfComma !== -1) { values.push(indexOfComma); }
-        if (indexOfSemicolon !== -1) { values.push(indexOfSemicolon); }
+        const positiveIndexes = indexOfAcceptedDelimiters.filter((indexValue) => indexValue !== -1);
 
-        return Math.min(...values, indexOfEnd);
+        return Math.min(...positiveIndexes, indexOfEnd);
     }
 }
