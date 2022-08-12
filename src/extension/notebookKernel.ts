@@ -61,13 +61,17 @@ export class NotebookKernel {
 
                 execution.end(true, Date.now());
             } catch (e) {
+                const errorMsg = e instanceof Error && e.message || stringify(e, undefined, 4);
                 execution.replaceOutput([
                     new vscode.NotebookCellOutput([
                         vscode.NotebookCellOutputItem.error({ 
                             name: e instanceof Error && e.name || 'error', 
-                            message: e instanceof Error && e.message || stringify(e, undefined, 4)})
+                            message: errorMsg})
                     ])
                 ]);
+                
+                vscode.window.showErrorMessage(
+                    `An error occured while processing the REST Book request: ${errorMsg}`, "OK");
                 execution.end(false, Date.now());
             }
         };
@@ -85,6 +89,7 @@ export class NotebookKernel {
             }
             
         } catch (err) {
+            const errorMsg = err instanceof Error && err.message || stringify(err, undefined, 4);
             execution.replaceOutput([
                 new vscode.NotebookCellOutput([
                     vscode.NotebookCellOutputItem.error({ 
@@ -92,6 +97,9 @@ export class NotebookKernel {
                             message: err instanceof Error && err.message || stringify(err, undefined, 4)})
                 ])
             ]);
+
+            vscode.window.showErrorMessage(
+                `An error occured while processing the REST Book request: ${errorMsg}`, "OK");
             execution.end(false, Date.now());
             return;
         }

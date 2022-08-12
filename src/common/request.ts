@@ -1,11 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
-var stringify = require('json-stringify-safe');
 import { pickBy, identity, isEmpty } from 'lodash';
 import { logDebug, formatURL, NAME } from './common';
 import * as vscode from 'vscode';
 import { Method, RequestHeaderField } from './httpConstants';
 import * as cache from './cache';
+import { VariableParser } from './variableParser';
 
 // full documentation available here: https://github.com/axios/axios#request-config
 // using default values for undefined
@@ -37,11 +37,10 @@ export class RequestParser {
     private requestOptions: Request | undefined;
     private baseUrl?: string;
     private variableName: string | undefined;
-    private valuesReplacedBySecrets: string[] = [];
 
     constructor(query: string, eol: vscode.EndOfLine) {
 
-        let linesOfText = query.split((eol == vscode.EndOfLine.LF ? '\n' : '\r\n'));
+        let linesOfText = query.split((eol === vscode.EndOfLine.LF ? '\n' : '\r\n'));
 
         if (linesOfText.filter(s => { return s; }).length === 0) {
             throw new Error('Please provide request information (at minimum a URL) before running the cell!');
@@ -53,7 +52,7 @@ export class RequestParser {
 
         this.originalRequest = this._parseOutVariableDeclarations();
 
-        if(this.originalRequest.length == 0) { return; }
+        if(this.originalRequest.length === 0) { return; }
 
         this.variableName = this._parseVariableName();
 
@@ -87,24 +86,6 @@ export class RequestParser {
 
     getVariableName(): string | undefined {
         return this.variableName;
-    }
-
-    wasReplacedBySecret(text: string): boolean {
-        if(typeof text === 'string') {
-            for(let replaced of this.valuesReplacedBySecrets) {
-                if(text.includes(replaced)) {
-                    return true;
-                }
-            }
-        } else if(typeof text === 'number') {
-            for(let replaced of this.valuesReplacedBySecrets) {
-                if(`${text}`.includes(replaced)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     private _parseOutVariableDeclarations(): string[] {
@@ -192,26 +173,29 @@ export class RequestParser {
         const findAndReplaceVarsInUrl = (url: string) => {
             let tokens = url.split('/');
 
-            for(let i = 0; i < tokens.length; i++) {
-                if(!tokens[i].startsWith('$')) { continue; }
+            for (let i = 0; i < tokens.length; i++) {
+                let currentToken = tokens[i];
 
-                tokens[i] = this._attemptToLoadVariable(tokens[i]);
+                tokens[i] = VariableParser.instance.attemptToLoadVariable(currentToken).value;
             }
 
-            return tokens.join('/');
+            let returnValue = tokens.join('/');
+            return returnValue;
         };
 
-        if(tokens.length === 1) {
-            let url = findAndReplaceVarsInUrl(tokens[0].split('?')[0]);
-            this.baseUrl = url;
-            return formatURL(url);
+        let urlToken = '';
+
+        if (tokens.length === 1) {
+            urlToken = tokens[0].split('?')[0];
         } else if (tokens.length === 2) {
-            let url = findAndReplaceVarsInUrl(tokens[1].split('?')[0]);
-            this.baseUrl = url;
-            return formatURL(url);
+            urlToken = tokens[1].split('?')[0];
+        } else {
+            throw new Error('Invalid URL given!');
         }
-            
-        throw new Error('Invalid URL given!');
+
+        let url = findAndReplaceVarsInUrl(urlToken);
+        this.baseUrl = url;
+        return formatURL(url);
     }
 
     private _parseQueryParams(): {[key: string] : string} | undefined {
@@ -239,7 +223,7 @@ export class RequestParser {
             let parts = p.split('=');
             if (parts.length !== 2) { throw new Error(`Invalid query paramter for ${p}`); }
 
-            params[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
+            params[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim()).value;
             params[parts[0]] = params[parts[0]].replace(/%20/g, '+');
         }
 
@@ -271,7 +255,7 @@ export class RequestParser {
                 continue;
             }
 
-            headers[parts[0]] = this._attemptToLoadVariable(parts[1].trim());
+            headers[parts[0]] = VariableParser.instance.attemptToLoadVariable(parts[1].trim()).value;
             i++;
         }
 
@@ -294,14 +278,12 @@ export class RequestParser {
         let fileContents = this._attemptToLoadFile(bodyStr);
         if( fileContents ) { return fileContents; }
 
-        if(bodyStr.startsWith('$')) {
-            let variableContents = cache.attemptToLoadVariable(bodyStr.substr(1));
-            if( variableContents ) { 
-                if(bodyStr.startsWith('$SECRETS')) {
-                    this.valuesReplacedBySecrets.push(variableContents);
-                }
-                return variableContents;
-            }
+        let variableContents = VariableParser.instance.attemptToLoadVariable(
+            bodyStr
+        );
+
+        if (variableContents.hasResolved) {
+            return variableContents.value;
         }
 
         try {
@@ -324,45 +306,5 @@ export class RequestParser {
             // File doesn't exist
         }
         return;
-    }
-
-    private _attemptToLoadVariable(text: string): string {
-        let indexOfDollarSign = text.indexOf('$');
-        if(indexOfDollarSign === -1) {
-            return text;
-        }
-
-        let beforeVariable = text.substr(0, indexOfDollarSign);
-
-        let indexOfEndOfPossibleVariable = this._getEndOfWordIndex(text, indexOfDollarSign);
-        let possibleVariable = text.substr(indexOfDollarSign + 1, indexOfEndOfPossibleVariable);
-        let loadedFromVariable = cache.attemptToLoadVariable(possibleVariable);
-        if(loadedFromVariable) {
-            if(typeof loadedFromVariable === 'string') {
-                if(possibleVariable.startsWith('SECRETS')) {
-                    this.valuesReplacedBySecrets.push(loadedFromVariable);
-                }
-                return beforeVariable + loadedFromVariable;
-            } else {
-                return beforeVariable + stringify(loadedFromVariable);
-            }
-        }
-
-        return text;
-    }
-
-    private _getEndOfWordIndex(text: string, startingIndex?: number): number {
-        let indexOfSpace = text.indexOf(' ', startingIndex ?? 0);
-        let indexOfComma = text.indexOf(',', startingIndex ?? 0);
-        let indexOfSemicolon = text.indexOf(';', startingIndex ?? 0);
-        let indexOfEnd = text.length - 1;
-
-        let values: number[] = [];
-
-        if(indexOfSpace !== -1) { values.push(indexOfSpace); }
-        if(indexOfComma !== -1) { values.push(indexOfComma); }
-        if(indexOfSemicolon !== -1) { values.push(indexOfSemicolon); }
-
-        return Math.min(... values, indexOfEnd);
     }
 }

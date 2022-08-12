@@ -11,6 +11,9 @@
             "include": "#variable"
         },
         {
+            "include": "#variableOther"
+        },
+        {
             "include": "#headerkey"
         },
         {
@@ -35,6 +38,10 @@
         },
         "variable": {
             "name": "variable",
+            "match": "(?:\\{\\{)(SECRETS:)?([A-Za-z0-9._\\-\\[\\]]*)(?:\\}\\})"
+        },
+        "variableOther": {
+            "name": "variable.other",
             "match": "\\$[A-Za-z0-9.-\\[\\]]*"
         },
         "json": {
