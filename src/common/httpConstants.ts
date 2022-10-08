@@ -100,7 +100,7 @@ export enum MIMEType {
     html = "text/html",
     xml = "text/xml",
     xmlApp = "application/xml",
-    js ="text/javascript",
+    js = "text/javascript",
     jsApp = "application/javascript",
     ecma = "application/ecmascript",
     ecmaApp = "text/ecmascript",

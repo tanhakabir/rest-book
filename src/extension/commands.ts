@@ -2,14 +2,14 @@ import * as vscode from 'vscode';
 import * as secrets from '../common/secrets';
 
 interface PickerResult {
-    id: string,
-    type: string
+	id: string,
+	type: string
 	value?: string
 }
 
 interface InputResult {
-    id: string,
-    value: string
+	id: string,
+	value: string
 }
 
 class SecretItem implements vscode.QuickPickItem {
@@ -24,8 +24,8 @@ class AddNewSecretItem implements vscode.QuickPickItem {
 
 class ViewSecretItem implements vscode.QuickPickItem {
 	public secretName: string;
-	public get label(): string { 
-		return `View the secret for ${this.secretName}...`; 
+	public get label(): string {
+		return `View the secret for ${this.secretName}...`;
 	}
 	public readonly alwaysShow = true;
 	constructor(secret: string) {
@@ -35,8 +35,8 @@ class ViewSecretItem implements vscode.QuickPickItem {
 
 class DeleteSecretItem implements vscode.QuickPickItem {
 	public secretName: string;
-	public get label(): string { 
-		return `Delete ${this.secretName}...`; 
+	public get label(): string {
+		return `Delete ${this.secretName}...`;
 	}
 	public readonly alwaysShow = true;
 	constructor(secret: string) {
@@ -56,7 +56,7 @@ class SetSecretName {
 	public readonly alwaysShow = true;
 
 	constructor(placeholder?: string) {
-		if(placeholder) { this.secretName = placeholder; }
+		if (placeholder) { this.secretName = placeholder; }
 	}
 }
 
@@ -70,7 +70,7 @@ class SetSecretValueItem {
 	public readonly alwaysShow = true;
 
 	constructor(placeholder?: string) {
-		if(placeholder) { this.secret = placeholder; }
+		if (placeholder) { this.secret = placeholder; }
 	}
 }
 
@@ -91,16 +91,16 @@ function _getSecretInput(state: InteractiveSecretInputState, autofills: SecretIn
 
 	quickInput.value = autofills.label;
 
-	switch(+state) {
+	switch (+state) {
 		case InteractiveSecretInputState.addSecretName:
-			if(autofills.label === '') {
+			if (autofills.label === '') {
 				quickInput.title = "Create a name for your secret";
 			} else {
 				quickInput.title = "Edit name of secret";
 			}
 			break;
 		case InteractiveSecretInputState.addSecretValue:
-			if(autofills.label === '') {
+			if (autofills.label === '') {
 				quickInput.title = "Add secret";
 			} else {
 				quickInput.title = "Edit secret";
@@ -111,7 +111,7 @@ function _getSecretInput(state: InteractiveSecretInputState, autofills: SecretIn
 	return quickInput;
 }
 
-async function _showSecretInput(state: InteractiveSecretInputState, autofills:SecretInputItem): Promise<InputResult> {
+async function _showSecretInput(state: InteractiveSecretInputState, autofills: SecretInputItem): Promise<InputResult> {
 	return new Promise<InputResult>((resolve, _) => {
 		const quickInput = _getSecretInput(state, autofills);
 
@@ -121,11 +121,11 @@ async function _showSecretInput(state: InteractiveSecretInputState, autofills:Se
 		};
 
 		quickInput.onDidAccept(() => {
-			if(autofills instanceof SetSecretName) {
-				resolve({value: quickInput.value, id: 'name'});
-			} else if(autofills instanceof SetSecretValueItem) {
+			if (autofills instanceof SetSecretName) {
+				resolve({ value: quickInput.value, id: 'name' });
+			} else if (autofills instanceof SetSecretValueItem) {
 				closeQuickInput();
-				resolve({value: quickInput.value, id: 'value'});
+				resolve({ value: quickInput.value, id: 'value' });
 			}
 		});
 
@@ -142,11 +142,11 @@ function _getSecretPicker(state: InteractiveSecretPickerState, extra?: string[] 
 		case InteractiveSecretPickerState.selectAction:
 			const secretListItems = (extra as string[]).map(b => new SecretItem(b));
 			quickPick.title = 'View an existing secret or add a new secret';
-			newQpItems = [ ... secretListItems];
+			newQpItems = [...secretListItems];
 			newQpItems.splice(0, 0, new AddNewSecretItem());
 			break;
 		case InteractiveSecretPickerState.editSecret:
-			if(typeof extra === 'string') {
+			if (typeof extra === 'string') {
 				quickPick.title = `View or delete ${extra}`;
 				newQpItems.push(new ViewSecretItem(extra));
 				newQpItems.push(new DeleteSecretItem(extra));
@@ -160,7 +160,7 @@ function _getSecretPicker(state: InteractiveSecretPickerState, extra?: string[] 
 }
 
 async function _showSecretPicker(state: InteractiveSecretPickerState, extra?: string[] | string): Promise<PickerResult | null> {
-    return new Promise<PickerResult | null>((resolve, _reject) => {
+	return new Promise<PickerResult | null>((resolve, _reject) => {
 		const quickPick = _getSecretPicker(state, extra);
 
 		let secret: String | undefined;
@@ -177,18 +177,18 @@ async function _showSecretPicker(state: InteractiveSecretPickerState, extra?: st
 			const selected = quickPick.selectedItems[0];
 			if (selected instanceof AddNewSecretItem) {
 				resolve({ type: 'command', id: 'new' });
-                return;
+				return;
 			}
 
 			if (selected instanceof ViewSecretItem) {
 				resolve({ type: 'command', id: 'view', value: extra as string });
-                return;
+				return;
 			}
 
 			if (selected instanceof DeleteSecretItem) {
 				resolve({ type: 'command', id: 'delete', value: extra as string });
 				closeQuickPick();
-                return;
+				return;
 			}
 
 			secret = selected.label;
@@ -198,25 +198,25 @@ async function _showSecretPicker(state: InteractiveSecretPickerState, extra?: st
 
 		quickPick.onDidHide(async () => {
 			if (secret) {
-				resolve({ type: 'secret', id:'secret', value: secret as string });
+				resolve({ type: 'secret', id: 'secret', value: secret as string });
 			} else {
 				resolve(null);
 			}
 		});
 
 		quickPick.show();
-    });
+	});
 }
 
-async function _useInteractiveSecretInput(state: InteractiveSecretInputState, secret? : string) {
-	let placeholder; 
-	if(secret) {
+async function _useInteractiveSecretInput(state: InteractiveSecretInputState, secret?: string) {
+	let placeholder;
+	if (secret) {
 		placeholder = secrets.getSecret(secret);
 	}
 
 	let inputResult;
 
-	switch(+state) {
+	switch (+state) {
 		case InteractiveSecretInputState.addSecretName:
 			inputResult = await _showSecretInput(state, new SetSecretName(placeholder));
 			break;
@@ -225,9 +225,9 @@ async function _useInteractiveSecretInput(state: InteractiveSecretInputState, se
 			break;
 	}
 
-	if(inputResult?.id === 'name') {
+	if (inputResult?.id === 'name') {
 		_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue, inputResult.value);
-	} else if(inputResult?.id === 'value' && secret) {
+	} else if (inputResult?.id === 'value' && secret) {
 		secrets.addSecret(secret, inputResult.value);
 		vscode.window.showInformationMessage(`Saved secret for ${secret}.`);
 	}
@@ -236,7 +236,7 @@ async function _useInteractiveSecretInput(state: InteractiveSecretInputState, se
 async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, extra?: string[] | string) {
 	const pickerResult = await _showSecretPicker(state, extra);
 
-	if(!pickerResult) { return; }
+	if (!pickerResult) { return; }
 
 	if (pickerResult.type === 'secret') {
 		_useInteractiveSecretPicker(InteractiveSecretPickerState.editSecret, pickerResult.value);
@@ -248,7 +248,7 @@ async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, 
 	}
 
 	if (pickerResult.type === 'command' && pickerResult.id === 'view') {
-		if(pickerResult.value) {
+		if (pickerResult.value) {
 			_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue, pickerResult.value);
 		} else {
 			_useInteractiveSecretInput(InteractiveSecretInputState.addSecretValue);
@@ -257,21 +257,21 @@ async function _useInteractiveSecretPicker(state: InteractiveSecretPickerState, 
 	}
 
 	if (pickerResult.type === 'command' && pickerResult.id === 'delete') {
-		if(pickerResult.value) { secrets.deleteSecret(pickerResult.value); }
+		if (pickerResult.value) { secrets.deleteSecret(pickerResult.value); }
 		vscode.window.showInformationMessage(`Deleted secret ${pickerResult.value}.`);
 		return;
 	}
 }
 
 export function registerCommands(extensionId: string): vscode.Disposable {
-    const subscriptions: vscode.Disposable[] = [];
+	const subscriptions: vscode.Disposable[] = [];
 
-    subscriptions.push(vscode.commands.registerCommand('rest-book.secrets', () => {
-        _useInteractiveSecretPicker(InteractiveSecretPickerState.selectAction, secrets.getNamesOfSecrets());
-    }));
+	subscriptions.push(vscode.commands.registerCommand('rest-book.secrets', () => {
+		_useInteractiveSecretPicker(InteractiveSecretPickerState.selectAction, secrets.getNamesOfSecrets());
+	}));
 
 	subscriptions.push(vscode.commands.registerCommand('rest-book.newNotebook', async () => {
-		const newNotebook = await vscode.workspace.openNotebookDocument('rest-book', 
+		const newNotebook = await vscode.workspace.openNotebookDocument('rest-book',
 			new vscode.NotebookData([
 				new vscode.NotebookCellData(vscode.NotebookCellKind.Code, '', 'rest-book')
 			]));
@@ -287,5 +287,5 @@ export function registerCommands(extensionId: string): vscode.Disposable {
 		);
 	}));
 
-    return vscode.Disposable.from(...subscriptions);
+	return vscode.Disposable.from(...subscriptions);
 }
