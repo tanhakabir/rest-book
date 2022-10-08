@@ -6,7 +6,7 @@ import './style.css';
 export const activate: ActivationFunction = (_context) => ({
 	renderOutputItem(data, element) {
 		try {
-			render(<Response response={data.json()}/>, element);
+			render(<Response response={data.json()} />, element);
 		} catch {
 			render(<p>Error!</p>, element);
 		}
